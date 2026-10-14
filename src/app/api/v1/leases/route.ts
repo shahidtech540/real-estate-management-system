@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "leases:write");
     return NextResponse.json(
-      { lease: createLease(ctx.organizationId, ctx.sub, await req.json()) },
+      { lease: createLease(ctx.organizationId, ctx.sub, await readJson(req)) },
       { status: 201 },
     );
   } catch (e) {
@@ -55,7 +56,7 @@ export async function PATCH(req: NextRequest) {
         newEndDate: dateSchema.optional(),
         applyEscalation: z.boolean().optional(),
       }),
-      await req.json(),
+      await readJson(req),
     );
     return NextResponse.json({
       lease: updateLeaseLifecycle(ctx.organizationId, ctx.sub, body.id, body),

@@ -1,3 +1,4 @@
+import {productionDeployment} from "@/server/security/config";
 import { NextResponse } from "next/server";
 import { getDb } from "@/server/db";
 
@@ -12,13 +13,13 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     service: "rems-agentic-platform",
-    phase: 7,
+    phase: 8,
     timestamp: new Date().toISOString(),
     dbLatencyMs: latencyMs,
-    metrics: {
+    ...(productionDeployment()?{}:{metrics: {
       organizations: orgCount,
       companyProperties: propCount,
       companyUnits: unitCount,
-    },
+    }}),
   });
 }

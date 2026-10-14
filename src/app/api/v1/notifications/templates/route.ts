@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     return NextResponse.json({
-      templates: saveTemplate(requireAuth(req), await req.json()),
+      templates: saveTemplate(requireAuth(req), await readJson(req)),
     });
   } catch (e) {
     return handleApiError(e);

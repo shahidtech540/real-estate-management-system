@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
@@ -27,7 +28,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         action: z.enum(["triage", "assign", "work_order", "confirm"]),
         data: z.unknown(),
       }),
-      await req.json(),
+      await readJson(req),
     );
     const result =
       action === "triage"

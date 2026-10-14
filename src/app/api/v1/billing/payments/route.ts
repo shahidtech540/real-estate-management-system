@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
   try {
     const ctx = requireAuth(req);
     requirePermission(ctx, "payments:write");
-    const body = valid(paymentSchema, await req.json());
+    const body = valid(paymentSchema, await readJson(req));
     return NextResponse.json(recordPayment(ctx.organizationId, ctx.sub, body), {
       status: 201,
     });

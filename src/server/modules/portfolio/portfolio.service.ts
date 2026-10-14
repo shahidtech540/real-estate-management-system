@@ -452,6 +452,7 @@ export function createBuilding(
 
 export function listUnits(params: {
   organizationId: string;
+  ownerUserId?: string;
   propertyId?: string;
   buildingId?: string;
   type?: string;
@@ -467,6 +468,10 @@ export function listUnits(params: {
   let where = "WHERE u.organization_id = ? AND u.deleted_at IS NULL";
   const args: (string | number)[] = [params.organizationId];
 
+  if (params.ownerUserId !== undefined) {
+    where += " AND EXISTS (SELECT 1 FROM property_owners po JOIN owners o ON o.id=po.owner_id AND o.organization_id=po.organization_id WHERE po.organization_id=u.organization_id AND po.property_id=u.property_id AND po.deleted_at IS NULL AND o.deleted_at IS NULL AND o.user_id=?)";
+    args.push(params.ownerUserId);
+  }
   if (params.propertyId) {
     where += " AND u.property_id = ?";
     args.push(params.propertyId);

@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
@@ -16,7 +17,7 @@ export async function POST(
           ctx.organizationId,
           ctx.sub,
           id,
-          await req.json(),
+          await readJson(req),
         ),
       },
       { status: 201 },

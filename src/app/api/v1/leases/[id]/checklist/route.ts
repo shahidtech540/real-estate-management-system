@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import {
   requireAuth,
@@ -46,7 +47,7 @@ export async function PUT(
         ctx.organizationId,
         ctx.sub,
         id,
-        await req.json(),
+        await readJson(req),
       ),
     });
   } catch (e) {

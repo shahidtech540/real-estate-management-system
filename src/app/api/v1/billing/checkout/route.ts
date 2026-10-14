@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
         amountMinor: moneySchema.positive(),
         requestId: z.string().min(8),
       }),
-      await req.json(),
+      await readJson(req),
     );
     const confirmation = getPaymentGateway(b.method).confirm(b);
     return NextResponse.json(

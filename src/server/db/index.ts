@@ -1,3 +1,5 @@
+import {validateDeployment,productionDeployment} from "../security/config";
+import {migratePhase8} from "./phase8";
 import type { DatabaseSync as DatabaseSyncType } from "node:sqlite";
 import { createRequire } from "node:module";
 import fs from "node:fs";
@@ -22,6 +24,7 @@ export function getDb(): DatabaseSyncType {
     return dbInstance;
   }
 
+  validateDeployment();
   const isTest = process.env.NODE_ENV === "test";
   const configuredPath = process.env.SQLITE_DB_PATH;
   const dbPath = configuredPath
@@ -38,7 +41,7 @@ export function getDb(): DatabaseSyncType {
   }
 
   dbInstance = new DatabaseSync(dbPath);
-  dbInstance.exec("PRAGMA busy_timeout = 5000;");
+  dbInstance.exec("PRAGMA busy_timeout = 5000; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;");
   dbInstance.exec(SCHEMA_DDL);
   // Additive Phase 3 migration: preserve previously created tenant records.
   if (
@@ -52,15 +55,17 @@ export function getDb(): DatabaseSyncType {
     );
   }
   migratePhase4(dbInstance);
-  seedDatabase(dbInstance);
-  seedPhase4(dbInstance);
+  if(!productionDeployment()){seedDatabase(dbInstance);seedPhase4(dbInstance);}
+  else if(!dbInstance.prepare("SELECT id FROM organizations WHERE deleted_at IS NULL").get()){dbInstance.close();dbInstance=null;throw new Error("Empty production database: run production provisioning; demo seeding is disabled.");}
   // Regression suites intentionally retain the original multi-org fixture world.
   // Production, preview and browser tests always use the real business profile.
-  if (process.env.NODE_ENV !== "test") applyBusinessProfile(dbInstance);
+  if (process.env.NODE_ENV !== "test" && !productionDeployment()) applyBusinessProfile(dbInstance);
   migratePhase5(dbInstance);
   seedPhase5(dbInstance);
   migratePhase6(dbInstance);
   migratePhase7(dbInstance);
+  migratePhase8(dbInstance);
+  if(productionDeployment()&&dbInstance.prepare("SELECT id FROM users WHERE status='active' AND deleted_at IS NULL AND email LIKE '%@fahadrealestate.test'").get()){dbInstance.close();dbInstance=null;throw new Error("Suspend demo accounts before using production deployment mode.");}
 
   return dbInstance;
 }

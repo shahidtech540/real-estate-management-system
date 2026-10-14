@@ -15,7 +15,7 @@ company/branch/project assumptions in the historical logs below.
   **90/90 unit/integration tests** and **19/19 browser tests** pass, with production
   build/typecheck green (Phases 0–4 only).
 - Local backup made before preview migration. Details: [`docs/BUSINESS_PROFILE.md`](docs/BUSINESS_PROFILE.md).
-- **Phases 5–7 completed for their documented local scopes. Phase 8 awaits approval. PR #2 remains unmerged.**
+- **Phases 5–8 completed for their documented local scopes. Stop after Phase 8; PR #2 remains unmerged.**
 
 ## Phase Summary Matrix
 
@@ -29,7 +29,7 @@ company/branch/project assumptions in the historical logs below.
 | **Phase 5** | Accounting, dashboards, reports, exports | ✅ Completed (property-operations / local scope) | 112 unit tests; 21 browser tests; 95.07% statements | Immutable balanced ledger, source posting/reconciliation, expenses/receipts, budgets, KPIs, CSV/XLSX/PDF, personal digests |
 | **Phase 6** | Agent orchestration layer, approval queue, audit, kill switch | ✅ Completed (local structured-plan scope) | 142 unit/integration; 24 browser workflows | Versioned allowlist, durable cursor, independent source-bound approvals, budgets, fresh RBAC and org/agent kill controls |
 | **Phase 7** | Lead, Listing, Rent, Maintenance, Lease & Insights agents + eval suite | ✅ Completed (local rules / lexical-retrieval scope) | 125 domain evaluations + 20 integration tests; 287 total tests; 30 browser workflows | Six source-backed assessments, bilingual drafts, cited retrieval, private/nonbinding approved actions and stale-proposal/permission controls |
-| **Phase 8** | Tenant/owner portals, hardening, performance, docs, deployment guide | ⏳ Pending | — | Dedicated Owner & Tenant portals, OWASP security hardening, OpenAPI spec, runbook, user guides |
+| **Phase 8** | Tenant/owner portals, hardening, performance, docs, deployment guide | ✅ Completed (local portals / opt-in production controls) | 47 new tests; 334 total tests; 33 demo browser workflows + 1 production smoke; 92.54% statements | Scoped bilingual portals, explicit account linkage, nonbinding consent, session/body/origin/rate hardening, verified backup/provisioning, OpenAPI and deployment runbook |
 
 ---
 
@@ -256,3 +256,76 @@ verification, a protected workspace, reload and logout. PR #2 stays unmerged.
   at mobile width in both English and Urdu, and short-preview content visibility.
 - Tightened a sign-in test locator to distinguish the error message from Next.js's
   screen-reader route announcer. Authentication regressions continue to pass.
+
+
+## Phase 8 checkpoint — completed 2026-10-15
+
+### Delivered
+
+- Dedicated `/portal/tenant`, `/portal/owner`, role-directed `/portal` and staff
+  source-bound consent UI; guided bilingual navigation and mobile RTL, record cards,
+  active-unit tenant submission/confirmation, unsigned lease/owner statement PDFs,
+  authorized vault metadata and in-app messages.
+- Fresh personal profile/organization scopes, 20/default and 50/max stable pagination;
+  whole-property owner invoice balance explicitly not a payout share. Administrator
+  identity-verified account linkage/unlinking/replacement is audited, role-matched and
+  server-owned. No email auto-linking, unlinked full-org fallback or privacy leak via
+  legacy dashboard/user/owner/property/unit/vault routes. Same-property **other-unit**
+  vault records remain private to their own tenants.
+- Immutable source-hashed owner acknowledgements, stale-source/final decision
+  rejection and current property-ownership recheck. Consent never mutates money or
+  contracts and does not bypass Phase 6/7 independent approvals/secondary permissions.
+- Strong new passwords, fresh active RBAC/token-version checks, atomic refresh and
+  account-wide logout revocation; secure production cookies, Origin defense even
+  with expired access, streamed bounded object JSON, persistent fixed-window quotas,
+  runtime CSP/security headers/private APIs, published-only anonymous lead targeting.
+- Explicit production startup/provisioning controls: absent-path empty real-business
+  bootstrap (one RYK office/admin/RBAC/local agents, zero inventory or financial
+  fixtures), real-email/14+ character account passwords, distinct secrets, no active
+  demo users/implicit demo seeding, no initial HTML demo credentials, no wildcard
+  frames or public business metrics. CLI online backup includes committed WAL and
+  verifies copied integrity/foreign keys, without overwriting existing paths.
+- Updated Next/Vitest/PostCSS and compatible npm lock; runtime `tsx` CLIs, non-root
+  pruned Docker runtime and secret/data-safe build context. SQLite workers share one
+  volume; Postgres/Redis/MinIO design services are opt-in, not runtime switches.
+- Route-complete OpenAPI inventory (50 routes/91 operations), typed new portal
+  requests, static consistency validator, API/user/deployment/recovery guides,
+  decisions/model/README updates and expanded CI gates.
+
+### Final local verification
+
+- **334/334 tests across 13 files** (287 previous + **47 Phase 8**); additive money/
+  history equality, negative scopes/ownership, linkage, stale/final consent, fresh
+  roles/revocation, malformed cookie/hash/JSON, expiry/body/CSRF/rates/config and
+  production bootstrap + verified backup subprocess checks.
+- Coverage: **92.54% statements, 93.21% lines, 83.43% branches, 98.22% functions**;
+  exceeds all configured thresholds. Typecheck and production build passed.
+- **33/33 demo Chromium workflows**: all previous 30 plus tenant portal finance/
+  maintenance/vault/logout/Urdu, owner consent/PDF and negative personal access.
+  Separate **1/1 production smoke**: runtime CSP/HSTS, secure cookies, no initial
+  demo credentials/cards, no financial fixtures, disabled role switch, weak-password
+  rejection. Browser DBs are isolated synthetic fixtures, not a business deployment.
+- Prisma/Compose static validation and OpenAPI route/schema checks passed. Docker
+  execution was unavailable; no container-runtime success is claimed.
+- Performance: **10,000 additional synthetic in-memory invoices**, 50 bounded
+  20-record reads, median **3.41 ms**, p95 **6.59 ms**, against 1,000 ms smoke budget.
+  This is not concurrent production load/SLA evidence.
+- **Runtime npm audit: 0 known vulnerabilities. Full graph: 5 high, 0 critical**,
+  remaining Tailwind/braces build-chain advisories documented, not hidden.
+- Regenerated lock verified with clean npm 10 `npm ci`; no npm 11 requirement.
+
+### Runtime / stop boundary
+
+The prior runtime DB/backups were absent in the restored workspace; the running
+`data/phase8-demo.sqlite` is a **fresh demo**, not recovered business history.
+No financial source data was represented as recovered or promoted into production.
+Local migration preservation tests are not claims about a missing historic DB.
+
+Read [`docs/PHASE8.md`](docs/PHASE8.md), [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
+and [`docs/API.md`](docs/API.md). `npm ci && npm run dev`; sign in with the matching
+owner/tenant demo account and visit the personal portal. Deployment instructions
+opt into empty production provisioning; backups/upgrade rehearsals preserve history.
+
+**Stop after Phase 8. No later implementation or PR #2 merge without further
+user authorization. Live integrations and independent launch review remain outside
+this completed local checkpoint.**

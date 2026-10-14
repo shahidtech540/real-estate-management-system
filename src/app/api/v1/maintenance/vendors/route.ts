@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     return NextResponse.json(
-      { vendor: saveVendor(requireAuth(req), await req.json()) },
+      { vendor: saveVendor(requireAuth(req), await readJson(req)) },
       { status: 201 },
     );
   } catch (e) {
@@ -37,7 +38,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const b = valid(
       z.object({ id: z.string().min(1), data: z.unknown() }),
-      await req.json(),
+      await readJson(req),
     );
     return NextResponse.json({
       vendor: saveVendor(requireAuth(req), b.data, b.id),

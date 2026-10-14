@@ -139,6 +139,7 @@ model User {
   fullName         String         @map("full_name")
   phone            String?
   locale           String         @default("en")
+  tokenVersion Int @default(0) @map("token_version")
   twoFactorEnabled Boolean        @default(false) @map("two_factor_enabled")
   twoFactorSecret  String?        @map("two_factor_secret")
   status           String         @default("active")
@@ -1136,4 +1137,30 @@ model AgentArtifact {
   organization Organization @relation(fields: [organizationId], references: [id])
   @@unique([organizationId, reference])
   @@map("agent_artifacts")
+}
+
+model PortalReview {
+ id String @id @default(cuid())
+ organizationId String @map("organization_id")
+ ownerId String @map("owner_id")
+ propertyId String @map("property_id")
+ entityType String @map("entity_type")
+ entityId String @map("entity_id")
+ summary String
+ proposedCostMinor BigInt @map("proposed_cost_minor")
+ sourceHash String @map("source_hash")
+ status String @default("pending")
+ decisionNote String? @map("decision_note")
+ createdAt DateTime @default(now()) @map("created_at")
+ createdBy String @map("created_by")
+ reviewedAt DateTime? @map("reviewed_at")
+ reviewedBy String? @map("reviewed_by")
+ @@index([organizationId,ownerId,status,createdAt])
+ @@map("portal_reviews")
+}
+model AuthRateLimit {
+ key String @id
+ count Int
+ resetAt Int @map("reset_at")
+ @@map("auth_rate_limits")
 }

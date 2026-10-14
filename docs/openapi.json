@@ -1,0 +1,5321 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Fahad Real Estate API",
+    "version": "0.8.0",
+    "description": "Route-complete operation inventory; detailed typed Phase 8 personal-portal contracts. Local SQLite, rules/retrieval and mock-provider scope. Credentials are never URL parameters."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/v1/accounting": {
+      "get": {
+        "operationId": "get__api_v1_accounting",
+        "summary": "GET /api/v1/accounting",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_accounting",
+        "summary": "POST /api/v1/accounting",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/audit-logs": {
+      "get": {
+        "operationId": "get__api_v1_admin_audit_logs",
+        "summary": "GET /api/v1/admin/audit-logs",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/admin/branches": {
+      "get": {
+        "operationId": "get__api_v1_admin_branches",
+        "summary": "GET /api/v1/admin/branches",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_admin_branches",
+        "summary": "POST /api/v1/admin/branches",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles": {
+      "get": {
+        "operationId": "get__api_v1_admin_roles",
+        "summary": "GET /api/v1/admin/roles",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_admin_roles",
+        "summary": "PATCH /api/v1/admin/roles",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "operationId": "get__api_v1_admin_users",
+        "summary": "GET /api/v1/admin/users",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_admin_users",
+        "summary": "POST /api/v1/admin/users",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_admin_users",
+        "summary": "PATCH /api/v1/admin/users",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/domain": {
+      "get": {
+        "operationId": "get__api_v1_agents_domain",
+        "summary": "GET /api/v1/agents/domain",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_agents_domain",
+        "summary": "POST /api/v1/agents/domain",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents": {
+      "get": {
+        "operationId": "get__api_v1_agents",
+        "summary": "GET /api/v1/agents",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_agents",
+        "summary": "POST /api/v1/agents",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/2fa": {
+      "post": {
+        "operationId": "post__api_v1_auth_2fa",
+        "summary": "POST /api/v1/auth/2fa",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/context": {
+      "post": {
+        "operationId": "post__api_v1_auth_context",
+        "summary": "POST /api/v1/auth/context",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "get": {
+        "operationId": "get__api_v1_auth_login",
+        "summary": "GET /api/v1/auth/login",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_auth_login",
+        "summary": "POST /api/v1/auth/login",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "post__api_v1_auth_logout",
+        "summary": "POST /api/v1/auth/logout",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "get__api_v1_auth_me",
+        "summary": "GET /api/v1/auth/me",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "operationId": "post__api_v1_auth_refresh",
+        "summary": "POST /api/v1/auth/refresh",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/billing/arrears": {
+      "get": {
+        "operationId": "get__api_v1_billing_arrears",
+        "summary": "GET /api/v1/billing/arrears",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/billing/checkout": {
+      "post": {
+        "operationId": "post__api_v1_billing_checkout",
+        "summary": "POST /api/v1/billing/checkout",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/billing/invoices": {
+      "get": {
+        "operationId": "get__api_v1_billing_invoices",
+        "summary": "GET /api/v1/billing/invoices",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_billing_invoices",
+        "summary": "POST /api/v1/billing/invoices",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_billing_invoices",
+        "summary": "PATCH /api/v1/billing/invoices",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/billing/payments": {
+      "get": {
+        "operationId": "get__api_v1_billing_payments",
+        "summary": "GET /api/v1/billing/payments",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_billing_payments",
+        "summary": "POST /api/v1/billing/payments",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/billing/receipts/{id}": {
+      "get": {
+        "operationId": "get__api_v1_billing_receipts_id_",
+        "summary": "GET /api/v1/billing/receipts/{id}",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/billing/statements": {
+      "get": {
+        "operationId": "get__api_v1_billing_statements",
+        "summary": "GET /api/v1/billing/statements",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_billing_statements",
+        "summary": "POST /api/v1/billing/statements",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_billing_statements",
+        "summary": "PATCH /api/v1/billing/statements",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/buildings": {
+      "get": {
+        "operationId": "get__api_v1_buildings",
+        "summary": "GET /api/v1/buildings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_buildings",
+        "summary": "POST /api/v1/buildings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/crm/deals": {
+      "get": {
+        "operationId": "get__api_v1_crm_deals",
+        "summary": "GET /api/v1/crm/deals",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_crm_deals",
+        "summary": "POST /api/v1/crm/deals",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/crm/leads": {
+      "get": {
+        "operationId": "get__api_v1_crm_leads",
+        "summary": "GET /api/v1/crm/leads",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_crm_leads",
+        "summary": "POST /api/v1/crm/leads",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_crm_leads",
+        "summary": "PATCH /api/v1/crm/leads",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/crm/viewings": {
+      "get": {
+        "operationId": "get__api_v1_crm_viewings",
+        "summary": "GET /api/v1/crm/viewings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_crm_viewings",
+        "summary": "POST /api/v1/crm/viewings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_crm_viewings",
+        "summary": "PATCH /api/v1/crm/viewings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{id}/access": {
+      "post": {
+        "operationId": "post__api_v1_documents_id_access",
+        "summary": "POST /api/v1/documents/{id}/access",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents": {
+      "get": {
+        "operationId": "get__api_v1_documents",
+        "summary": "GET /api/v1/documents",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_documents",
+        "summary": "POST /api/v1/documents",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "get__api_v1_health",
+        "summary": "GET /api/v1/health",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/leases/{id}/agreement": {
+      "get": {
+        "operationId": "get__api_v1_leases_id_agreement",
+        "summary": "GET /api/v1/leases/{id}/agreement",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/leases/{id}/checklist": {
+      "get": {
+        "operationId": "get__api_v1_leases_id_checklist",
+        "summary": "GET /api/v1/leases/{id}/checklist",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "put": {
+        "operationId": "put__api_v1_leases_id_checklist",
+        "summary": "PUT /api/v1/leases/{id}/checklist",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leases/{id}/deposit": {
+      "post": {
+        "operationId": "post__api_v1_leases_id_deposit",
+        "summary": "POST /api/v1/leases/{id}/deposit",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leases": {
+      "get": {
+        "operationId": "get__api_v1_leases",
+        "summary": "GET /api/v1/leases",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_leases",
+        "summary": "POST /api/v1/leases",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_leases",
+        "summary": "PATCH /api/v1/leases",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/listings/{slug}": {
+      "get": {
+        "operationId": "get__api_v1_listings_slug_",
+        "summary": "GET /api/v1/listings/{slug}",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/listings/feed": {
+      "get": {
+        "operationId": "get__api_v1_listings_feed",
+        "summary": "GET /api/v1/listings/feed",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/listings": {
+      "get": {
+        "operationId": "get__api_v1_listings",
+        "summary": "GET /api/v1/listings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_listings",
+        "summary": "POST /api/v1/listings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_listings",
+        "summary": "PATCH /api/v1/listings",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maintenance/cycle": {
+      "post": {
+        "operationId": "post__api_v1_maintenance_cycle",
+        "summary": "POST /api/v1/maintenance/cycle",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maintenance/schedules": {
+      "post": {
+        "operationId": "post__api_v1_maintenance_schedules",
+        "summary": "POST /api/v1/maintenance/schedules",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_maintenance_schedules",
+        "summary": "PATCH /api/v1/maintenance/schedules",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maintenance/tickets/{id}": {
+      "get": {
+        "operationId": "get__api_v1_maintenance_tickets_id_",
+        "summary": "GET /api/v1/maintenance/tickets/{id}",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_maintenance_tickets_id_",
+        "summary": "PATCH /api/v1/maintenance/tickets/{id}",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maintenance/tickets": {
+      "get": {
+        "operationId": "get__api_v1_maintenance_tickets",
+        "summary": "GET /api/v1/maintenance/tickets",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_maintenance_tickets",
+        "summary": "POST /api/v1/maintenance/tickets",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/maintenance/vendors": {
+      "get": {
+        "operationId": "get__api_v1_maintenance_vendors",
+        "summary": "GET /api/v1/maintenance/vendors",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_maintenance_vendors",
+        "summary": "POST /api/v1/maintenance/vendors",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_maintenance_vendors",
+        "summary": "PATCH /api/v1/maintenance/vendors",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/dispatch": {
+      "post": {
+        "operationId": "post__api_v1_notifications_dispatch",
+        "summary": "POST /api/v1/notifications/dispatch",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "get__api_v1_notifications",
+        "summary": "GET /api/v1/notifications",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_notifications",
+        "summary": "POST /api/v1/notifications",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_notifications",
+        "summary": "PATCH /api/v1/notifications",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/notifications/templates": {
+      "get": {
+        "operationId": "get__api_v1_notifications_templates",
+        "summary": "GET /api/v1/notifications/templates",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "put": {
+        "operationId": "put__api_v1_notifications_templates",
+        "summary": "PUT /api/v1/notifications/templates",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/owners": {
+      "get": {
+        "operationId": "get__api_v1_owners",
+        "summary": "GET /api/v1/owners",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_owners",
+        "summary": "POST /api/v1/owners",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "put__api_v1_owners",
+        "summary": "PUT /api/v1/owners",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal": {
+      "get": {
+        "operationId": "get__api_v1_portal",
+        "summary": "GET /api/v1/portal",
+        "description": "Authenticated personal scope is derived from current role and database-linked user profiles; no client identity override. Without resource returns summary/staff consent options; with resource returns paged minimized records. Staff cannot request personal collections.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "leases",
+                "invoices",
+                "payments",
+                "tickets",
+                "properties",
+                "units",
+                "statements",
+                "reviews",
+                "notifications"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PortalPage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/PortalSummary"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_portal",
+        "summary": "POST /api/v1/portal",
+        "description": "Administrator explicitly links/unlinks existing profiles and matching-role accounts after offline identity verification; changes are audited. Staff requests an immutable source-bound linked-owner acknowledgement. Only that owner decides; no automatic business/financial write or contract execution. Independent agent/staff approvals are still required.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "201": {
+            "description": "Created request or final nonbinding consent acknowledgement."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "409": {
+            "description": "Source changed or decision already final."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ConsentRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ConsentDecision"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ProfileLink"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portfolio/import-csv": {
+      "post": {
+        "operationId": "post__api_v1_portfolio_import_csv",
+        "summary": "POST /api/v1/portfolio/import-csv",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/properties/{id}": {
+      "get": {
+        "operationId": "get__api_v1_properties_id_",
+        "summary": "GET /api/v1/properties/{id}",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/properties": {
+      "get": {
+        "operationId": "get__api_v1_properties",
+        "summary": "GET /api/v1/properties",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_properties",
+        "summary": "POST /api/v1/properties",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/leads": {
+      "post": {
+        "operationId": "post__api_v1_public_leads",
+        "summary": "POST /api/v1/public/leads",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "operationId": "get__api_v1_reports",
+        "summary": "GET /api/v1/reports",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      }
+    },
+    "/api/v1/tenants": {
+      "get": {
+        "operationId": "get__api_v1_tenants",
+        "summary": "GET /api/v1/tenants",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_tenants",
+        "summary": "POST /api/v1/tenants",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_tenants",
+        "summary": "PATCH /api/v1/tenants",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/units": {
+      "get": {
+        "operationId": "get__api_v1_units",
+        "summary": "GET /api/v1/units",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_units",
+        "summary": "POST /api/v1/units",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_units",
+        "summary": "PATCH /api/v1/units",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "rems_access_token",
+        "description": "HttpOnly session transport; fresh identical validation and Origin defense for mutations."
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "previewHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-REMS-Access-Token",
+        "description": "Same signed JWT, identical validation; no privileged fallback."
+      }
+    },
+    "schemas": {
+      "ProfileLink": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "profileType",
+          "profileId",
+          "userId"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "link_profile"
+            ]
+          },
+          "profileType": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "tenant"
+            ]
+          },
+          "profileId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Active same-organization matching-role account; null explicitly unlinks. Requires admin:manage plus the domain profile write permission."
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PortalPage": {
+        "type": "object",
+        "required": [
+          "resource",
+          "page",
+          "limit",
+          "hasMore",
+          "items",
+          "currency"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 50
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "description": "Minimized role-scoped source DTO; schema depends on selected collection."
+            }
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "PKR"
+            ]
+          }
+        }
+      },
+      "PortalSummary": {
+        "type": "object",
+        "required": [
+          "role",
+          "company",
+          "linkedProfiles",
+          "outstandingMinor",
+          "options"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "tenant",
+              "staff"
+            ]
+          },
+          "company": {
+            "type": "string"
+          },
+          "linkedProfiles": {
+            "type": "integer"
+          },
+          "outstandingMinor": {
+            "type": "integer",
+            "description": "Recorded invoice balances. Owner value is whole-property balance, not pro-rata payout."
+          },
+          "options": {
+            "type": "object"
+          }
+        }
+      },
+      "ConsentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "ownerId",
+          "entityType",
+          "entityId",
+          "summary"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "request_consent"
+            ]
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string",
+            "enum": [
+              "lease",
+              "maintenance"
+            ]
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 1200
+          },
+          "proposedCostMinor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000000,
+            "default": 0
+          }
+        }
+      },
+      "ConsentDecision": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "id",
+          "decision",
+          "note"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "decide_consent"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000
+          }
+        }
+      }
+    }
+  }
+}

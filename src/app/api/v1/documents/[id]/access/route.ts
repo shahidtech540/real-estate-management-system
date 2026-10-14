@@ -1,6 +1,9 @@
+import {getDb} from "@/server/db";
+import {canReadDocument} from "@/server/modules/shared/access";
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAuth, requirePermission } from "@/server/auth/guards";
+import { requireAuth, requirePermission,HttpError } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
 import { recordDocumentAccess } from "@/server/modules/documents/documents.service";
 
@@ -17,9 +20,11 @@ export async function POST(
     requirePermission(ctx, "documents:read");
 
     const { id } = await context.params;
+    const doc=getDb().prepare("SELECT entity_type,entity_id FROM documents WHERE organization_id=? AND id=? AND deleted_at IS NULL").get(ctx.organizationId,id);
+    if(!doc||!canReadDocument(ctx,String(doc.entity_type),String(doc.entity_id)))throw new HttpError(404,"NOT_FOUND","Document not found.");
     let accessType: "view" | "download" = "view";
     try {
-      const body = await req.json();
+      const body = await readJson(req);
       const parsed = accessSchema.safeParse(body);
       if (parsed.success) {
         accessType = parsed.data.accessType;

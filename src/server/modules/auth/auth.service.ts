@@ -1,3 +1,6 @@
+import {atomic} from "../shared/domain";
+import {productionDeployment} from "../../security/config";
+import {hashPassword} from "../../auth/crypto";
 import crypto from "node:crypto";
 import { getDb } from "../../db";
 import {
@@ -174,6 +177,7 @@ function issueTokensForUser(
   const refreshExpiresSeconds = 7 * 24 * 3600; // 7 days
 
   const jwtPayload: Omit<JwtPayload, "iat" | "exp"> = {
+    tokenVersion:Number(getDb().prepare("SELECT token_version FROM users WHERE id=? AND organization_id=?").get(userView.id,userView.organization.id)!.token_version),
     sub: userView.id,
     email: userView.email,
     fullName: userView.fullName,
@@ -287,6 +291,7 @@ export function loginWithPassword(input: {
     }
   }
 
+  if(productionDeployment()&&userRow.passwordHash.startsWith("pbkdf2$10000$"))db.prepare("UPDATE users SET password_hash=? WHERE id=?").run(hashPassword(input.password),userRow.id);
   const now = new Date().toISOString();
   db.prepare("UPDATE users SET last_login_at = ?, updated_at = ? WHERE id = ?").run(
     now,
@@ -320,7 +325,7 @@ export function loginWithPassword(input: {
   };
 }
 
-export function refreshSession(input: {
+function refreshSessionInternal(input: {
   refreshToken: string;
   ipAddress?: string;
   userAgent?: string;
@@ -386,6 +391,8 @@ export function refreshSession(input: {
   };
 }
 
+export function refreshSession(input:Parameters<typeof refreshSessionInternal>[0]){return atomic(()=>refreshSessionInternal(input));}
+
 export function logoutSession(input: {
   refreshToken?: string;
   userId?: string;
@@ -400,6 +407,8 @@ export function logoutSession(input: {
     ).run(now, now, tokenHash);
   }
   if (input.userId && input.organizationId) {
+    db.prepare("UPDATE users SET token_version=token_version+1 WHERE id=? AND organization_id=?").run(input.userId,input.organizationId);
+    db.prepare("UPDATE refresh_tokens SET revoked_at=?,updated_at=? WHERE user_id=? AND organization_id=? AND revoked_at IS NULL").run(now,now,input.userId,input.organizationId);
     recordAuditLog({
       organizationId: input.organizationId,
       actorUserId: input.userId,
@@ -428,7 +437,7 @@ export function setupTwoFactor(
   ).run(secret, now, userId, organizationId);
 
   const otpauthUri = buildOtpAuthUri(userView.email, secret);
-  const currentDemoCode = generateTotpCode(secret);
+  const currentDemoCode = productionDeployment()?"":generateTotpCode(secret);
 
   recordAuditLog({
     organizationId,
@@ -565,6 +574,7 @@ export function switchUserContext(input: {
 }
 
 export function listDemoAccounts() {
+  if(productionDeployment())return [];
   const db = getDb();
   return db
     .prepare(`

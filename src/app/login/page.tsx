@@ -66,9 +66,11 @@ const ROLE_BADGE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> =
 export default function LoginPage() {
   const router = useRouter();
   const [locale, setLocale] = useState<Locale>("en");
+  const [demoEnabled,setDemoEnabled]=useState(false);
+  const [demoReady,setDemoReady]=useState(false);
   const [accounts, setAccounts] = useState<DemoAccount[]>([]);
-  const [email, setEmail] = useState("admin@fahadrealestate.test");
-  const [password, setPassword] = useState("Password123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -78,12 +80,13 @@ export default function LoginPage() {
     authFetch("/api/v1/auth/login")
       .then((res) => res.json())
       .then((data) => {
+        setDemoEnabled(data.demoEnabled===true);setDemoReady(true);if(data.demoEnabled===true){setEmail(v=>v||"admin@fahadrealestate.test");setPassword(v=>v||"Password123!");}
         if (data.accounts) {
           setAccounts(data.accounts);
         }
       })
       .catch(() => {
-        // ignore
+        setError("Unable to load sign-in configuration. Reload to retry.");
       });
   }, []);
 
@@ -206,8 +209,7 @@ export default function LoginPage() {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-1">{t(locale, "signIn")}</h2>
           <p className="text-sm text-slate-600 mb-6">
-            Sign in with credentials or click any role card to test role-based access control and
-            multi-tenancy isolation.
+            {demoEnabled?"Sign in with credentials or a demo role card to test role-based access.":"Sign in with your own account credentials."}
           </p>
 
           {error && (
@@ -230,8 +232,9 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 data-testid="email-input"
+                disabled={!demoReady}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm"
-                placeholder="admin@fahadrealestate.test"
+                placeholder="Your account email"
               />
             </div>
 
@@ -245,12 +248,13 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 data-testid="password-input"
+                disabled={!demoReady}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm"
               />
-              <p className="mt-1 text-xs text-slate-500">
+              {demoEnabled&&<p className="mt-1 text-xs text-slate-500">
                 Default demo password for all seeded accounts:{" "}
                 <code className="font-mono font-semibold text-slate-700">Password123!</code>
-              </p>
+              </p>}
             </div>
 
             {requiresTwoFactor && (
@@ -274,7 +278,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !demoReady}
               data-testid="login-submit"
               className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold text-sm shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition"
             >
@@ -309,7 +313,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right Column: One-Click Role Switcher Cards */}
-        <div className="lg:col-span-7 space-y-4">
+        {demoEnabled&&<div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -330,7 +334,7 @@ export default function LoginPage() {
                 <button
                   key={acc.id}
                   type="button"
-                  disabled={loading}
+                  disabled={loading || !demoReady}
                   onClick={() => handleQuickSelect(acc)}
                   data-testid={`quick-login-${acc.roleSlug}-${acc.organizationId}`}
                   className={`text-left p-4 rounded-xl border transition group ${
@@ -366,7 +370,7 @@ export default function LoginPage() {
               );
             })}
           </div>
-        </div>
+        </div>}
       </main>
     </div>
   );

@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
   try {
     const ctx = requireAuth(req);
     requirePermission(ctx, "invoices:write");
-    const body = await req.json();
+    const body = await readJson(req);
     if (body.action === "recurring_charge")
       return NextResponse.json(
         {
@@ -96,7 +97,7 @@ export async function PATCH(req: NextRequest) {
           reason: z.string().trim().min(1),
         }),
       ]),
-      await req.json(),
+      await readJson(req),
     );
     return NextResponse.json(
       body.action === "late_fees"

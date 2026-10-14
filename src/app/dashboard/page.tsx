@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { OrchestrationWorkspace } from "@/components/OrchestrationWorkspace";
 import { AccountingWorkspace } from "@/components/AccountingWorkspace";
 
@@ -280,6 +281,7 @@ TCC-01,TCC-01-A,TCC-CSV-502,shop,-250,250 Sq.Ft.,0,1,available,9000000,55000`;
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [demoEnabled,setDemoEnabled]=useState(false);
   const [activeTab, setActiveTab] = useState<
     | "overview"
     | "listings"
@@ -383,6 +385,7 @@ export default function DashboardPage() {
   const [orgUsers, setOrgUsers] = useState<OrgUserItem[]>([]);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
+  const [newUserPassword,setNewUserPassword]=useState("");
   const [newUserRole, setNewUserRole] = useState("agent");
 
   const [totpSetup, setTotpSetup] = useState<{
@@ -408,6 +411,7 @@ export default function DashboardPage() {
       }
       const data = await res.json();
       setUser(data.user);
+      setDemoEnabled(data.demoEnabled!==false);
       setBranches(data.branches || []);
       setSummary(data.summary);
       setLocale(data.user.locale || "en");
@@ -805,7 +809,7 @@ export default function DashboardPage() {
       body: JSON.stringify({
         email: newUserEmail,
         fullName: newUserName,
-        password: "Password123!",
+        password: newUserPassword || (demoEnabled ? "Password123!" : ""),
         roleSlug: newUserRole,
         branchId: user?.branch?.id,
       }),
@@ -818,6 +822,7 @@ export default function DashboardPage() {
     }
     setNewUserEmail("");
     setNewUserName("");
+    setNewUserPassword("");
     showNotification("success", `Created user ${data.user.email} (${data.user.roleName})`);
     fetchUsers();
     fetchAudit();
@@ -949,11 +954,13 @@ export default function DashboardPage() {
                 aria-label="Switch Role"
                 title={`${user.role.name} (${user.email})`}
                 data-testid="role-switcher-select"
+                disabled={!demoEnabled}
                 value={user.email}
                 onChange={(e) => handleQuickSwitchRole(e.target.value)}
                 className="min-w-0 w-full flex-1 bg-transparent py-2 text-xs font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
               >
-                {QUICK_SWITCH_ACCOUNTS.map((acc) => (
+                {!demoEnabled&&<option value={user.email}>{user.fullName}</option>}
+                {demoEnabled&&QUICK_SWITCH_ACCOUNTS.map((acc) => (
                   <option key={acc.email} value={acc.email} className="bg-slate-900 text-white">
                     {acc.label}
                   </option>
@@ -1049,9 +1056,9 @@ export default function DashboardPage() {
                 {user.permissions.length} {t(locale, "assignedPermissions")}
               </span>
             </div>
-            <span className="shrink-0 inline-flex items-center gap-2 text-xs font-medium text-slate-500">
+            <span className="min-w-0 max-w-full inline-flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              {t(locale, "phase6Status")}
+              {t(locale, "phase6Status")} <Link className="ms-3 underline" href="/portal">{locale==="ur"?"ذاتی پورٹل / رضامندی":"Personal portal / owner consent"}</Link>
             </span>
           </div>
 
@@ -2399,9 +2406,13 @@ export default function DashboardPage() {
                     required
                     value={newUserEmail}
                     onChange={(e) => setNewUserEmail(e.target.value)}
-                    placeholder="saad@fahadrealestate.test"
+                    placeholder="User account email"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
                   />
+                </div>
+                <div>
+                  <label htmlFor="new-user-password" className="block text-xs font-semibold text-slate-700 mb-1">Initial password</label>
+                  <input id="new-user-password" type="password" autoComplete="new-password" required={!demoEnabled} minLength={demoEnabled?8:14} maxLength={256} value={newUserPassword} onChange={e=>setNewUserPassword(e.target.value)} placeholder={demoEnabled?"Blank uses demo password":"14+ characters; share securely"} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Role</label>

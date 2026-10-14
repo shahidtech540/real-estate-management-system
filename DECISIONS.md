@@ -264,3 +264,52 @@ This header is never attached to external URLs and never placed in query strings
 - Run 125 named local source-backed/adversarial evaluations plus engine integration
   and browser regressions. Record defaults/limitations in docs/PHASE7.md.
 - Stop at Phase 7; do not start Phase 8 or merge PR #2 without authorization.
+
+
+## Phase 8 — authorized 2026-10-15, personal portals / operations
+
+- User authorized the next phase after Phase 7. Finish Phase 8 completely, then
+  stop; keep branch/PR #2 open and unmerged. No implicit next-phase authorization.
+- Preserve Fahad Real Estate / one RYK office. Existing additive schemas retain
+  source money/history. Restored workspace has no prior runtime database: identify
+  `data/phase8-demo.sqlite` as a fresh demo, never recovered business history.
+- Personal access derives from current role/org/active linked profile, not client
+  IDs or matching emails. Explicit administrator linkage with matching-role active
+  accounts is audited; absent links mean empty records. Staff collection access
+  is separate from owner/tenant consent UI. Preserve secondary domain permissions.
+- Default page/limit 1/20, maximum 50; no unbounded personal collections. Owner
+  whole-property invoice balance is not pro-rata payout. Staff consent/onboarding
+  option lists are bounded; use known IDs through privileged API beyond UI limits.
+- Consent is an immutable source-hashed nonbinding acknowledgement only. A stale
+  source needs a fresh request; final decisions cannot be edited. Never execute
+  money/contracts or bypass independent staff/agent approvals after owner consent.
+- Keep 15-minute access / 7-day rotating refresh; revoke all account sessions on
+  authenticated logout, with current permissions/status/token version on each call.
+  Preserve legacy deterministic demo hashes; new passwords use 600k PBKDF2.
+- Stream JSON with 1 MiB object-only bound, retain agent 64 KB checks; production
+  error responses omit internals. Explicit signed header requests are not cookie
+  CSRF. Compare browser target Host for Next bound URLs and allow exact configured
+  origins for trusted TLS proxies; do not trust forwarded IP as authorization.
+- Fixed-window persistent limits are modest same-office defaults, not an edge
+  anti-DDoS service. Runtime CSP permits inline Next code; production framing is
+  self-only by default, bare wildcard rejected. Demo allows Arena embedding.
+- REMS_DEPLOYMENT=production is separate from the Next build NODE_ENV. It requires
+  explicit DB/distinct strong secrets, refuses demo accounts/implicit seeding,
+  hides initial-render demo controls and health counts. Production user creation
+  requires an explicit 14+ character password and a non-demo email.
+- Add an absent-path production bootstrap (one admin/RBAC/RYK office/local agents,
+  zero inventory/money), verified SQLite online backup CLI and documented staged
+  upgrade/recovery. No placeholder live Postgres/Redis/S3/provider switch or invented
+  domain. Docker non-root runtime keeps tsx CLIs; design services are opt-in only.
+- Next 15.5.28/Vitest 4.1.11/PostCSS patched graph. Runtime audit zero at checkpoint;
+  full graph retains five high Tailwind/braces build-chain reports, not full-zero.
+  The regenerated lock installs with npm 10; no npm 11 requirement remains.
+- Query benchmark uses 10k extra synthetic invoices/50 bounded reads in-memory,
+  conservative 1000ms p95 gate; not a concurrent production SLA. Browser tests use
+  disposable databases. SPA role readiness uses explicit UI assertions, not
+  network-idle waits affected by unrelated Next prefetch streams.
+- Route-complete OpenAPI inventory plus strict new portal request schemas; do not
+  falsely advertise complete strict schemas for every historical DTO. Static
+  validator checks actual route/method coverage and references.
+- No security/legal certification, live payment/outbound/model/OCR, automatic
+  contract execution, bank verification or historical-data recovery is claimed.

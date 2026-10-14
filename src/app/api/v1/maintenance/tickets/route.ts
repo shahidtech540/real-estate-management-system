@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     return NextResponse.json(
-      { ticket: createTicket(requireAuth(req), await req.json()) },
+      { ticket: createTicket(requireAuth(req), await readJson(req)) },
       { status: 201 },
     );
   } catch (e) {

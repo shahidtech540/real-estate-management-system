@@ -1,3 +1,4 @@
+import {publicOrganizationId} from "../shared/public-organization";
 import crypto from "node:crypto";
 import { getDb } from "../../db";
 import { HttpError } from "../../auth/guards";
@@ -192,8 +193,8 @@ export function capturePublicLead(input: {
   requirementsText?: string;
 }) {
   const db = getDb();
-  let organizationId = "org_pakland";
-  let branchId: string | null = "br_isb";
+  let organizationId = publicOrganizationId();
+  let branchId: string | null = String(db.prepare("SELECT id FROM branches WHERE organization_id=? AND deleted_at IS NULL ORDER BY is_headquarters DESC,id LIMIT 1").get(organizationId)?.id||"")||null;
   let resolvedListingId: string | null = null;
   let listingTitle = "General Website Inquiry";
 
@@ -203,12 +204,13 @@ export function capturePublicLead(input: {
         SELECT l.id, l.organization_id as organizationId, l.title_en as titleEn, p.branch_id as branchId
         FROM listings l
         JOIN properties p ON p.id = l.property_id
-        WHERE (l.id = ? OR l.slug = ?) AND l.deleted_at IS NULL
+        WHERE (l.id = ? OR l.slug = ?) AND l.organization_id=? AND l.status='published' AND l.deleted_at IS NULL AND p.deleted_at IS NULL
       `)
-      .get(input.listingId || "", input.listingSlug || "") as
+      .get(input.listingId || "", input.listingSlug || "",organizationId) as
       | { id: string; organizationId: string; titleEn: string; branchId: string }
       | undefined;
 
+    if(!lst)throw new HttpError(404,"LISTING_NOT_FOUND","Published listing not found for this business.");
     if (lst) {
       organizationId = lst.organizationId;
       branchId = lst.branchId;

@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -28,6 +29,7 @@ const updateUserSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const ctx = requireAuth(req);
+    requirePermission(ctx,"admin:manage");
     const users = listOrganizationUsers(ctx.organizationId);
     return NextResponse.json({ users });
   } catch (err) {
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "admin:manage");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = createUserSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -61,7 +63,7 @@ export async function PATCH(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "admin:manage");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = updateUserSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

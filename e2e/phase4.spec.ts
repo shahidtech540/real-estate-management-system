@@ -24,7 +24,7 @@ async function workspace(page: Page, id: string) {
 async function switchRole(page: Page, email: string) {
   await page.getByTestId("role-switcher-select").selectOption(email);
   await expect(page.getByTestId("role-switcher-select")).toHaveValue(email);
-  await page.waitForLoadState("networkidle");
+
 }
 test("tenant photo ticket flows through coordinator work order and tenant-rated closure", async ({
   page,
@@ -199,7 +199,7 @@ test("expanded Phase 4 forms fit mobile English and Urdu RTL", async ({
     "Preventive maintenance schedules",
   ])
     await page.getByText(title, { exact: true }).click();
-  await page.waitForLoadState("networkidle");
+
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(376);
@@ -217,7 +217,7 @@ test("expanded Phase 4 forms fit mobile English and Urdu RTL", async ({
   await workspace(page, "notifications");
   for (const title of ["ایک اطلاع بھیجیں", "مرمت کی اطلاعات کے سانچے"])
     await page.getByText(title, { exact: true }).click();
-  await page.waitForLoadState("networkidle");
+
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(376);

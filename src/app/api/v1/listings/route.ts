@@ -1,3 +1,5 @@
+import {publicOrganizationId} from "@/server/modules/shared/public-organization";
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { extractAuthContext, requireAuth, requirePermission } from "@/server/auth/guards";
@@ -42,7 +44,7 @@ export async function GET(req: NextRequest) {
     }
 
     const listings = listListings({
-      organizationId: ctx?.organizationId || "org_pakland",
+      organizationId: ctx?.organizationId || publicOrganizationId(),
       onlyPublished: isPublic,
       purpose: searchParams.get("purpose") || undefined,
       status: searchParams.get("status") || undefined,
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "listings:write");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = createListingSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -101,7 +103,7 @@ export async function PATCH(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "listings:write");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = updateListingSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

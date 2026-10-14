@@ -1,3 +1,4 @@
+import {productionDeployment} from "@/server/security/config";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
@@ -17,6 +18,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({
+      demoEnabled:!productionDeployment(),
       user,
       branches,
       summary,

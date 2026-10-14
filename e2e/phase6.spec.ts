@@ -34,7 +34,7 @@ async function queue(
 async function switchRole(page: Page, email: string) {
   await page.getByTestId("role-switcher-select").selectOption(email);
   await expect(page.getByTestId("role-switcher-select")).toHaveValue(email);
-  await page.waitForLoadState("networkidle");
+
   await page.getByTestId("workspace-select").selectOption("orchestration");
 }
 test("structured plan executes ordered reads and displays durable traces", async ({

@@ -234,3 +234,19 @@ SHA-256 binds organization, run, ordinal, tool/version, exact input and source s
   immutable plan-level `expectedSourceHash` binds proposals before approval staging;
   existing approved `tool_calls.source_hash` remains an execution check.
 - No new financial source table or synthetic cash/posting is introduced.
+
+
+## Phase 8 additive runtime structures
+
+- `users.token_version` (integer default 0) gates fresh access claims; authenticated
+  logout increments it and revokes this account's refresh tokens.
+- `portal_reviews`: organization, owner, property, lease/ticket source, immutable
+  summary/cost/source hash/requester, final decision/note/reviewer timestamps.
+  Update/delete triggers retain intent and final history. Decisions are nonbinding.
+- `auth_rate_limits`: hashed key, request count, expiry; persistent fixed-window
+  quotas with expired-key cleanup and capacity guard.
+- Partial indexes cover active linked owner/tenant profiles and personal invoice,
+  lease/ticket collections; owner statement/review indexes support bounded pages.
+- Prisma models document these structures; Node SQLite DDL is the active runtime.
+  Administrator account linkage uses existing owner/tenant `user_id` columns and
+  does not replace original domain or immutable financial tables.

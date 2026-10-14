@@ -39,3 +39,49 @@ export function assertReadable(
   if (!canReadProperty(ctx, propertyId, tenantId))
     throw new HttpError(404, "NOT_FOUND", "Record not found.");
 }
+/** Entity-scoped vault visibility; portal roles never inherit the whole org vault. */
+export function canReadDocument(
+  ctx: JwtPayload,
+  type: string,
+  id: string,
+): boolean {
+  const tables: Record<string, string> = {
+      property: "properties",
+      unit: "units",
+      owner: "owners",
+      tenant: "tenants",
+      lease: "leases",
+      organization: "organizations",
+    },
+    table = tables[type];
+  if (!table) return false;
+  const row = getDb()
+    .prepare(
+      `SELECT * FROM ${table} WHERE id=? ${type === "organization" ? "" : "AND organization_id=?"} AND deleted_at IS NULL`,
+    )
+    .get(id, ...(type === "organization" ? [] : [ctx.organizationId]));
+  if (!row || (type === "organization" && id !== ctx.organizationId))
+    return false;
+  if (type === "lease" && !ctx.permissions.includes("leases:read"))
+    return false;
+  if (!["owner", "tenant"].includes(ctx.roleSlug)) return true;
+  if (type === "owner")
+    return ctx.roleSlug === "owner" && canReadOwner(ctx, id);
+  if (type === "tenant")
+    return ctx.roleSlug === "tenant" && row.user_id === ctx.sub;
+  if (type === "lease")
+    return canReadProperty(ctx, String(row.property_id), String(row.tenant_id));
+  if (!["property", "unit"].includes(type)) return false;
+  const property = type === "property" ? id : String(row.property_id);
+  if (ctx.roleSlug === "owner") return canReadProperty(ctx, property);
+  return !!getDb()
+    .prepare(
+      `SELECT l.id FROM leases l JOIN tenants t ON t.id=l.tenant_id AND t.organization_id=l.organization_id WHERE l.organization_id=? AND l.property_id=? ${type === "unit" ? "AND l.unit_id=?" : ""} AND l.status IN ('active','expiring','renewed') AND l.deleted_at IS NULL AND t.deleted_at IS NULL AND t.user_id=?`,
+    )
+    .get(
+      ctx.organizationId,
+      property,
+      ...(type === "unit" ? [id] : []),
+      ctx.sub,
+    );
+}

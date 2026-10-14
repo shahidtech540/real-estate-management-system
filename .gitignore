@@ -33,3 +33,6 @@ yarn-error.log*
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Runtime databases/backups must live in persistent external storage, not Git.
+data/

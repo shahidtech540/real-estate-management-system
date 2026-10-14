@@ -78,8 +78,8 @@ Paid statements, ledger records and audit history are not rewritten. See
 **External payment and email/SMS/WhatsApp adapters are mock implementations.**
 `mock_sent` is simulated delivery. Live delivery fails closed until a validated
 provider adapter is implemented. No real charges, bank payouts or messages are
-performed by the mocks. Agent orchestration, full accounting, dedicated portals
-and production hardening remain in their later phases.
+performed by the mocks. Local accounting, bounded agent orchestration and personal portals are implemented.
+Live providers and production security certification are not implied.
 
 ## Tests
 
@@ -93,12 +93,12 @@ CI=true npm run test:e2e
 
 Security regression suites intentionally retain the original multi-organization
 fixture world under `NODE_ENV=test`. Business-profile tests explicitly migrate it
-and check the corrected setup. Production and browser tests always use the actual
-Fahad Real Estate profile; no old branches/company are exposed by the normal app.
+and check the corrected setup. Normal demo/browser workflows use the corrected
+Fahad Real Estate profile; the production smoke provisions a separate empty fixture; no old branches/company are exposed by the normal app.
 
 ## Deployment notes
 
-Docker scaffolding: `docker compose up --build`; app and maintenance worker share
+Demo Docker: `docker compose up --build`; app and all three workers share
 a persistent SQLite volume. Docker execution was unavailable in the development
 sandbox. PostgreSQL, Redis and S3 settings remain deployment designs, not enabled
 runtime switches. Use secure deployment-specific secrets; the demo is not a
@@ -115,7 +115,7 @@ Until then exports use relative listing paths rather than an invented domain.
 - [Phase 3 walkthrough/API](docs/PHASE3.md)
 - [Phase 4 walkthrough/API](docs/PHASE4.md)
 
-**Phase 5 is on hold** until the user approves continuing. PR #2 remains unmerged.
+**Phases 0–8 are complete for their documented local scope. PR #2 remains unmerged.**
 
 ## Phase 7: six domain agents
 
@@ -133,5 +133,34 @@ reminders are in-app only. An administrator cannot approve their own write.
 npm run test:agents  # 125 evaluations + 20 guarded-engine integration tests
 ```
 
-See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 7 complete; Phase 8
-awaits approval. PR #2 remains unmerged.**
+See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 8 complete; awaiting authorization for any further work. PR #2 remains unmerged.**
+
+
+## Phase 8: owner and tenant portals
+
+Visit **`/portal/tenant`** or **`/portal/owner`** after signing in with the matching
+role (demo emails above, password `Password123!`). Staff opens **`/portal`** for
+source-bound owner consent; administrators can explicitly link/unlink personal
+accounts after verifying identity. No automatic business write follows consent.
+Guided English/Urdu navigation, bounded source records, tenant repairs, statement/
+unsigned-lease PDFs and private in-app messages are implemented.
+
+```bash
+npm run test:portals
+npm run perf:portals       # 10,000 synthetic in-memory invoices, no business DB touched
+npm run validate:api
+npm run audit:production
+npm run test:e2e:production # after build + Chromium install
+```
+
+Real deployment is **opt-in**: `REMS_DEPLOYMENT=production`, strong distinct signing
+secrets, persistent database and HTTPS. Use `npm run db:provision` only for an absent
+production path with environment-supplied real admin credentials. It creates zero
+inventory/financial fixtures. `npm run db:backup -- <new-path>` creates a verified
+online SQLite backup. Do not treat `NODE_ENV=production` alone as the security switch.
+
+See [portal/user/security guide](docs/PHASE8.md), [deployment/recovery runbook](docs/DEPLOYMENT.md)
+and [API](docs/API.md) / [OpenAPI](docs/openapi.json). The preview is a **fresh demo**,
+not recovered historical data. Runtime audit is clean at this checkpoint; the full
+build graph still has five documented high Tailwind/braces advisory reports.
+**Stopping at Phase 8; no PR merge or next phase without authorization.**

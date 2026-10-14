@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "tenants:write");
     return NextResponse.json(
-      { tenant: createTenant(ctx.organizationId, ctx.sub, await req.json()) },
+      { tenant: createTenant(ctx.organizationId, ctx.sub, await readJson(req)) },
       { status: 201 },
     );
   } catch (e) {
@@ -44,7 +45,7 @@ export async function PATCH(req: NextRequest) {
         id: z.string().min(1),
         kycStatus: z.enum(["pending", "verified", "rejected"]),
       }),
-      await req.json(),
+      await readJson(req),
     );
     return NextResponse.json({
       tenant: updateTenantKyc(

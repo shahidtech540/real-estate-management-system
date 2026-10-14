@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
     requirePermission(ctx, "accounting:write");
     const body = valid(
       z.object({ periodMonth: monthSchema }),
-      await req.json(),
+      await readJson(req),
     );
     return NextResponse.json(
       {
@@ -78,7 +79,7 @@ export async function PATCH(req: NextRequest) {
     requirePermission(ctx, "payments:write");
     const body = valid(
       z.object({ id: z.string().min(1), reference: z.string().trim().min(1) }),
-      await req.json(),
+      await readJson(req),
     );
     return NextResponse.json({
       statement: recordOwnerPayout(

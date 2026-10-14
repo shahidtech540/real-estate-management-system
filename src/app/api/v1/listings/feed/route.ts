@@ -1,3 +1,4 @@
+import {publicOrganizationId} from "@/server/modules/shared/public-organization";
 import { NextRequest, NextResponse } from "next/server";
 import { extractAuthContext } from "@/server/auth/guards";
 import { handleApiError } from "@/server/auth/http";
@@ -8,7 +9,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const format = searchParams.get("format") === "csv" ? "csv" : "json";
     const ctx = extractAuthContext(req);
-    const organizationId = ctx?.organizationId || "org_pakland";
+    const organizationId = ctx?.organizationId || publicOrganizationId();
 
     const feed = exportSyndicationFeed(organizationId, format);
     return new NextResponse(feed.body, {
