@@ -1,0 +1,791 @@
+// Prisma Schema for Production PostgreSQL + pgvector deployment
+// Covers all 32 entities in docs/ERD.md with multi-tenancy (organizationId),
+// audit fields (createdAt, updatedAt, createdBy, deletedAt), and integer minor units.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model Organization {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  name            String
+  legalName       String    @map("legal_name")
+  country         String    @default("PK")
+  defaultCurrency String    @default("PKR") @map("default_currency")
+  defaultLocale   String    @default("en") @map("default_locale")
+  taxNumber       String?   @map("tax_number")
+  status          String    @default("active")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdBy       String?   @map("created_by")
+  deletedAt       DateTime? @map("deleted_at")
+
+  branches        Branch[]
+  roles           Role[]
+  permissions     Permission[]
+  users           User[]
+  owners          Owner[]
+  properties      Property[]
+  tenants         Tenant[]
+  leases          Lease[]
+  invoices        Invoice[]
+  payments        Payment[]
+  accounts        Account[]
+  ledgerEntries   LedgerEntry[]
+  vendors         Vendor[]
+  tickets         MaintenanceTicket[]
+  documents       Document[]
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+  agents          Agent[]
+
+  @@map("organizations")
+}
+
+model Branch {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  code           String
+  name           String
+  city           String
+  address        String
+  phone          String?
+  isHeadquarters Boolean      @default(false) @map("is_headquarters")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  users          User[]
+  properties     Property[]
+
+  @@index([organizationId])
+  @@map("branches")
+}
+
+model Role {
+  id              String           @id @default(cuid())
+  organizationId  String           @map("organization_id")
+  slug            String
+  name            String
+  description     String
+  isSystem        Boolean          @default(true) @map("is_system")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  createdBy       String?          @map("created_by")
+  deletedAt       DateTime?        @map("deleted_at")
+
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  rolePermissions RolePermission[]
+  users           User[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("roles")
+}
+
+model Permission {
+  id              String           @id @default(cuid())
+  organizationId  String           @map("organization_id")
+  code            String
+  module          String
+  description     String
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  createdBy       String?          @map("created_by")
+
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  rolePermissions RolePermission[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id             String     @id @default(cuid())
+  organizationId String     @map("organization_id")
+  roleId         String     @map("role_id")
+  permissionId   String     @map("permission_id")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+  createdBy      String?    @map("created_by")
+
+  role           Role       @relation(fields: [roleId], references: [id])
+  permission     Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+  @@index([organizationId])
+  @@map("role_permissions")
+}
+
+model User {
+  id               String         @id @default(cuid())
+  organizationId   String         @map("organization_id")
+  branchId         String?        @map("branch_id")
+  roleId           String         @map("role_id")
+  email            String
+  passwordHash     String         @map("password_hash")
+  fullName         String         @map("full_name")
+  phone            String?
+  locale           String         @default("en")
+  twoFactorEnabled Boolean        @default(false) @map("two_factor_enabled")
+  twoFactorSecret  String?        @map("two_factor_secret")
+  status           String         @default("active")
+  lastLoginAt      DateTime?      @map("last_login_at")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  createdBy        String?        @map("created_by")
+  deletedAt        DateTime?      @map("deleted_at")
+
+  organization     Organization   @relation(fields: [organizationId], references: [id])
+  branch           Branch?        @relation(fields: [branchId], references: [id])
+  role             Role           @relation(fields: [roleId], references: [id])
+  refreshTokens    RefreshToken[]
+
+  @@unique([organizationId, email])
+  @@index([organizationId, roleId])
+  @@map("users")
+}
+
+model RefreshToken {
+  id             String    @id @default(cuid())
+  organizationId String    @map("organization_id")
+  userId         String    @map("user_id")
+  tokenHash      String    @unique @map("token_hash")
+  expiresAt      DateTime  @map("expires_at")
+  revokedAt      DateTime? @map("revoked_at")
+  ipAddress      String?   @map("ip_address")
+  userAgent      String?   @map("user_agent")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdBy      String?   @map("created_by")
+
+  user           User      @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, userId])
+  @@map("refresh_tokens")
+}
+
+model Owner {
+  id               String          @id @default(cuid())
+  organizationId   String          @map("organization_id")
+  userId           String?         @map("user_id")
+  fullName         String          @map("full_name")
+  cnicNtn          String          @map("cnic_ntn")
+  email            String
+  phone            String
+  bankName         String?         @map("bank_name")
+  iban             String?
+  managementFeePct Float           @default(5.0) @map("management_fee_pct")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  createdBy        String?         @map("created_by")
+  deletedAt        DateTime?       @map("deleted_at")
+
+  organization     Organization    @relation(fields: [organizationId], references: [id])
+  propertyOwners   PropertyOwner[]
+
+  @@index([organizationId])
+  @@map("owners")
+}
+
+model Property {
+  id             String          @id @default(cuid())
+  organizationId String          @map("organization_id")
+  branchId       String          @map("branch_id")
+  code           String
+  name           String
+  type           String
+  city           String
+  address        String
+  latitude       Float?
+  longitude      Float?
+  totalUnits     Int             @default(0) @map("total_units")
+  status         String          @default("active")
+  amenitiesJson  String          @default("[]") @map("amenities_json")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  createdBy      String?         @map("created_by")
+  deletedAt      DateTime?       @map("deleted_at")
+
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  branch         Branch          @relation(fields: [branchId], references: [id])
+  propertyOwners PropertyOwner[]
+  buildings      Building[]
+  units          Unit[]
+
+  @@index([organizationId, branchId])
+  @@map("properties")
+}
+
+model PropertyOwner {
+  id             String    @id @default(cuid())
+  organizationId String    @map("organization_id")
+  propertyId     String    @map("property_id")
+  ownerId        String    @map("owner_id")
+  ownershipPct   Float     @map("ownership_pct")
+  isPrimary      Boolean   @default(false) @map("is_primary")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdBy      String?   @map("created_by")
+  deletedAt      DateTime? @map("deleted_at")
+
+  property       Property  @relation(fields: [propertyId], references: [id])
+  owner          Owner     @relation(fields: [ownerId], references: [id])
+
+  @@index([organizationId, propertyId])
+  @@map("property_owners")
+}
+
+model Building {
+  id             String    @id @default(cuid())
+  organizationId String    @map("organization_id")
+  propertyId     String    @map("property_id")
+  code           String
+  name           String
+  floors         Int       @default(1)
+  blockSector    String?   @map("block_sector")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdBy      String?   @map("created_by")
+  deletedAt      DateTime? @map("deleted_at")
+
+  property       Property  @relation(fields: [propertyId], references: [id])
+  units          Unit[]
+
+  @@index([organizationId, propertyId])
+  @@map("buildings")
+}
+
+model Unit {
+  id               String    @id @default(cuid())
+  organizationId   String    @map("organization_id")
+  propertyId       String    @map("property_id")
+  buildingId       String?   @map("building_id")
+  unitNumber       String    @map("unit_number")
+  type             String
+  areaSqft         Float     @map("area_sqft")
+  areaDisplay      String    @map("area_display")
+  bedrooms         Int       @default(0)
+  bathrooms        Int       @default(0)
+  status           String    @default("available")
+  marketPriceMinor BigInt    @map("market_price_minor")
+  monthlyRentMinor BigInt    @map("monthly_rent_minor")
+  currency         String    @default("PKR")
+  amenitiesJson    String    @default("[]") @map("amenities_json")
+  photosJson       String    @default("[]") @map("photos_json")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  createdBy        String?   @map("created_by")
+  deletedAt        DateTime? @map("deleted_at")
+
+  property         Property  @relation(fields: [propertyId], references: [id])
+  building         Building? @relation(fields: [buildingId], references: [id])
+
+  @@index([organizationId, propertyId, status])
+  @@map("units")
+}
+
+model Listing {
+  id               String    @id @default(cuid())
+  organizationId   String    @map("organization_id")
+  propertyId       String    @map("property_id")
+  unitId           String    @map("unit_id")
+  slug             String    @unique
+  titleEn          String    @map("title_en")
+  titleUr          String    @map("title_ur")
+  descriptionEn    String    @map("description_en")
+  descriptionUr    String    @map("description_ur")
+  purpose          String
+  askingPriceMinor BigInt    @map("asking_price_minor")
+  currency         String    @default("PKR")
+  status           String    @default("draft")
+  syndicatePortals Boolean   @default(true) @map("syndicate_portals")
+  publishedAt      DateTime? @map("published_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  createdBy        String?   @map("created_by")
+  deletedAt        DateTime? @map("deleted_at")
+
+  @@index([organizationId, status])
+  @@map("listings")
+}
+
+model Lead {
+  id               String    @id @default(cuid())
+  organizationId   String    @map("organization_id")
+  branchId         String?   @map("branch_id")
+  listingId        String?   @map("listing_id")
+  assignedAgentId  String?   @map("assigned_agent_id")
+  fullName         String    @map("full_name")
+  phone            String
+  email            String?
+  source           String
+  stage            String    @default("new")
+  score            Int       @default(50)
+  budgetMinor      BigInt    @default(0) @map("budget_minor")
+  currency         String    @default("PKR")
+  requirementsText String?   @map("requirements_text")
+  notesJson        String    @default("[]") @map("notes_json")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  createdBy        String?   @map("created_by")
+  deletedAt        DateTime? @map("deleted_at")
+
+  @@index([organizationId, stage])
+  @@map("leads")
+}
+
+model Client {
+  id             String    @id @default(cuid())
+  organizationId String    @map("organization_id")
+  leadId         String?   @map("lead_id")
+  fullName       String    @map("full_name")
+  cnic           String?
+  phone          String
+  email          String?
+  clientType     String    @default("buyer") @map("client_type")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdBy      String?   @map("created_by")
+  deletedAt      DateTime? @map("deleted_at")
+
+  @@index([organizationId])
+  @@map("clients")
+}
+
+model Viewing {
+  id              String    @id @default(cuid())
+  organizationId  String    @map("organization_id")
+  leadId          String    @map("lead_id")
+  unitId          String    @map("unit_id")
+  agentId         String    @map("agent_id")
+  scheduledAt     DateTime  @map("scheduled_at")
+  status          String    @default("scheduled")
+  calendarEventId String?   @map("calendar_event_id")
+  feedback        String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdBy       String?   @map("created_by")
+  deletedAt       DateTime? @map("deleted_at")
+
+  @@index([organizationId, agentId])
+  @@map("viewings")
+}
+
+model Deal {
+  id              String    @id @default(cuid())
+  organizationId  String    @map("organization_id")
+  leadId          String?   @map("lead_id")
+  clientId        String    @map("client_id")
+  unitId          String    @map("unit_id")
+  primaryAgentId  String    @map("primary_agent_id")
+  dealType        String    @map("deal_type")
+  dealValueMinor  BigInt    @map("deal_value_minor")
+  commissionPct   Float     @map("commission_pct")
+  commissionMinor BigInt    @map("commission_minor")
+  agentSplitsJson String    @default("[]") @map("agent_splits_json")
+  currency        String    @default("PKR")
+  status          String    @default("pending")
+  closedAt        DateTime? @map("closed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdBy       String?   @map("created_by")
+  deletedAt       DateTime? @map("deleted_at")
+
+  @@index([organizationId, status])
+  @@map("deals")
+}
+
+model Tenant {
+  id                    String       @id @default(cuid())
+  organizationId        String       @map("organization_id")
+  userId                String?      @map("user_id")
+  fullName              String       @map("full_name")
+  cnic                  String
+  phone                 String
+  email                 String
+  kycStatus             String       @default("verified") @map("kyc_status")
+  emergencyContactName  String?      @map("emergency_contact_name")
+  emergencyContactPhone String?      @map("emergency_contact_phone")
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @updatedAt @map("updated_at")
+  createdBy             String?      @map("created_by")
+  deletedAt             DateTime?    @map("deleted_at")
+
+  organization          Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@map("tenants")
+}
+
+model Lease {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  propertyId     String       @map("property_id")
+  unitId         String       @map("unit_id")
+  tenantId       String       @map("tenant_id")
+  leaseNumber    String       @map("lease_number")
+  status         String       @default("active")
+  startDate      DateTime     @map("start_date")
+  endDate        DateTime     @map("end_date")
+  rentMinor      BigInt       @map("rent_minor")
+  depositMinor   BigInt       @map("deposit_minor")
+  escalationPct  Float        @default(10.0) @map("escalation_pct")
+  dueDay         Int          @default(5) @map("due_day")
+  graceDays      Int          @default(5) @map("grace_days")
+  lateFeeMinor   BigInt       @default(500000) @map("late_fee_minor")
+  currency       String       @default("PKR")
+  documentId     String?      @map("document_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, status])
+  @@map("leases")
+}
+
+model Invoice {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  leaseId        String       @map("lease_id")
+  propertyId     String       @map("property_id")
+  unitId         String       @map("unit_id")
+  tenantId       String       @map("tenant_id")
+  invoiceNumber  String       @map("invoice_number")
+  type           String       @default("rent")
+  periodMonth    String       @map("period_month")
+  dueDate        DateTime     @map("due_date")
+  amountMinor    BigInt       @map("amount_minor")
+  lateFeeMinor   BigInt       @default(0) @map("late_fee_minor")
+  totalMinor     BigInt       @map("total_minor")
+  paidMinor      BigInt       @default(0) @map("paid_minor")
+  currency       String       @default("PKR")
+  status         String       @default("pending")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, status, dueDate])
+  @@map("invoices")
+}
+
+model Payment {
+  id              String       @id @default(cuid())
+  organizationId  String       @map("organization_id")
+  invoiceId       String       @map("invoice_id")
+  tenantId        String       @map("tenant_id")
+  method          String
+  referenceNumber String       @map("reference_number")
+  amountMinor     BigInt       @map("amount_minor")
+  currency        String       @default("PKR")
+  status          String       @default("completed")
+  paidAt          DateTime     @default(now()) @map("paid_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  createdBy       String?      @map("created_by")
+  deletedAt       DateTime?    @map("deleted_at")
+
+  organization    Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, invoiceId])
+  @@map("payments")
+}
+
+model Receipt {
+  id             String    @id @default(cuid())
+  organizationId String    @map("organization_id")
+  paymentId      String    @unique @map("payment_id")
+  invoiceId      String    @map("invoice_id")
+  tenantId       String    @map("tenant_id")
+  receiptNumber  String    @map("receipt_number")
+  amountMinor    BigInt    @map("amount_minor")
+  currency       String    @default("PKR")
+  issuedAt       DateTime  @default(now()) @map("issued_at")
+  pdfUrl         String?   @map("pdf_url")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdBy      String?   @map("created_by")
+  deletedAt      DateTime? @map("deleted_at")
+
+  @@index([organizationId, tenantId])
+  @@map("receipts")
+}
+
+model Account {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  code           String
+  name           String
+  type           String
+  currency       String       @default("PKR")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, code])
+  @@map("accounts")
+}
+
+model LedgerEntry {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  accountId      String       @map("account_id")
+  propertyId     String?      @map("property_id")
+  ownerId        String?      @map("owner_id")
+  invoiceId      String?      @map("invoice_id")
+  paymentId      String?      @map("payment_id")
+  entryDate      DateTime     @map("entry_date")
+  direction      String
+  amountMinor    BigInt       @map("amount_minor")
+  currency       String       @default("PKR")
+  category       String
+  description    String
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, propertyId, entryDate])
+  @@map("ledger_entries")
+}
+
+model Vendor {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  name           String
+  tradeCategory  String       @map("trade_category")
+  phone          String
+  email          String?
+  rating         Float        @default(4.5)
+  baseRateMinor  BigInt       @map("base_rate_minor")
+  currency       String       @default("PKR")
+  slaHours       Int          @default(24) @map("sla_hours")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, tradeCategory])
+  @@map("vendors")
+}
+
+model MaintenanceTicket {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  propertyId     String       @map("property_id")
+  unitId         String       @map("unit_id")
+  tenantId       String?      @map("tenant_id")
+  ticketNumber   String       @map("ticket_number")
+  title          String
+  description    String
+  category       String
+  priority       String       @default("medium")
+  status         String       @default("open")
+  slaDueAt       DateTime     @map("sla_due_at")
+  photosJson     String       @default("[]") @map("photos_json")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, status, priority])
+  @@map("maintenance_tickets")
+}
+
+model WorkOrder {
+  id                 String    @id @default(cuid())
+  organizationId     String    @map("organization_id")
+  ticketId           String    @map("ticket_id")
+  vendorId           String    @map("vendor_id")
+  workOrderNumber    String    @map("work_order_number")
+  status             String    @default("scheduled")
+  estimatedCostMinor BigInt    @map("estimated_cost_minor")
+  actualCostMinor    BigInt    @default(0) @map("actual_cost_minor")
+  currency           String    @default("PKR")
+  scheduledAt        DateTime  @map("scheduled_at")
+  completedAt        DateTime? @map("completed_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  createdBy          String?   @map("created_by")
+  deletedAt          DateTime? @map("deleted_at")
+
+  @@index([organizationId, ticketId])
+  @@map("work_orders")
+}
+
+model Document {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  entityType     String       @map("entity_type")
+  entityId       String       @map("entity_id")
+  title          String
+  category       String
+  version        Int          @default(1)
+  storageKey     String       @map("storage_key")
+  mimeType       String       @map("mime_type")
+  sizeBytes      Int          @map("size_bytes")
+  tagsJson       String       @default("[]") @map("tags_json")
+  expiryDate     DateTime?    @map("expiry_date")
+  contentText    String?      @map("content_text")
+  embeddingJson  String?      @map("embedding_json")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, entityType, entityId])
+  @@map("documents")
+}
+
+model Notification {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  userId         String?      @map("user_id")
+  channel        String
+  recipient      String
+  subject        String
+  body           String
+  status         String       @default("sent")
+  isAiDrafted    Boolean      @default(false) @map("is_ai_drafted")
+  sentAt         DateTime?    @map("sent_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, userId])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  actorUserId    String?      @map("actor_user_id")
+  action         String
+  entityType     String       @map("entity_type")
+  entityId       String       @map("entity_id")
+  ipAddress      String?      @map("ip_address")
+  userAgent      String?      @map("user_agent")
+  metadataJson   String       @default("{}") @map("metadata_json")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  createdBy      String?      @map("created_by")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@map("audit_logs")
+}
+
+model Agent {
+  id              String       @id @default(cuid())
+  organizationId  String       @map("organization_id")
+  slug            String
+  name            String
+  description     String
+  goal            String
+  autonomyLevel   String       @default("act_with_approval") @map("autonomy_level")
+  isEnabled       Boolean      @default(true) @map("is_enabled")
+  costBudgetMinor BigInt       @default(500000) @map("cost_budget_minor")
+  currency        String       @default("PKR")
+  allowedToolsJson String      @default("[]") @map("allowed_tools_json")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  createdBy       String?      @map("created_by")
+  deletedAt       DateTime?    @map("deleted_at")
+
+  organization    Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, slug])
+  @@map("agents")
+}
+
+model AgentRun {
+  id               String   @id @default(cuid())
+  organizationId   String   @map("organization_id")
+  agentId          String   @map("agent_id")
+  triggerType      String   @map("trigger_type")
+  inputText        String   @map("input_text")
+  reasoningSummary String   @map("reasoning_summary")
+  outputText       String   @map("output_text")
+  status           String   @default("completed")
+  tokensUsed       Int      @default(0) @map("tokens_used")
+  costMinor        BigInt   @default(0) @map("cost_minor")
+  currency         String   @default("PKR")
+  approvedBy       String?  @map("approved_by")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdBy        String?  @map("created_by")
+
+  @@index([organizationId, agentId])
+  @@map("agent_runs")
+}
+
+model ToolCall {
+  id               String   @id @default(cuid())
+  organizationId   String   @map("organization_id")
+  agentRunId       String   @map("agent_run_id")
+  toolName         String   @map("tool_name")
+  inputJson        String   @map("input_json")
+  outputJson       String   @map("output_json")
+  requiresApproval Boolean  @default(false) @map("requires_approval")
+  status           String   @default("executed")
+  durationMs       Int      @default(0) @map("duration_ms")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdBy        String?  @map("created_by")
+
+  @@index([organizationId, agentRunId])
+  @@map("tool_calls")
+}
+
+model ApprovalRequest {
+  id             String    @id @default(cuid())
+  organizationId String    @map("organization_id")
+  agentRunId     String    @map("agent_run_id")
+  toolCallId     String?   @map("tool_call_id")
+  agentSlug      String    @map("agent_slug")
+  actionType     String    @map("action_type")
+  summary        String
+  payloadJson    String    @map("payload_json")
+  status         String    @default("pending")
+  reviewedBy     String?   @map("reviewed_by")
+  reviewedAt     DateTime? @map("reviewed_at")
+  reviewNote     String?   @map("review_note")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdBy      String?   @map("created_by")
+
+  @@index([organizationId, status])
+  @@map("approval_requests")
+}
