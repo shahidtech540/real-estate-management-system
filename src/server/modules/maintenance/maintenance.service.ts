@@ -1,3 +1,4 @@
+import { postWorkOrderInternal } from "../accounting/posting";
 import { z } from "zod";
 import { getDb } from "@/server/db";
 import type { JwtPayload } from "@/server/auth/crypto";
@@ -596,6 +597,7 @@ export function updateWorkOrder(ctx: JwtPayload, id: string, input: unknown) {
         ctx.organizationId,
       );
     event(ctx, ticket, b.status, b.note);
+    if(b.status === "completed") postWorkOrderInternal(ctx.organizationId,ctx.sub,b.workOrderId);
     return ticketDetail(ctx, id);
   });
 }

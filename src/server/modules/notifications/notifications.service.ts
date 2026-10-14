@@ -51,7 +51,7 @@ function audit(ctx: JwtPayload, action: string, id: string) {
     entityId: id,
   });
 }
-function enqueue(
+export function enqueue(
   org: string,
   actor: string,
   userId: string,

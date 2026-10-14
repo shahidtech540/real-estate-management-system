@@ -51,13 +51,16 @@ The unrelated secondary demo company is retired and no longer available to sign 
 
 ## Current capabilities
 
-Phases 0–4 are complete for local/mock-provider use:
+Phases 0–5 are complete for local/mock-provider use:
 - Role-based access, organization isolation, optional TOTP and English/Urdu RTL.
 - Properties/units, ownership splits, document vault and CSV import.
 - Listings/public enquiries, CRM pipeline, viewings and commission tracking.
 - Tenants/leases, rent invoices, payment records, PDF receipts and owner statements.
 - Photo maintenance tickets, vendor work orders, costs, tenant confirmations,
   SLA alerts, preventive schedules and a notification inbox/outbox.
+- Accrual accounting, immutable double-entry journals, expenses/receipts, budgets,
+  financial/operational reports, CSV/XLSX/PDF exports and private scheduled digests.
+  See [`docs/PHASE5.md`](docs/PHASE5.md).
 
 At narrow widths use the **Workspace** dropdown. Existing rent records and unit
 identities survive the business correction. The five invented sub-projects are

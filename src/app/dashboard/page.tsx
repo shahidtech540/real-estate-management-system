@@ -1,4 +1,5 @@
 "use client";
+import { AccountingWorkspace } from "@/components/AccountingWorkspace";
 
 import { authFetch, clearAccessToken } from "@/lib/auth-client";
 
@@ -283,6 +284,7 @@ export default function DashboardPage() {
     | "listings"
     | "crm"
     | "tenancy"
+    | "accounting"
     | "maintenance"
     | "notifications"
     | "billing"
@@ -297,6 +299,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [branches, setBranches] = useState<BranchItem[]>([]);
   useEffect(() => {
+    if(user && activeTab === "accounting" && !user.permissions.includes("accounting:read")) setActiveTab("overview");
     if (user && activeTab === "maintenance" && !user.permissions.includes("maintenance:read")) {
       setActiveTab("notifications");
     }
@@ -900,6 +903,7 @@ export default function DashboardPage() {
     ...(user.permissions.includes("leases:read") ? [{ id: "tenancy", label: t(locale, "tenancyTab"), icon: FileText }] : []),
     ...(user.permissions.includes("invoices:read") ? [{ id: "billing", label: t(locale, "billingTab"), icon: Briefcase }] : []),
     ...(user.permissions.includes("maintenance:read") ? [{ id: "maintenance", label: t(locale, "maintenanceTab"), icon: Activity }] : []),
+    ...(user.permissions.includes("accounting:read") ? [{id:"accounting",label:locale==="ur"?"اکاؤنٹنگ اور رپورٹس":"Accounting & reports",icon:FileSpreadsheet}] : []),
     { id: "notifications", label: t(locale, "notificationsTab"), icon: Activity },
     { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
     { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
@@ -1585,6 +1589,7 @@ export default function DashboardPage() {
 
         {activeTab === "tenancy" && <TenancyWorkspace permissions={user.permissions} locale={locale} units={units} onRefresh={() => { fetchPortfolio(); fetchAudit(auditFilter); }} />}
         {activeTab === "billing" && <BillingWorkspace permissions={user.permissions} locale={locale} onRefresh={() => { fetchMe(); fetchAudit(auditFilter); }} />}
+        {activeTab === "accounting" && <AccountingWorkspace key={user.id} locale={locale} permissions={user.permissions} />}
         {activeTab === "maintenance" && <MaintenanceWorkspace key={user.id} permissions={user.permissions} locale={locale} roleSlug={user.role.slug} />}
         {activeTab === "notifications" && <NotificationsWorkspace key={user.id} permissions={user.permissions} locale={locale} />}
         {/* TAB 2: OWNERS & MULTI-OWNER SPLITS */}

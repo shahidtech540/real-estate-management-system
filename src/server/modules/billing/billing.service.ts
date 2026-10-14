@@ -1,3 +1,5 @@
+import { postInvoiceInternal, postPayoutsInternal } from "../accounting/posting";
+import { savepoint } from "../shared/domain";
 import { getDb } from "@/server/db";
 import {
   newId,
@@ -346,6 +348,7 @@ export function generateMonthlyRentCycle(
       metadata: { periodMonth, generatedCount, skippedCount, totalBilledMinor },
     });
 
+    for(const invoice of db.prepare("SELECT id FROM invoices WHERE organization_id=? AND period_month=? AND deleted_at IS NULL").all(organizationId,periodMonth)) postInvoiceInternal(organizationId,actorUserId,String(invoice.id));
     return {
       periodMonth,
       generatedCount,
@@ -383,6 +386,7 @@ export function createAdHocInvoice(
     }),
     input,
   );
+  return savepoint(() => {
   const db = getDb();
   const lease = db
     .prepare(
@@ -442,9 +446,11 @@ export function createAdHocInvoice(
     metadata: { invoiceNumber, type: input.type, amountMinor: amt },
   });
 
+  postInvoiceInternal(organizationId,actorUserId,id);
   return listInvoices({ organizationId, limit: 100000 }).find(
     (i) => i.id === id,
   )!;
+  });
 }
 
 export function applyLateFees(
@@ -499,6 +505,7 @@ export function applyLateFees(
       db.prepare(
         "UPDATE invoices SET late_fee_minor = ?, total_minor = total_minor + ?, status = CASE WHEN paid_minor > 0 THEN 'partially_paid' ELSE 'overdue' END, updated_at = ? WHERE id = ?",
       ).run(feeToAdd, feeToAdd, now, row.id);
+      postInvoiceInternal(organizationId,actorUserId,row.id);
       updatedCount++;
       totalLateFeeAddedMinor += feeToAdd;
     }
@@ -601,6 +608,7 @@ export function issueCreditNote(
       },
     });
 
+    postInvoiceInternal(organizationId,actorUserId,invoiceId);
     return listInvoices({ organizationId, limit: 100000 }).find(
       (i) => i.id === invoiceId,
     )!;
@@ -779,6 +787,7 @@ export function recordPayment(
       },
     });
 
+    postInvoiceInternal(organizationId,actorUserId,inv.id);
     const updatedInvoice = listInvoices({ organizationId, limit: 100000 }).find(
       (i) => i.id === inv.id,
     )!;
@@ -972,7 +981,8 @@ export function generateOwnerStatements(
           costMinor: number;
         };
 
-        const propExpenseMinor = expRow.costMinor;
+        const extraExpenses = db.prepare(`SELECT COALESCE(SUM(CASE WHEN l.direction='debit' THEN l.amount_minor ELSE -l.amount_minor END),0) n FROM ledger_entries l JOIN accounts a ON a.id=l.account_id AND a.organization_id=l.organization_id JOIN journal_batches j ON j.id=l.journal_id AND j.organization_id=l.organization_id WHERE l.organization_id=? AND l.property_id=? AND substr(l.entry_date,1,7)=? AND a.type='expense' AND j.source_type<>'work_order'`).get(organizationId,h.propertyId,periodMonth);
+        const propExpenseMinor = expRow.costMinor+Number(extraExpenses!.n);
 
         const ownerShareGross = Math.round(
           rentRow.collectedMinor * (h.ownershipPct / 100),
@@ -1179,6 +1189,7 @@ export function recordOwnerPayout(
         "UPDATE owner_statements SET status = 'paid', updated_at = ? WHERE id = ?",
       )
       .run(nowIso(), statementId);
+    postPayoutsInternal(org,actor,statementId);
     recordAuditLog({
       organizationId: org,
       actorUserId: actor,

@@ -1,3 +1,4 @@
+import { postDepositsInternal } from "../accounting/posting";
 import { getDb } from "@/server/db";
 import {
   newId,
@@ -882,6 +883,7 @@ export function recordDeposit(
       entityId: leaseId,
       metadata: input,
     });
+    postDepositsInternal(org,actor,leaseId);
     return getLeaseEvents(org, leaseId);
   });
 }

@@ -50,3 +50,11 @@ export function atomic<T>(fn: () => T): T {
     throw e;
   }
 }
+
+/** Nestable unit of work for ad-hoc billing, also called by the monthly cycle. */
+export function savepoint<T>(fn: () => T): T {
+ const db=getDb(),name=`sp_${randomUUID().replaceAll('-','')}`;
+ db.exec(`SAVEPOINT ${name}`);
+ try {const value=fn();db.exec(`RELEASE SAVEPOINT ${name}`);return value;}
+ catch(error){db.exec(`ROLLBACK TO SAVEPOINT ${name}`);db.exec(`RELEASE SAVEPOINT ${name}`);throw error;}
+}

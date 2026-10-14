@@ -179,3 +179,24 @@ This header is never attached to external URLs and never placed in query strings
 - No real website/email domain is known; use relative listing URLs until
   `PUBLIC_SITE_URL` is configured. Back up existing SQLite before migration.
 - This is a Phase 0–4 configuration correction. Do not begin Phase 5 or merge PR #2.
+
+## 8. Phase 5 accounting defaults (user authorized after business correction)
+
+- Accrual property-operations ledger, separate from corporate statutory accounts;
+  do not double count cash-basis owner statements or CRM commission estimates.
+- Balanced immutable two-line journals; source-transaction hooks, atomic/idempotent
+  backfill, reserved AR/AP/deposit controls and reasoned reversals. No editing posted
+  history. Snapshot owner allocation with exact integer largest-remainder rounding.
+- Missing historical receipt evidence goes to **legacy settlements clearing**, not
+  invented cash. Display its amount and posting discrepancies prominently.
+- Maintenance accrues to payable; explicit full vendor settlement records cash
+  movement but never initiates a transfer. Expenses support private receipt uploads.
+- Actual date scopes versus full-month budgets; current operational KPIs are labeled
+  as current, unknown vacancy dates stay unknown. Historical fee date limitations,
+  consolidated owner payouts and report definitions are explicit in docs/PHASE5.md.
+- CSV formula protection, genuine XLSX (fflate ZIP, inline text), English PDF with
+  Unicode-preserving alternatives; exports never silently truncate the ledger.
+- Scheduled reports deliver private personal in-app snapshots only, with fresh RBAC,
+  missed-run coalescing and daily/weekly/monthly intervals. External delivery stays off.
+- User subsequently authorized **finishing Phase 5 and continuing directly to Phase 6**.
+  PR #2 remains unmerged. Phase 7 still requires a later authorization.

@@ -15,10 +15,14 @@
     "db:seed": "tsx src/server/db/seed-cli.ts",
     "billing:cycle": "tsx src/server/modules/billing/cycle-cli.ts",
     "maintenance:cycle": "tsx src/server/modules/maintenance/cycle-cli.ts",
-    "maintenance:worker": "tsx src/server/modules/maintenance/cycle-cli.ts --watch"
+    "maintenance:worker": "tsx src/server/modules/maintenance/cycle-cli.ts --watch",
+    "accounting:sync": "tsx src/server/modules/accounting/cycle-cli.ts --sync",
+    "reports:cycle": "tsx src/server/modules/accounting/cycle-cli.ts",
+    "reports:worker": "tsx src/server/modules/accounting/cycle-cli.ts --watch"
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "fflate": "^0.8.3",
     "lucide-react": "^0.468.0",
     "next": "15.5.27",
     "pdf-lib": "^1.17.1",

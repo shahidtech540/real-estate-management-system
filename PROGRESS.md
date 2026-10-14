@@ -15,7 +15,7 @@ company/branch/project assumptions in the historical logs below.
   **90/90 unit/integration tests** and **19/19 browser tests** pass, with production
   build/typecheck green (Phases 0–4 only).
 - Local backup made before preview migration. Details: [`docs/BUSINESS_PROFILE.md`](docs/BUSINESS_PROFILE.md).
-- **Phase 5 remains on hold. PR #2 remains unmerged.**
+- **Phase 5 authorized and completed; Phase 6 subsequently authorized. PR #2 remains unmerged.**
 
 ## Phase Summary Matrix
 
@@ -26,12 +26,26 @@ company/branch/project assumptions in the historical logs below.
 | **Phase 2** | Listings, public site, CRM (leads, viewings, deals) | ✅ **COMPLETED** | **91.91%** (15/15 tests passing) | Bilingual public marketplace (`/listings`), SEO detail pages (`/listings/[slug]`), SVG QR code generator, JSON/CSV portal syndication feeds, public Web Lead Capture form, CRM Lead pipeline & scoring (`0–100`), viewing scheduler with Google Calendar links, and deal closing with multi-agent commission splits |
 | **Phase 3** | Tenants, leases, invoicing, payments, receipts, owner statements | ✅ **COMPLETED (local / mock-provider scope)** | **93.29%** overall statements; **38/38** unit/integration tests + **1/1** browser workflow | Tenant KYC, validated lease lifecycle, PDF agreements/receipts, deposits, inspections, recurring rent/fees, partial payments, credits, arrears, owner statements/payout records |
 | **Phase 4** | Maintenance, vendors, notifications | ✅ **COMPLETED (local / mock-provider scope)** | **84/84** tests; **16/16** browser checks; **94.32%** statements | Tenant photo tickets → triage → vendor work order → actual cost → tenant confirmation; SLA alerts; preventive schedules; durable notification outbox |
-| **Phase 5** | Accounting, dashboards, reports, exports | ⏳ Pending | — | Chart of accounts, double-entry ledger, budget vs actual, executive KPIs, CSV/PDF exports |
+| **Phase 5** | Accounting, dashboards, reports, exports | ✅ Completed (property-operations / local scope) | 112 unit tests; 21 browser tests; 95.07% statements | Immutable balanced ledger, source posting/reconciliation, expenses/receipts, budgets, KPIs, CSV/XLSX/PDF, personal digests |
 | **Phase 6** | Agent orchestration layer, approval queue, audit, kill switch | ⏳ Pending | — | Tool registry, multi-step agent runner, human-in-the-loop approval queue, cost budgets, kill switches |
 | **Phase 7** | Lead, Listing, Rent, Maintenance, Lease & Insights agents + eval suite | ⏳ Pending | — | All 6 domain AI agents + 120+ scenario & adversarial prompt-injection evaluation tests |
 | **Phase 8** | Tenant/owner portals, hardening, performance, docs, deployment guide | ⏳ Pending | — | Dedicated Owner & Tenant portals, OWASP security hardening, OpenAPI spec, runbook, user guides |
 
 ---
+
+## Phase 5 completion checkpoint
+
+- Delivered accounting workspace, typed chart of accounts, paired immutable journals,
+  atomic billing/deposit/maintenance/payout posting, audited reversals, exact owner
+  allocation snapshots, explicit legacy clearing and organization-wide reconciliation.
+- Expenses/private receipt downloads, vendor payment records, monthly budget/actual,
+  financial and operational reports, authenticated CSV/XLSX/English PDF, personal
+  scheduled in-app snapshots with a serial worker and permission revocation checks.
+- No historical financial rows reset; no bank receipt, legal status or vacancy date
+  fabricated. Boundaries, measurement definitions and run/API guide: docs/PHASE5.md.
+- Typecheck/build passed, **112/112 unit/integration**, **21/21 browser**; coverage
+  **95.07% statements/lines, 82.99% branches, 100% functions**.
+- User explicitly authorized proceeding directly to Phase 6. PR #2 stays unmerged.
 
 ## Phase 4 Detailed Completion Log
 

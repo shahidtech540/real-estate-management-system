@@ -12,7 +12,7 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     service: "rems-agentic-platform",
-    phase: 4,
+    phase: 5,
     timestamp: new Date().toISOString(),
     dbLatencyMs: latencyMs,
     metrics: {
