@@ -8,6 +8,7 @@ import {
   nowIso,
   today,
   valid,
+  sourceDate,
   dateSchema,
   monthSchema,
   moneySchema,
@@ -517,7 +518,7 @@ export function payVendor(ctx: JwtPayload, input: unknown) {
         .get(org, b.workOrderId);
     if (!row)
       throw new HttpError(404, "NOT_FOUND", "Completed work order not found.");
-    if (b.paidDate < String(row.completed_at).slice(0, 10))
+    if (b.paidDate < sourceDate(String(row.completed_at)))
       throw new HttpError(
         400,
         "PAYMENT_DATE",

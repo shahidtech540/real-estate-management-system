@@ -964,7 +964,7 @@ export function generateOwnerStatements(
           .prepare(
             `SELECT COALESCE(SUM(pay.amount_minor), 0) AS collectedMinor
            FROM payments pay JOIN invoices i ON i.id = pay.invoice_id
-           WHERE pay.organization_id = ? AND i.property_id = ? AND substr(pay.paid_at,1,7) = ? AND i.type = 'rent' AND pay.status = 'completed' AND pay.deleted_at IS NULL`,
+           WHERE pay.organization_id = ? AND i.property_id = ? AND strftime('%Y-%m',pay.paid_at,'+5 hours') = ? AND i.type = 'rent' AND pay.status = 'completed' AND pay.deleted_at IS NULL`,
           )
           .get(organizationId, h.propertyId, periodMonth) as {
           collectedMinor: number;
@@ -975,7 +975,7 @@ export function generateOwnerStatements(
             `SELECT COALESCE(SUM(w.actual_cost_minor), 0) AS costMinor
            FROM work_orders w
            JOIN maintenance_tickets mt ON mt.id = w.ticket_id
-           WHERE w.organization_id = ? AND mt.property_id = ? AND substr(COALESCE(w.completed_at, w.created_at), 1, 7) = ? AND w.deleted_at IS NULL AND w.status = 'completed'`,
+           WHERE w.organization_id = ? AND mt.property_id = ? AND strftime('%Y-%m',COALESCE(w.completed_at,w.created_at),'+5 hours') = ? AND w.deleted_at IS NULL AND w.status = 'completed'`,
           )
           .get(organizationId, h.propertyId, periodMonth) as {
           costMinor: number;

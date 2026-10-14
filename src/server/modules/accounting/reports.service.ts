@@ -4,6 +4,24 @@ import { HttpError, requirePermission } from "@/server/auth/guards";
 import type { JwtPayload } from "@/server/auth/crypto";
 import { dateSchema, today, valid } from "../shared/domain";
 import { budgetOwnerAmount } from "./accounting.service";
+/** Sum in BigInt before converting back; reject scopes that cannot preserve every paisa. */
+export function sumMinor(values: number[]): number {
+  if (values.some((v) => !Number.isSafeInteger(v)))
+    throw new HttpError(
+      422,
+      "MONEY_PRECISION",
+      "Amounts exceed exact integer precision; narrow report scope.",
+    );
+  const total = values.reduce((n, v) => n + BigInt(v), 0n),
+    limit = BigInt(Number.MAX_SAFE_INTEGER);
+  if (total > limit || total < -limit)
+    throw new HttpError(
+      422,
+      "MONEY_PRECISION",
+      "Amounts exceed exact integer precision; narrow report scope.",
+    );
+  return Number(total);
+}
 export const filterSchema = z
   .object({
     from: dateSchema,
@@ -200,17 +218,19 @@ export function financialReport(ctx: JwtPayload, input: unknown) {
         openingMinor,
         debitMinor,
         creditMinor,
-        closingMinor: openingMinor + debitMinor - creditMinor,
+        closingMinor: sumMinor([openingMinor, debitMinor, -creditMinor]),
       };
     });
   const sum = (type: string) =>
-      accounts
-        .filter((a) => a.type === type)
-        .reduce((n, a) => n + a.debitMinor - a.creditMinor, 0),
+      sumMinor(
+        accounts
+          .filter((a) => a.type === type)
+          .flatMap((a) => [a.debitMinor, -a.creditMinor]),
+      ),
     closing = (type: string) =>
-      accounts
-        .filter((a) => a.type === type)
-        .reduce((n, a) => n + a.closingMinor, 0);
+      sumMinor(
+        accounts.filter((a) => a.type === type).map((a) => a.closingMinor),
+      );
   const budgets = db
     .prepare(
       `SELECT b.*,p.name AS property_name,a.code AS account_code,a.name AS account_name FROM accounting_budgets b JOIN properties p ON p.id=b.property_id AND p.organization_id=b.organization_id JOIN accounts a ON a.id=b.account_id AND a.organization_id=b.organization_id WHERE b.organization_id=? AND b.period_month BETWEEN ? AND ? ${q.propertyId ? "AND b.property_id=?" : ""} ORDER BY b.period_month,p.name,a.code`,
@@ -267,19 +287,19 @@ export function financialReport(ctx: JwtPayload, input: unknown) {
       periodMonth,
       plannedMinor,
       actualMinor,
-      varianceMinor: plannedMinor - actualMinor,
+      varianceMinor: sumMinor([plannedMinor, -actualMinor]),
     };
   });
   const totals = {
-    debitMinor: accounts.reduce((n, a) => n + a.debitMinor, 0),
-    creditMinor: accounts.reduce((n, a) => n + a.creditMinor, 0),
+    debitMinor: sumMinor(accounts.map((a) => a.debitMinor)),
+    creditMinor: sumMinor(accounts.map((a) => a.creditMinor)),
     incomeMinor: 0 - sum("income"),
     expenseMinor: sum("expense"),
-    profitMinor: -sum("income") - sum("expense"),
+    profitMinor: sumMinor([-sum("income"), -sum("expense")]),
     assetsMinor: closing("asset"),
     liabilitiesMinor: 0 - closing("liability"),
     equityMinor: 0 - closing("equity"),
-    retainedEarningsMinor: -closing("income") - closing("expense"),
+    retainedEarningsMinor: sumMinor([-closing("income"), -closing("expense")]),
     cashMovementMinor:
       accounts.find((a) => a.code === "1000")!.debitMinor -
       accounts.find((a) => a.code === "1000")!.creditMinor,
@@ -373,7 +393,7 @@ export function operationalReport(ctx: JwtPayload, input: unknown) {
   );
   const recordedPayments = db
     .prepare(
-      "SELECT p.amount_minor,p.paid_at,i.property_id FROM payments p JOIN invoices i ON i.id=p.invoice_id AND i.organization_id=p.organization_id WHERE p.organization_id=? AND p.deleted_at IS NULL AND p.status='completed' AND i.type='rent' AND substr(p.paid_at,1,10) BETWEEN ? AND ?",
+      "SELECT p.amount_minor,p.paid_at,i.property_id FROM payments p JOIN invoices i ON i.id=p.invoice_id AND i.organization_id=p.organization_id WHERE p.organization_id=? AND p.deleted_at IS NULL AND p.status='completed' AND i.type='rent' AND date(p.paid_at,'+5 hours') BETWEEN ? AND ?",
     )
     .all(org, q.from, q.to)
     .filter((p) => propertyIds.has(p.property_id));
@@ -457,7 +477,7 @@ export function operationalReport(ctx: JwtPayload, input: unknown) {
   const maintenanceCostMinor = Number(
     db
       .prepare(
-        `SELECT COALESCE(SUM(w.actual_cost_minor),0) n FROM work_orders w JOIN maintenance_tickets t ON t.id=w.ticket_id AND t.organization_id=w.organization_id JOIN units u ON u.id=t.unit_id AND u.organization_id=t.organization_id WHERE w.organization_id=? AND w.deleted_at IS NULL AND w.status='completed' AND substr(w.completed_at,1,10) BETWEEN ? AND ? ${propertyClause}`,
+        `SELECT COALESCE(SUM(w.actual_cost_minor),0) n FROM work_orders w JOIN maintenance_tickets t ON t.id=w.ticket_id AND t.organization_id=w.organization_id JOIN units u ON u.id=t.unit_id AND u.organization_id=t.organization_id WHERE w.organization_id=? AND w.deleted_at IS NULL AND w.status='completed' AND date(w.completed_at,'+5 hours') BETWEEN ? AND ? ${propertyClause}`,
       )
       .get(org, q.from, q.to, ...args.slice(1))!.n,
   );

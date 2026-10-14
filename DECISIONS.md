@@ -200,3 +200,29 @@ This header is never attached to external URLs and never placed in query strings
   missed-run coalescing and daily/weekly/monthly intervals. External delivery stays off.
 - User subsequently authorized **finishing Phase 5 and continuing directly to Phase 6**.
   PR #2 remains unmerged. Phase 7 still requires a later authorization.
+
+## 9. Phase 6 orchestration defaults
+
+- Working local human-authored structured-plan adapter, no fabricated LLM usage.
+  Natural-language reasoning/domain agents remain Phase 7; all nonlocal planner modes
+  fail closed. There is no asynchronous external operation inside transactions.
+- Strict versioned allowlisted tools. All engine writes require independent review,
+  even when an admin initiates them. Suggest-only agents cannot write. No external
+  message, deletion, arbitrary SQL/network/shell or unsupported operation is registered.
+- Persist immutable plan/intent and cursor. Use nested savepoints so source effects,
+  ledger/audit writes and cursor/result commit together. Test separate workers racing
+  an approved credit; do not rely solely on repeated sequential idempotency tests.
+- Bind approval to exact input, tool/version and source snapshot hash; reject stale
+  balances/ownership/vendor state. Recheck fresh creator and reviewer permissions.
+  Owners do not inherit full-org engine data via their existing approval permission.
+- Per-org/per-agent kill terminally stops unexecuted work, preserving completed
+  history. Re-enable only permits new runs. No promise to interrupt/undo in-flight
+  synchronous source transactions. Cancellation/rejection/failure are terminal.
+- Provider costs are zero for local plans; recorded budgets are enforced, alongside
+  cost-independent daily attempt and per-run step quotas. Paid async provider budget
+  reservation is explicitly required before a future provider can be switched on.
+- Financial timestamps and receipt/maintenance date scopes use the Karachi business
+  date consistently; historical paid owner snapshots are never rewritten.
+- Static Prisma/WASM and Compose validation is now executable in CI. Docker runtime
+  execution remains unavailable. No production-security certification is asserted.
+- Stop after Phase 6; Phase 7 has not been authorized. Do not merge PR #2.

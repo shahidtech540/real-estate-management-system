@@ -1,6 +1,6 @@
 import { getDb } from "@/server/db";
 import { HttpError } from "@/server/auth/guards";
-import { newId, nowIso, today } from "../shared/domain";
+import { newId, nowIso, today, sourceDate } from "../shared/domain";
 import { recordAuditLog } from "../audit/audit.service";
 export interface Share {
   ownerId: string | null;
@@ -328,7 +328,7 @@ export function postInvoiceInternal(org: string, actor: string, id: string) {
         String(credit.id),
         cancelled ? 0 : Number(credit.amount_minor),
         property,
-        String(credit.created_at).slice(0, 10),
+        sourceDate(String(credit.created_at)),
         code,
         "1100",
         `Credit ${credit.id}: ${credit.reason}`,
@@ -343,7 +343,7 @@ export function postInvoiceInternal(org: string, actor: string, id: string) {
         String(payment.id),
         Number(payment.amount_minor),
         property,
-        String(payment.paid_at).slice(0, 10),
+        sourceDate(String(payment.paid_at)),
         "1000",
         "1100",
         `Payment ${payment.reference_number}`,
@@ -380,7 +380,7 @@ export function postWorkOrderInternal(org: string, actor: string, id: string) {
       id,
       Number(row.actual_cost_minor),
       String(row.property_id),
-      String(row.completed_at).slice(0, 10),
+      sourceDate(String(row.completed_at)),
       "5000",
       "2000",
       `Completed maintenance ${row.work_order_number}`,
@@ -410,7 +410,7 @@ export function postDepositsInternal(
         String(e.id),
         Number(payload.amountMinor),
         String(e.property_id),
-        String(e.created_at).slice(0, 10),
+        sourceDate(String(e.created_at)),
         received ? "1000" : "2100",
         received ? "2100" : "1000",
         `${e.type}: ${payload.reference}`,
@@ -438,7 +438,7 @@ export function postPayoutsInternal(
         String(p.id),
         Number(p.amount_minor),
         null,
-        String(p.paid_at).slice(0, 10),
+        sourceDate(String(p.paid_at)),
         "3100",
         "1000",
         `Owner distribution: ${p.reference_number}`,

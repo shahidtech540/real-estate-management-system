@@ -28,6 +28,9 @@ jobs:
       - name: TypeScript typecheck
         run: npm run typecheck
 
+      - name: Validate PostgreSQL design and Compose shared-volume configuration
+        run: npm run validate:design
+
       - name: Run unit & integration tests with coverage threshold (>= 70%)
         run: npm run test:coverage
 

@@ -1,4 +1,5 @@
 "use client";
+import { OrchestrationWorkspace } from "@/components/OrchestrationWorkspace";
 import { AccountingWorkspace } from "@/components/AccountingWorkspace";
 
 import { authFetch, clearAccessToken } from "@/lib/auth-client";
@@ -284,6 +285,7 @@ export default function DashboardPage() {
     | "listings"
     | "crm"
     | "tenancy"
+    | "orchestration"
     | "accounting"
     | "maintenance"
     | "notifications"
@@ -299,6 +301,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [branches, setBranches] = useState<BranchItem[]>([]);
   useEffect(() => {
+    if(user && activeTab === "orchestration" && !user.permissions.includes("agents:read")) setActiveTab("overview");
     if(user && activeTab === "accounting" && !user.permissions.includes("accounting:read")) setActiveTab("overview");
     if (user && activeTab === "maintenance" && !user.permissions.includes("maintenance:read")) {
       setActiveTab("notifications");
@@ -904,6 +907,7 @@ export default function DashboardPage() {
     ...(user.permissions.includes("invoices:read") ? [{ id: "billing", label: t(locale, "billingTab"), icon: Briefcase }] : []),
     ...(user.permissions.includes("maintenance:read") ? [{ id: "maintenance", label: t(locale, "maintenanceTab"), icon: Activity }] : []),
     ...(user.permissions.includes("accounting:read") ? [{id:"accounting",label:locale==="ur"?"اکاؤنٹنگ اور رپورٹس":"Accounting & reports",icon:FileSpreadsheet}] : []),
+    ...(user.permissions.includes("agents:read") ? [{id:"orchestration",label:locale==="ur"?"ایجنٹ آرکیسٹریشن":"Agent orchestration",icon:Sparkles}] : []),
     { id: "notifications", label: t(locale, "notificationsTab"), icon: Activity },
     { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
     { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
@@ -1047,7 +1051,7 @@ export default function DashboardPage() {
             </div>
             <span className="shrink-0 inline-flex items-center gap-2 text-xs font-medium text-slate-500">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              {t(locale, "phase4Status")}
+              {t(locale, "phase6Status")}
             </span>
           </div>
 
@@ -1589,6 +1593,7 @@ export default function DashboardPage() {
 
         {activeTab === "tenancy" && <TenancyWorkspace permissions={user.permissions} locale={locale} units={units} onRefresh={() => { fetchPortfolio(); fetchAudit(auditFilter); }} />}
         {activeTab === "billing" && <BillingWorkspace permissions={user.permissions} locale={locale} onRefresh={() => { fetchMe(); fetchAudit(auditFilter); }} />}
+        {activeTab === "orchestration" && <OrchestrationWorkspace key={user.id} userId={user.id} locale={locale} permissions={user.permissions} />}
         {activeTab === "accounting" && <AccountingWorkspace key={user.id} locale={locale} permissions={user.permissions} />}
         {activeTab === "maintenance" && <MaintenanceWorkspace key={user.id} permissions={user.permissions} locale={locale} roleSlug={user.role.slug} />}
         {activeTab === "notifications" && <NotificationsWorkspace key={user.id} permissions={user.permissions} locale={locale} />}

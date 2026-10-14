@@ -189,3 +189,36 @@ erDiagram
 Immutable events/reviews/runs are retained rather than soft-deleted. Operational
 choices and lifecycle/RBAC guarantees are detailed in [`PHASE4.md`](PHASE4.md).
 Prisma mirrors the design; SQLite is still the implemented database engine.
+
+## Phase 5/6 additive runtime schema
+
+`src/server/db/phase5.ts` and `phase6.ts` are the authoritative tested SQLite
+migrations; Prisma mirrors the deployment design but is not an active database
+switch. PostgreSQL must explicitly port SQLite CHECKs, partial indexes and triggers.
+
+```mermaid
+erDiagram
+  organizations ||--o{ journal_batches : scopes
+  journal_batches ||--|{ ledger_entries : paired_lines
+  ledger_entries ||--o{ ledger_owner_allocations : snapshots
+  owners ||--o{ ledger_owner_allocations : attributed
+  accounts ||--o{ ledger_entries : posts
+  properties ||--o{ journal_batches : scopes
+  organizations ||--o{ accounting_source_state : idempotency
+  journal_batches ||--o| accounting_expenses : evidence
+  accounts ||--o{ accounting_budgets : plans
+  properties ||--o{ accounting_budgets : plans
+  work_orders ||--o| accounting_vendor_payments : settled
+  users ||--o{ report_schedules : owns
+  report_schedules ||--o{ report_deliveries : snapshots
+  notifications ||--o| report_deliveries : announces
+  organizations ||--|| orchestration_settings : kill_quotas
+  agents ||--o{ agent_runs : plans
+  agent_runs ||--o{ tool_calls : ordered_cursor
+  tool_calls ||--o| approval_requests : bound_intent
+```
+
+Journals/ledger/allocation history is immutable. Source state tracks posting deltas;
+reversals append new balanced journals. Run plan/intent are immutable; mutable run
+cursor and tool status commit **in the same transaction as source effects**. Approval
+SHA-256 binds organization, run, ordinal, tool/version, exact input and source snapshot.

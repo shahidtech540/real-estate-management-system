@@ -3,6 +3,7 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   timeout: 60000,
+  workers: 1, // Shared demo fixtures and kill switches: keep workflow tests serial.
   webServer: {
     command: "npm start",
     url: "http://localhost:3000",

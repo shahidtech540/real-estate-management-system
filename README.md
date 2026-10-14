@@ -26,6 +26,10 @@ npm run db:seed
 npm run dev
 # Second terminal, using the SAME database path/environment as the app:
 npm run maintenance:worker
+# Optional separate terminals, using the SAME database:
+npm run accounting:sync  # one-time existing-source import (safe to repeat)
+npm run reports:worker
+npm run agents:worker
 ```
 
 Open `http://localhost:3000`. SQLite at `./data/rems.sqlite` initializes and migrates
@@ -51,7 +55,7 @@ The unrelated secondary demo company is retired and no longer available to sign 
 
 ## Current capabilities
 
-Phases 0–5 are complete for local/mock-provider use:
+Phases 0–6 are complete for local/mock-provider use:
 - Role-based access, organization isolation, optional TOTP and English/Urdu RTL.
 - Properties/units, ownership splits, document vault and CSV import.
 - Listings/public enquiries, CRM pipeline, viewings and commission tracking.
@@ -61,6 +65,9 @@ Phases 0–5 are complete for local/mock-provider use:
 - Accrual accounting, immutable double-entry journals, expenses/receipts, budgets,
   financial/operational reports, CSV/XLSX/PDF exports and private scheduled digests.
   See [`docs/PHASE5.md`](docs/PHASE5.md).
+- Durable local structured-plan orchestration, independent approval queues, fresh
+  permission checks, immutable intent/source hashes, budgets and kill switches.
+  See [`docs/PHASE6.md`](docs/PHASE6.md). Domain reasoning agents remain Phase 7.
 
 At narrow widths use the **Workspace** dropdown. Existing rent records and unit
 identities survive the business correction. The five invented sub-projects are

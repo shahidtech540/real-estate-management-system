@@ -292,6 +292,8 @@ model Unit {
   property         Property  @relation(fields: [propertyId], references: [id])
   building         Building? @relation(fields: [buildingId], references: [id])
 
+  vacantSince DateTime? @map("vacant_since")
+
   @@index([organizationId, propertyId, status])
   @@map("units")
 }
@@ -568,6 +570,10 @@ model LedgerEntry {
 
   organization   Organization @relation(fields: [organizationId], references: [id])
 
+  journalId String? @map("journal_id")
+  lineNumber Int? @map("line_number")
+  @@unique([organizationId, journalId, lineNumber])
+
   @@index([organizationId, propertyId, entryDate])
   @@map("ledger_entries")
 }
@@ -741,6 +747,8 @@ model Agent {
 
   organization    Organization @relation(fields: [organizationId], references: [id])
 
+  runtimeInitialized Boolean @default(false) @map("runtime_initialized")
+
   @@unique([organizationId, slug])
   @@map("agents")
 }
@@ -762,6 +770,15 @@ model AgentRun {
   updatedAt        DateTime @updatedAt @map("updated_at")
   createdBy        String?  @map("created_by")
 
+  planJson String @default("[]") @map("plan_json")
+  nextStep Int @default(0) @map("next_step")
+  requestKey String? @map("request_key")
+  provider String @default("local-scripted")
+  maxCostMinor BigInt @default(0) @map("max_cost_minor")
+  errorCode String? @map("error_code")
+  errorMessage String? @map("error_message")
+  @@unique([organizationId, createdBy, requestKey])
+
   @@index([organizationId, agentId])
   @@map("agent_runs")
 }
@@ -779,6 +796,13 @@ model ToolCall {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
   createdBy        String?  @map("created_by")
+
+  stepIndex Int? @map("step_index")
+  inputHash String? @map("input_hash")
+  toolVersion String? @map("tool_version")
+  sourceHash String? @map("source_hash")
+  executedAt DateTime? @map("executed_at")
+  @@unique([organizationId, agentRunId, stepIndex])
 
   @@index([organizationId, agentRunId])
   @@map("tool_calls")
@@ -800,6 +824,9 @@ model ApprovalRequest {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
   createdBy      String?   @map("created_by")
+
+
+  @@unique([organizationId, toolCallId])
 
   @@index([organizationId, status])
   @@map("approval_requests")
@@ -959,4 +986,136 @@ model NotificationTemplate {
   createdBy      String   @map("created_by")
   @@unique([organizationId, event, locale])
   @@map("notification_templates")
+}
+
+// Phase 5/6 PostgreSQL design. SQLite migrations are authoritative for runtime
+// foreign keys, partial indexes, CHECKs and immutability triggers; port those explicitly.
+model JournalBatch {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  propertyId String? @map("property_id")
+  entryDate DateTime @map("entry_date")
+  description String
+  sourceType String @map("source_type")
+  sourceId String @map("source_id")
+  reference String
+  reversedBatchId String? @map("reversed_batch_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, reference])
+  @@unique([reversedBatchId])
+  @@index([organizationId, entryDate, propertyId])
+  @@map("journal_batches")
+}
+model AccountingSourceState {
+  organizationId String @map("organization_id")
+  sourceType String @map("source_type")
+  sourceId String @map("source_id")
+  postedMinor BigInt @map("posted_minor")
+  propertyId String? @map("property_id")
+  revision Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@id([organizationId, sourceType, sourceId])
+  @@map("accounting_source_state")
+}
+model LedgerOwnerAllocation {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  ledgerEntryId String @map("ledger_entry_id")
+  ownerId String? @map("owner_id")
+  amountMinor BigInt @map("amount_minor")
+  ownershipBasisPoints Int @map("ownership_basis_points")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  @@index([organizationId, ownerId, ledgerEntryId])
+  @@map("ledger_owner_allocations")
+}
+model AccountingExpense {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  propertyId String @map("property_id")
+  accountId String @map("account_id")
+  amountMinor BigInt @map("amount_minor")
+  expenseDate DateTime @map("expense_date")
+  description String
+  reference String
+  status String
+  journalId String @map("journal_id")
+  receiptName String? @map("receipt_name")
+  receiptMime String? @map("receipt_mime")
+  receiptData String? @map("receipt_data")
+  voidReason String? @map("void_reason")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, reference])
+  @@map("accounting_expenses")
+}
+model AccountingBudget {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  propertyId String @map("property_id")
+  accountId String @map("account_id")
+  periodMonth String @map("period_month")
+  amountMinor BigInt @map("amount_minor")
+  ownerSharesJson String @map("owner_shares_json")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, propertyId, accountId, periodMonth])
+  @@map("accounting_budgets")
+}
+model AccountingVendorPayment {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  workOrderId String @map("work_order_id")
+  reference String
+  paidDate DateTime @map("paid_date")
+  amountMinor BigInt @map("amount_minor")
+  journalId String @map("journal_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([workOrderId])
+  @@unique([organizationId, reference])
+  @@map("accounting_vendor_payments")
+}
+model ReportSchedule {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  userId String @map("user_id")
+  frequency String
+  nextDueAt DateTime @map("next_due_at")
+  active Boolean
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@map("report_schedules")
+}
+model ReportDelivery {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  scheduleId String @map("schedule_id")
+  dueAt DateTime @map("due_at")
+  reportJson String @map("report_json")
+  notificationId String @map("notification_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, scheduleId, dueAt])
+  @@map("report_deliveries")
+}
+model OrchestrationSettings {
+  organizationId String @id @map("organization_id")
+  enabled Boolean
+  dailyCostBudgetMinor BigInt @map("daily_cost_budget_minor")
+  dailyToolLimit Int @map("daily_tool_limit")
+  maxSteps Int @map("max_steps")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@map("orchestration_settings")
 }

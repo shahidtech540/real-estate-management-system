@@ -15,7 +15,7 @@ company/branch/project assumptions in the historical logs below.
   **90/90 unit/integration tests** and **19/19 browser tests** pass, with production
   build/typecheck green (Phases 0–4 only).
 - Local backup made before preview migration. Details: [`docs/BUSINESS_PROFILE.md`](docs/BUSINESS_PROFILE.md).
-- **Phase 5 authorized and completed; Phase 6 subsequently authorized. PR #2 remains unmerged.**
+- **Phases 5 and 6 completed for their documented local scopes. Phase 7 not started. PR #2 remains unmerged.**
 
 ## Phase Summary Matrix
 
@@ -27,11 +27,34 @@ company/branch/project assumptions in the historical logs below.
 | **Phase 3** | Tenants, leases, invoicing, payments, receipts, owner statements | ✅ **COMPLETED (local / mock-provider scope)** | **93.29%** overall statements; **38/38** unit/integration tests + **1/1** browser workflow | Tenant KYC, validated lease lifecycle, PDF agreements/receipts, deposits, inspections, recurring rent/fees, partial payments, credits, arrears, owner statements/payout records |
 | **Phase 4** | Maintenance, vendors, notifications | ✅ **COMPLETED (local / mock-provider scope)** | **84/84** tests; **16/16** browser checks; **94.32%** statements | Tenant photo tickets → triage → vendor work order → actual cost → tenant confirmation; SLA alerts; preventive schedules; durable notification outbox |
 | **Phase 5** | Accounting, dashboards, reports, exports | ✅ Completed (property-operations / local scope) | 112 unit tests; 21 browser tests; 95.07% statements | Immutable balanced ledger, source posting/reconciliation, expenses/receipts, budgets, KPIs, CSV/XLSX/PDF, personal digests |
-| **Phase 6** | Agent orchestration layer, approval queue, audit, kill switch | ⏳ Pending | — | Tool registry, multi-step agent runner, human-in-the-loop approval queue, cost budgets, kill switches |
+| **Phase 6** | Agent orchestration layer, approval queue, audit, kill switch | ✅ Completed (local structured-plan scope) | 142 unit/integration; 24 browser workflows | Versioned allowlist, durable cursor, independent source-bound approvals, budgets, fresh RBAC and org/agent kill controls |
 | **Phase 7** | Lead, Listing, Rent, Maintenance, Lease & Insights agents + eval suite | ⏳ Pending | — | All 6 domain AI agents + 120+ scenario & adversarial prompt-injection evaluation tests |
 | **Phase 8** | Tenant/owner portals, hardening, performance, docs, deployment guide | ⏳ Pending | — | Dedicated Owner & Tenant portals, OWASP security hardening, OpenAPI spec, runbook, user guides |
 
 ---
+
+## Phase 6 completion checkpoint
+
+- Delivered working local structured-plan adapter and 10 strict versioned domain
+  tools; no model/network/payment-provider usage fabricated. Domain agents stay Phase 7.
+- Durable ordered runs/cursor/results, request-key idempotency, independent approvals
+  with exact intent/version/source snapshots, no self-review, fresh creator/reviewer
+  authorization and stale-source rejection. Source effects and progress commit together.
+- Per-org/per-agent controls, budgets, cost-independent quotas, terminal kill/cancel,
+  trace and approval UI, bounded requests/outputs, serial CLI/worker and audited decisions.
+- Tests include actual file-backed restart and two separate workers racing one approved
+  credit. Browser coverage includes role-switched finance review, kill controls and RTL.
+- Prisma design and Compose shared-volume configuration validated with executable CI
+  checks. Docker container execution remains unavailable. See docs/PHASE6.md.
+- Preserved preview DB imported **474 balanced journals / 948 lines**; repeated sync
+  posted zero. All 240 invoices, 17 payments/receipts, 20 leases and other preexisting
+  financial source rows match the pre-Phase-5 backup exactly; foreign keys are clean.
+- Recorded cash from actual receipts: **PKR 1,597,500**; legacy clearing **PKR 20,520,000**
+  is NOT verified cash. No bank receipts were invented or source records reset.
+- Final verification: **142/142 unit/integration tests**, **24/24 browser tests**,
+  typecheck/build/design validation green. Coverage **95.43% statements/lines**,
+  **83.56% branches**, **100% functions**.
+- **STOP at Phase 6. Phase 7 not started/authorized. PR #2 remains unmerged.**
 
 ## Phase 5 completion checkpoint
 

@@ -18,7 +18,10 @@
     "maintenance:worker": "tsx src/server/modules/maintenance/cycle-cli.ts --watch",
     "accounting:sync": "tsx src/server/modules/accounting/cycle-cli.ts --sync",
     "reports:cycle": "tsx src/server/modules/accounting/cycle-cli.ts",
-    "reports:worker": "tsx src/server/modules/accounting/cycle-cli.ts --watch"
+    "reports:worker": "tsx src/server/modules/accounting/cycle-cli.ts --watch",
+    "agents:cycle": "tsx src/server/modules/orchestration/cycle-cli.ts",
+    "agents:worker": "tsx src/server/modules/orchestration/cycle-cli.ts --watch",
+    "validate:design": "node scripts/validate-design.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -33,6 +36,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
+    "@prisma/prisma-schema-wasm": "^6.19.0-26.2ba551f319ab1df4bc874a89965d8b3641056773",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
@@ -42,6 +46,7 @@
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "yaml": "^2.9.1"
   }
 }

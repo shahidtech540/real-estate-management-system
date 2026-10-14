@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { SCHEMA_DDL } from "./schema";
 import { seedDatabase } from "./seed";
+import { migratePhase6 } from "./phase6";
 import { migratePhase5, seedPhase5 } from "./phase5";
 import { applyBusinessProfile } from "./business-profile";
 import { migratePhase4, seedPhase4 } from "./phase4";
@@ -57,6 +58,7 @@ export function getDb(): DatabaseSyncType {
   if (process.env.NODE_ENV !== "test") applyBusinessProfile(dbInstance);
   migratePhase5(dbInstance);
   seedPhase5(dbInstance);
+  migratePhase6(dbInstance);
 
   return dbInstance;
 }

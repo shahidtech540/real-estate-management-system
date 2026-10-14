@@ -97,6 +97,39 @@ services:
       app:
         condition: service_healthy
 
+  reports-worker:
+    image: rems-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["npm", "run", "reports:worker"]
+    environment:
+      NODE_ENV: production
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+    volumes:
+      - sqlite_data:/app/data
+    depends_on:
+      app:
+        condition: service_healthy
+
+  agents-worker:
+    image: rems-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["npm", "run", "agents:worker"]
+    environment:
+      NODE_ENV: production
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+      AGENT_PROVIDER_MODE: local
+    volumes:
+      - sqlite_data:/app/data
+    depends_on:
+      app:
+        condition: service_healthy
+
 volumes:
   sqlite_data:
   postgres_data:
