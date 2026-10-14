@@ -95,7 +95,7 @@ function req(path: string, method = "GET", body?: unknown, token?: string) {
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 }
-function token(email = "admin@pakland.pk") {
+function token(email = "admin@fahadrealestate.test") {
   return loginWithPassword({ email, password: DEMO_PASSWORD }).accessToken;
 }
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
@@ -495,9 +495,9 @@ describe("Phase 3 tenancy & billing", () => {
   });
   it("enforces authentication, RBAC and row-level tenant / owner access through REST", async () => {
     expect((await invoicesApi.GET(req("billing/invoices"))).status).toBe(401);
-    const tenant = token("tenant@pakland.pk"),
-      owner = token("owner@pakland.pk"),
-      agent = token("agent@pakland.pk"),
+    const tenant = token("tenant@fahadrealestate.test"),
+      owner = token("owner@fahadrealestate.test"),
+      agent = token("agent@fahadrealestate.test"),
       other = token("admin@indusvalley.pk");
     expect(
       (

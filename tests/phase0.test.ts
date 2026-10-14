@@ -91,7 +91,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
     expect(invoices.c).toBe(240);
 
     const accounts = listDemoAccounts();
-    expect(accounts.length).toBe(7);
+    expect(accounts.length).toBe(6);
   });
 
   it("hashes passwords, signs/verifies JWTs, and generates/verifies RFC 6238 TOTP codes", () => {
@@ -103,7 +103,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
     const token = signAccessToken(
       {
         sub: "usr_admin",
-        email: "admin@pakland.pk",
+        email: "admin@fahadrealestate.test",
         fullName: "Tariq Mahmood",
         organizationId: "org_pakland",
         organizationSlug: "pakland-developers",
@@ -124,7 +124,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
     const expired = signAccessToken(
       {
         sub: "usr_admin",
-        email: "admin@pakland.pk",
+        email: "admin@fahadrealestate.test",
         fullName: "Tariq Mahmood",
         organizationId: "org_pakland",
         organizationSlug: "pakland-developers",
@@ -139,7 +139,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
 
     // TOTP 2FA check
     const secret = generateTotpSecret();
-    const uri = buildOtpAuthUri("admin@pakland.pk", secret);
+    const uri = buildOtpAuthUri("admin@fahadrealestate.test", secret);
     expect(uri).toContain("otpauth://totp/");
     const code = generateTotpCode(secret);
     expect(code).toMatch(/^\d{6}$/);
@@ -149,12 +149,12 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
 
   it("authenticates all 6 roles with distinct RBAC permissions and rotates refresh tokens", () => {
     const roleEmails = [
-      { email: "admin@pakland.pk", roleSlug: "admin", minPerms: 35 },
-      { email: "agent@pakland.pk", roleSlug: "agent", minPerms: 10 },
-      { email: "accountant@pakland.pk", roleSlug: "accountant", minPerms: 10 },
-      { email: "maintenance@pakland.pk", roleSlug: "maintenance_staff", minPerms: 8 },
-      { email: "owner@pakland.pk", roleSlug: "owner", minPerms: 8 },
-      { email: "tenant@pakland.pk", roleSlug: "tenant", minPerms: 5 },
+      { email: "admin@fahadrealestate.test", roleSlug: "admin", minPerms: 35 },
+      { email: "agent@fahadrealestate.test", roleSlug: "agent", minPerms: 10 },
+      { email: "accountant@fahadrealestate.test", roleSlug: "accountant", minPerms: 10 },
+      { email: "maintenance@fahadrealestate.test", roleSlug: "maintenance_staff", minPerms: 8 },
+      { email: "owner@fahadrealestate.test", roleSlug: "owner", minPerms: 8 },
+      { email: "tenant@fahadrealestate.test", roleSlug: "tenant", minPerms: 5 },
     ];
 
     for (const item of roleEmails) {
@@ -169,7 +169,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
 
     // Refresh token rotation
     const adminLogin = loginWithPassword({
-      email: "admin@pakland.pk",
+      email: "admin@fahadrealestate.test",
       password: DEMO_PASSWORD,
     });
     const firstRefreshToken = adminLogin.refreshToken!;
@@ -199,7 +199,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
 
     // Login without 2FA code prompts for 2FA
     const challenge = loginWithPassword({
-      email: "admin@pakland.pk",
+      email: "admin@fahadrealestate.test",
       password: DEMO_PASSWORD,
     });
     expect(challenge.requiresTwoFactor).toBe(true);
@@ -207,7 +207,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
 
     // Login with valid 2FA code succeeds
     const validLogin = loginWithPassword({
-      email: "admin@pakland.pk",
+      email: "admin@fahadrealestate.test",
       password: DEMO_PASSWORD,
       twoFactorCode: setup.currentDemoCode,
     });
@@ -221,7 +221,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
 
   it("enforces RBAC permissions and strict multi-tenancy isolation between organizations", () => {
     const tenantLogin = loginWithPassword({
-      email: "tenant@pakland.pk",
+      email: "tenant@fahadrealestate.test",
       password: DEMO_PASSWORD,
     });
     const tenantCtx = verifyAccessToken(tenantLogin.accessToken!)!;
@@ -270,17 +270,17 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
     const healthRes = await healthGet();
     const healthJson = await healthRes.json();
     expect(healthJson.status).toBe("ok");
-    expect(healthJson.metrics.paklandProperties).toBe(10);
+    expect(healthJson.metrics.companyProperties).toBe(10);
 
     // GET demo accounts
     const demoRes = await loginGet();
     const demoJson = await demoRes.json();
-    expect(demoJson.accounts.length).toBe(7);
+    expect(demoJson.accounts.length).toBe(6);
 
     // POST login via route handler
     const loginReq = new NextRequest("http://localhost:3000/api/v1/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email: "admin@pakland.pk", password: DEMO_PASSWORD }),
+      body: JSON.stringify({ email: "admin@fahadrealestate.test", password: DEMO_PASSWORD }),
       headers: { "content-type": "application/json" },
     });
     const loginRes = await loginPost(loginReq);
@@ -314,7 +314,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({
-          email: "newagent@pakland.pk",
+          email: "newagent@fahadrealestate.test",
           fullName: "Hassan Ali",
           password: "Password123!",
           roleSlug: "agent",
@@ -426,7 +426,7 @@ describe("Phase 0: Plan, ERD, Seed Dataset, Auth, RBAC & Multi-Tenancy", () => {
     expect(formatMinorCurrency(15000000)).toBe("PKR 150,000");
     expect(formatCompactPkr(2500000000)).toContain("Crore");
     expect(formatCompactPkr(50000000)).toContain("Lakh");
-    expect(t("ur", "appName")).toContain("پاک لینڈ");
-    expect(t("en", "appName")).toContain("PakLand");
+    expect(t("ur", "appName")).toContain("فہد رئیل اسٹیٹ");
+    expect(t("en", "appName")).toContain("Fahad Real Estate");
   });
 });

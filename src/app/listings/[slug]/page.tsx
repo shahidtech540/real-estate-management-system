@@ -34,7 +34,7 @@ export async function generateMetadata({
     };
   } catch {
     return {
-      title: "Property Listing | PakLand REMS",
+      title: "Property Listing | Fahad Real Estate REMS",
     };
   }
 }
@@ -196,11 +196,11 @@ export default async function ListingSeoDetailPage({
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-2">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
               <Building2 className="w-4 h-4 text-emerald-600" />
-              <span>Verified by PakLand Developers</span>
+              <span>Contact Fahad Real Estate to verify details</span>
             </div>
             <p className="text-xs text-slate-600">
-              All listings are backed by verified ownership records and NOC documentation in the
-              Central Document Vault.
+              Sample inventory is shown for demonstration. Verify ownership, approvals, price and
+              availability with Fahad Real Estate before making a commitment.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold pt-1">
               <CheckCircle2 className="w-4 h-4" />

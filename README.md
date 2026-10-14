@@ -1,101 +1,108 @@
-# PakLand Agentic Real Estate Management System (REMS)
+# Fahad Real Estate — Rahim Yar Khan
 
-A phased, multi-tenant **Real Estate Management System (REMS)** with planned **Agentic AI** capabilities, built for housing scheme developers, commercial centers, property managers, and real estate agencies.
+Property management for **Fahad Real Estate**, with a single office in
+**Rahim Yar Khan, Punjab, Pakistan**.
 
----
+## Projects
 
-## Quick Start
+All five projects are in Rahim Yar Khan:
 
-### Option A: Zero-Daemon Local Run (Node.js 22+)
+1. Fahad Garden Housing Scheme
+2. Abdullah City
+3. Taj Commercial Center
+4. VIP Block
+5. University Commercial Centers
+
+Exact street addresses, map coordinates, legal approvals and the company's real
+email/domain/phone have **not** been supplied. None are asserted by this setup.
+The units, owners, customers, prices and financial transactions remain **demo
+records**, not a verified inventory or legal/financial representation of the business.
+
+## Run locally (Node.js 22+)
+
 ```bash
-npm install
+npm ci
 npm run db:seed
 npm run dev
-```
-Phases 0–4 are implemented for local use; external integrations use explicit mocks.
-See `PROGRESS.md` for current capabilities and remaining production hardening.
-
-Open `http://localhost:3000`. The embedded SQLite database (`./data/rems.sqlite`) initializes the schema and seeds the full demo dataset automatically.
-
-### Option B: Docker Compose (PostgreSQL + pgvector, Redis, MinIO, App)
-```bash
-cp .env.example .env
-docker compose up --build
+# Second terminal, using the SAME database path/environment as the app:
+npm run maintenance:worker
 ```
 
----
+Open `http://localhost:3000`. SQLite at `./data/rems.sqlite` initializes and migrates
+automatically. To use a different file, export `SQLITE_DB_PATH` in both terminals.
+Production build: `npm run build`, then `npm start`.
 
-## Seeded Demo Accounts (All 6 Roles + Secondary Organization)
+### Demo sign-in
 
-Default Password for all accounts: **`Password123!`**
+Password for all six demo roles: **`Password123!`**.
 
-| Role | Email | Organization | Branch | Key Capabilities |
-|---|---|---|---|---|
-| **Admin** | `admin@pakland.pk` | PakLand Developers | Islamabad HQ | Full access (all 36 permissions), RBAC matrix editor, user/branch admin, audit trail |
-| **Sales Agent** | `agent@pakland.pk` | PakLand Developers | Islamabad HQ | Listings, CRM leads, viewings, deals, Lead & Listing AI agents |
-| **Accountant** | `accountant@pakland.pk` | PakLand Developers | Islamabad HQ | Rent invoicing, payments, receipts, owner statements, chart of accounts |
-| **Maintenance** | `maintenance@pakland.pk` | PakLand Developers | Rawalpindi | Maintenance ticket triage, SLA tracking, vendor & work order dispatch |
-| **Owner** | `owner@pakland.pk` | PakLand Developers | Islamabad HQ | Owner portal, property performance, payout statements, approvals |
-| **Tenant** | `tenant@pakland.pk` | PakLand Developers | Rawalpindi | Tenant portal (Urdu RTL default), lease details, invoices, ticket submission |
-| **Org 2 Admin** | `admin@indusvalley.pk` | Indus Valley Estates | Karachi HQ | Demonstrates strict row-level multi-tenant isolation (`org_indus`) |
+| Role | Demo email |
+|---|---|
+| Administrator | `admin@fahadrealestate.test` |
+| Sales agent | `agent@fahadrealestate.test` |
+| Accountant | `accountant@fahadrealestate.test` |
+| Maintenance coordinator | `maintenance@fahadrealestate.test` |
+| Owner | `owner@fahadrealestate.test` |
+| Tenant | `tenant@fahadrealestate.test` |
 
----
+`.test` is a reserved demo domain, not an operational company email address.
+Original `@pakland.pk` sign-ins remain aliases for the six existing demo users.
+The unrelated secondary demo company is retired and no longer available to sign in.
 
-## Verification & Testing Commands
+## Current capabilities
+
+Phases 0–4 are complete for local/mock-provider use:
+- Role-based access, organization isolation, optional TOTP and English/Urdu RTL.
+- Properties/units, ownership splits, document vault and CSV import.
+- Listings/public enquiries, CRM pipeline, viewings and commission tracking.
+- Tenants/leases, rent invoices, payment records, PDF receipts and owner statements.
+- Photo maintenance tickets, vendor work orders, costs, tenant confirmations,
+  SLA alerts, preventive schedules and a notification inbox/outbox.
+
+At narrow widths use the **Workspace** dropdown. Existing rent records and unit
+identities survive the business correction. The five invented sub-projects are
+archived and their operational inventory consolidated under the five named projects.
+Paid statements, ledger records and audit history are not rewritten. See
+[`docs/BUSINESS_PROFILE.md`](docs/BUSINESS_PROFILE.md) for migration details.
+
+**External payment and email/SMS/WhatsApp adapters are mock implementations.**
+`mock_sent` is simulated delivery. Live delivery fails closed until a validated
+provider adapter is implemented. No real charges, bank payouts or messages are
+performed by the mocks. Agent orchestration, full accounting, dedicated portals
+and production hardening remain in their later phases.
+
+## Tests
 
 ```bash
-# TypeScript strict check
 npm run typecheck
-
-# Run unit & integration test suite with >=70% coverage enforcement
 npm run test:coverage
-
-# Production build verification
 npm run build
+npx playwright install --with-deps chromium
+CI=true npm run test:e2e
 ```
 
----
+Security regression suites intentionally retain the original multi-organization
+fixture world under `NODE_ENV=test`. Business-profile tests explicitly migrate it
+and check the corrected setup. Production and browser tests always use the actual
+Fahad Real Estate profile; no old branches/company are exposed by the normal app.
 
-## Key Documentation
-- [`DECISIONS.md`](./DECISIONS.md) — Architectural & domain defaults
-- [`PROGRESS.md`](./PROGRESS.md) — Phase-by-phase completion log
-- [`docs/PLAN.md`](./docs/PLAN.md) — Architecture diagram, stack justification, folder structure, and risk register
-- [`docs/ERD.md`](./docs/ERD.md) — Core Entity-Relationship Diagram and data model specification
+## Deployment notes
 
+Docker scaffolding: `docker compose up --build`; app and maintenance worker share
+a persistent SQLite volume. Docker execution was unavailable in the development
+sandbox. PostgreSQL, Redis and S3 settings remain deployment designs, not enabled
+runtime switches. Use secure deployment-specific secrets; the demo is not a
+production-security certification.
 
-## Phase 3: Tenancy & Billing
+Set `PUBLIC_SITE_URL` to your actual deployed origin for absolute QR/feed links.
+Until then exports use relative listing paths rather than an invented domain.
 
-Open **Tenants & Leases** and **Rent & Payments** in `/dashboard`.
-See [`docs/PHASE3.md`](./docs/PHASE3.md) for the complete tenant-to-receipt
-walkthrough, API payloads, scheduled cycle command, browser test and explicit
-mock/live boundaries. Existing databases are preserved; to explore the expanded
-fixtures use `SQLITE_DB_PATH=./data/phase3-demo.sqlite npm run dev`.
+## Documentation / next checkpoint
 
-**Deployment note:** The current services run on SQLite even if `DATABASE_URL`
-is set. The Prisma PostgreSQL schema is a deployment design, not a functioning
-switchable repository. Live payment-provider processing is disabled; external
-verified payments may be recorded manually, or explicitly simulated locally.
+- [Business setup and safe migration](docs/BUSINESS_PROFILE.md)
+- [Progress](PROGRESS.md) and [decisions](DECISIONS.md)
+- [Architecture](docs/PLAN.md) and [data model](docs/ERD.md)
+- [Phase 3 walkthrough/API](docs/PHASE3.md)
+- [Phase 4 walkthrough/API](docs/PHASE4.md)
 
-
-## Phase 4: Maintenance, Vendors & Notifications
-
-Open **Maintenance & Vendors** and **Notifications** in the dashboard (or the
-**Workspace** dropdown on smaller screens). Report a tenant issue with photos,
-triage/assign it as maintenance staff, complete work with actual PKR costs, then
-confirm/rate it as the tenant. Administrators can review delivery logs and templates.
-
-Run the background scheduler in a second terminal using the app's database path:
-
-```bash
-npm run maintenance:worker  # every 60 seconds; Ctrl+C stops it
-# Or one scan (also suitable for cron):
-npm run maintenance:cycle
-```
-
-In-app notifications are real; **email/SMS/WhatsApp are simulated by default** and
-shown as `mock_sent`. No external message is sent in mock mode. Switching to live
-mode fails closed until a real provider adapter is implemented and validated.
-
-Walkthrough, SLA defaults, consent/retry rules, API reference and provider
-requirements: [`docs/PHASE4.md`](docs/PHASE4.md). Existing databases migrate without
-resetting rent/portfolio records. PR #2 remains unmerged; Phase 5 awaits approval.
+**Phase 5 is on hold** until the user approves continuing. PR #2 remains unmerged.

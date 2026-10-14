@@ -81,7 +81,7 @@ export function seedPhase4(db: DatabaseSync) {
   db.exec("BEGIN IMMEDIATE");
   try {
     for (const [id, name, category, rate] of [
-      ["ven_plumber", "PakLand Plumbing Services", "plumbing", 250000],
+      ["ven_plumber", "Fahad Real Estate Plumbing Services", "plumbing", 250000],
       ["ven_electric", "Safe Circuit Electricians", "electrical", 300000],
       ["ven_hvac", "Punjab HVAC Care", "hvac", 500000],
     ] as const)

@@ -224,7 +224,7 @@ export function listListings(params: ListingFilterParams) {
       ...r,
       syndicatePortals: Boolean(r.syndicatePortals),
       shareableUrl,
-      qrCodeSvgDataUri: generateListingQrSvg(`https://pakland.rems.pk/listings/${r.slug}`),
+      qrCodeSvgDataUri: generateListingQrSvg(`${(process.env.PUBLIC_SITE_URL || "").replace(/\/$/, "")}/listings/${r.slug}`),
       seo: {
         metaTitle: `${r.titleEn} | ${r.propertyName} (${r.city})`,
         metaDescription: r.descriptionEn.slice(0, 155),
@@ -444,7 +444,7 @@ export function exportSyndicationFeed(
   const feedItems = listings.map((l) => ({
     listing_id: l.id,
     slug: l.slug,
-    url: `https://pakland.rems.pk${l.shareableUrl}`,
+    url: `${(process.env.PUBLIC_SITE_URL || "").replace(/\/$/, "")}${l.shareableUrl}`,
     title_en: l.titleEn,
     title_ur: l.titleUr,
     purpose: l.purpose,

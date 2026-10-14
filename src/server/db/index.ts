@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { SCHEMA_DDL } from "./schema";
 import { seedDatabase } from "./seed";
+import { applyBusinessProfile } from "./business-profile";
 import { migratePhase4, seedPhase4 } from "./phase4";
 
 const requireSqlite = createRequire(import.meta.url);
@@ -50,6 +51,9 @@ export function getDb(): DatabaseSyncType {
   migratePhase4(dbInstance);
   seedDatabase(dbInstance);
   seedPhase4(dbInstance);
+  // Regression suites intentionally retain the original multi-org fixture world.
+  // Production, preview and browser tests always use the real business profile.
+  if (process.env.NODE_ENV !== "test") applyBusinessProfile(dbInstance);
 
   return dbInstance;
 }

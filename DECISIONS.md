@@ -159,3 +159,23 @@ This header is never attached to external URLs and never placed in query strings
 - Phase 4 is local/mock-provider complete, not a production-security certification.
   Dedicated portals, production object storage/provider callbacks, accounting and
   agent approval/orchestration remain in their planned later phases.
+
+## 7. User-confirmed business correction (supersedes original seed assumptions)
+
+- Name the company/office **Fahad Real Estate**, with **Rahim Yar Khan only**.
+  The five user-named projects are all in Rahim Yar Khan. Do not invent street
+  addresses, map pins, legal suffixes, tax numbers, approvals or contact domains.
+- Replace visible branding and use reserved `.test` demo mailboxes; retain old
+  demo email aliases and internal IDs only to preserve sessions/foreign keys.
+- Archive the unrelated demo organization and extra offices. Consolidate invented
+  sub-project operational records into the named parents; retain units and money.
+  Preserve paid statements, ledger and audit history. Parent ownership is still
+  explicitly demo data, not a verified real-world ownership assertion.
+- Correct misleading seeded listing/document text and clear guessed coordinates.
+  Remove unrelated city filters and the regional-office creation form, not the
+  completed Phase 0–4 capabilities or generic RBAC/isolation infrastructure.
+- Keep the old fixture world only for test-mode security regressions. Normal app,
+  CLI and production browser tests apply the corrected profile automatically.
+- No real website/email domain is known; use relative listing URLs until
+  `PUBLIC_SITE_URL` is configured. Back up existing SQLite before migration.
+- This is a Phase 0–4 configuration correction. Do not begin Phase 5 or merge PR #2.

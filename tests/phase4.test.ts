@@ -107,12 +107,12 @@ beforeEach(() => {
     "notification_templates",
   ])
     db.exec(`DELETE FROM ${table}`);
-  admin = context("admin@pakland.pk");
-  tenant = context("tenant@pakland.pk");
-  staff = context("maintenance@pakland.pk");
-  owner = context("owner@pakland.pk");
+  admin = context("admin@fahadrealestate.test");
+  tenant = context("tenant@fahadrealestate.test");
+  staff = context("maintenance@fahadrealestate.test");
+  owner = context("owner@fahadrealestate.test");
   indus = context("admin@indusvalley.pk");
-  agent = context("agent@pakland.pk");
+  agent = context("agent@fahadrealestate.test");
 });
 describe("Phase 4 maintenance", () => {
   it("adds Phase 4 to an existing Phase 3 schema without changing portfolio or rent data", () => {

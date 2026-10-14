@@ -18,7 +18,7 @@ test("normal sign-in, wrong-password feedback, reload and sign-out", async ({
   await page.getByTestId("password-input").fill("Password123!");
   await page.getByTestId("login-submit").click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByTestId("active-org-badge")).toContainText("PakLand");
+  await expect(page.getByTestId("active-org-badge")).toContainText("Fahad Real Estate");
   await page.reload();
   await expect(page.getByTestId("active-org-badge")).toBeVisible();
   await page.getByRole("button", { name: "Sign Out", exact: true }).click();
@@ -51,7 +51,7 @@ test("embedded preview signs in without cookies, survives reload, downloads a pr
   await page.goto("http://arena.test/");
   const app = page.frameLocator("iframe");
   await app.getByTestId("login-submit").click();
-  await expect(app.getByTestId("active-org-badge")).toContainText("PakLand");
+  await expect(app.getByTestId("active-org-badge")).toContainText("Fahad Real Estate");
   expect(
     (await context.cookies(baseURL!)).filter((c) => c.name.startsWith("rems_")),
   ).toHaveLength(0);
@@ -75,7 +75,7 @@ test("embedded preview signs in without cookies, survives reload, downloads a pr
   // token active while the browser ignores the new cookie.
   await app
     .locator('select[data-testid="role-switcher-select"]')
-    .selectOption("agent@pakland.pk");
+    .selectOption("agent@fahadrealestate.test");
   await expect(app.getByTestId("active-role-badge")).toContainText("agent");
   await app.getByTestId("tab-crm").click();
   await expect(app.getByText("FORBIDDEN_PERMISSION")).toHaveCount(0);
@@ -110,7 +110,7 @@ test("disabled browser storage does not turn successful sign-in into a network e
   await page.goto("/login");
   await page.getByTestId("login-submit").click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByTestId("active-org-badge")).toContainText("PakLand");
+  await expect(page.getByTestId("active-org-badge")).toContainText("Fahad Real Estate");
   await expect(page.getByText("Network error while signing in.")).toHaveCount(
     0,
   );
@@ -137,7 +137,7 @@ test("sign-in and protected APIs survive a preview proxy that strips Authorizati
   await page.goto("/login");
   await page.getByTestId("login-submit").click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByTestId("active-org-badge")).toContainText("PakLand");
+  await expect(page.getByTestId("active-org-badge")).toContainText("Fahad Real Estate");
   await page.getByTestId("tab-tenancy").click();
   await expect(
     page.getByRole("heading", { name: "Lease register", exact: true }),

@@ -219,7 +219,7 @@ export function loginWithPassword(input: {
   userAgent?: string;
 }): LoginResult {
   const db = getDb();
-  const normalizedEmail = input.email.trim().toLowerCase();
+  const normalizedEmail = input.email.trim().toLowerCase().replace(/@pakland\.pk$/, "@fahadrealestate.test");
 
   let query = `
     SELECT
@@ -227,7 +227,7 @@ export function loginWithPassword(input: {
       u.status, u.two_factor_enabled as twoFactorEnabled, u.two_factor_secret as twoFactorSecret
     FROM users u
     JOIN organizations o ON o.id = u.organization_id
-    WHERE LOWER(u.email) = ? AND u.deleted_at IS NULL
+    WHERE LOWER(u.email) = ? AND u.deleted_at IS NULL AND o.deleted_at IS NULL AND o.status = 'active'
   `;
   const args: string[] = [normalizedEmail];
 
@@ -586,7 +586,7 @@ export function listDemoAccounts() {
       JOIN roles r ON r.id = u.role_id
       JOIN organizations o ON o.id = u.organization_id
       LEFT JOIN branches b ON b.id = u.branch_id
-      WHERE u.deleted_at IS NULL
+      WHERE u.deleted_at IS NULL AND u.status = 'active' AND o.id = 'org_pakland' AND u.id IN ('usr_admin','usr_agent','usr_accountant','usr_maintenance','usr_owner','usr_tenant') AND o.deleted_at IS NULL AND o.status = 'active'
       ORDER BY o.id DESC, u.id ASC
     `)
     .all();

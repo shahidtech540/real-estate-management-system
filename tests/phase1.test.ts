@@ -73,7 +73,7 @@ describe("Phase 1: Properties, Buildings, Units, Multi-Owners, Document Vault & 
     const createdProp = createProperty("org_pakland", "usr_admin", {
       branchId: "br_isb",
       code: "PKL-NEW-01",
-      name: "PakLand Sapphire Residency",
+      name: "Fahad Real Estate Sapphire Residency",
       type: "residential_complex",
       city: "Islamabad",
       address: "Sector F-11 Markaz, Islamabad",
@@ -152,7 +152,7 @@ describe("Phase 1: Properties, Buildings, Units, Multi-Owners, Document Vault & 
     const newOwner = createOwner("org_pakland", "usr_admin", {
       fullName: "Mian Mansha",
       cnicNtn: "35202-7788990-1",
-      email: "mansha@pakland.pk",
+      email: "mansha@fahadrealestate.test",
       phone: "+92-300-9988776",
       bankName: "MCB Bank",
       iban: "PK44MUCB0001112223334445",
@@ -293,7 +293,7 @@ describe("Phase 1: Properties, Buildings, Units, Multi-Owners, Document Vault & 
 
   it("exposes all Phase 1 REST API route handlers with RBAC and multi-tenancy enforcement", async () => {
     const adminLogin = loginWithPassword({
-      email: "admin@pakland.pk",
+      email: "admin@fahadrealestate.test",
       password: DEMO_PASSWORD,
     });
     const headers = {
@@ -405,7 +405,7 @@ describe("Phase 1: Properties, Buildings, Units, Multi-Owners, Document Vault & 
         body: JSON.stringify({
           fullName: "Nawabzada Lashkari",
           cnicNtn: "54400-1122334-9",
-          email: "nawab@pakland.pk",
+          email: "nawab@fahadrealestate.test",
           phone: "+92-333-4455667",
         }),
       })

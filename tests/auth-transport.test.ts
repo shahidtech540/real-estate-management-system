@@ -10,7 +10,7 @@ import { POST as invoices } from "@/app/api/v1/billing/invoices/route";
 import { extractAuthContext } from "@/server/auth/guards";
 
 beforeEach(() => resetDbForTesting());
-const token = (email = "admin@pakland.pk") =>
+const token = (email = "admin@fahadrealestate.test") =>
   loginWithPassword({ email, password: DEMO_PASSWORD }).accessToken!;
 function req(headers: Record<string, string>, method = "GET", body?: unknown) {
   return new NextRequest("http://localhost:3000/api/v1/auth/me", {
@@ -31,7 +31,7 @@ describe("proxy-safe session header", () => {
     ] as Record<string, string>[]) {
       const response = await me(req(headers));
       expect(response.status).toBe(200);
-      expect((await response.json()).user.email).toBe("admin@pakland.pk");
+      expect((await response.json()).user.email).toBe("admin@fahadrealestate.test");
     }
   });
   it("rejects missing, forged, malformed and expired application credentials", async () => {
@@ -57,7 +57,7 @@ describe("proxy-safe session header", () => {
     ).toBe(401);
   });
   it("retains permission enforcement and organization isolation", async () => {
-    const agent = { [ACCESS_TOKEN_HEADER]: token("agent@pakland.pk") };
+    const agent = { [ACCESS_TOKEN_HEADER]: token("agent@fahadrealestate.test") };
     expect(
       (
         await invoices(

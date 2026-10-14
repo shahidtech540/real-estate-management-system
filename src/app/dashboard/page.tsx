@@ -256,13 +256,12 @@ interface AuditLogItem {
 }
 
 const QUICK_SWITCH_ACCOUNTS = [
-  { label: "Admin (PakLand)", email: "admin@pakland.pk" },
-  { label: "Sales Agent (PakLand)", email: "agent@pakland.pk" },
-  { label: "Accountant (PakLand)", email: "accountant@pakland.pk" },
-  { label: "Maintenance (PakLand)", email: "maintenance@pakland.pk" },
-  { label: "Owner (PakLand)", email: "owner@pakland.pk" },
-  { label: "Tenant (PakLand)", email: "tenant@pakland.pk" },
-  { label: "Admin (Indus Valley Org 2)", email: "admin@indusvalley.pk" },
+  { label: "Admin (Demo)", email: "admin@fahadrealestate.test" },
+  { label: "Sales Agent (Demo)", email: "agent@fahadrealestate.test" },
+  { label: "Accountant (Demo)", email: "accountant@fahadrealestate.test" },
+  { label: "Maintenance (Demo)", email: "maintenance@fahadrealestate.test" },
+  { label: "Owner (Demo)", email: "owner@fahadrealestate.test" },
+  { label: "Tenant (Demo)", email: "tenant@fahadrealestate.test" },
 ];
 
 const SAMPLE_VALID_CSV = `property_code,building_code,unit_number,type,area_sqft,area_display,bedrooms,bathrooms,status,market_price_pkr,monthly_rent_pkr
@@ -320,7 +319,7 @@ export default function DashboardPage() {
   const [newPropCode, setNewPropCode] = useState("");
   const [newPropName, setNewPropName] = useState("");
   const [newPropType, setNewPropType] = useState("housing_scheme");
-  const [newPropCity, setNewPropCity] = useState("Islamabad");
+  const [newPropCity, setNewPropCity] = useState("Rahim Yar Khan");
   const [newPropAddress, setNewPropAddress] = useState("");
 
   const [newUnitPropId, setNewUnitPropId] = useState("prop_1");
@@ -379,10 +378,6 @@ export default function DashboardPage() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
   const [newUserRole, setNewUserRole] = useState("agent");
-  const [newBranchCode, setNewBranchCode] = useState("");
-  const [newBranchName, setNewBranchName] = useState("");
-  const [newBranchCity, setNewBranchCity] = useState("");
-  const [newBranchAddress, setNewBranchAddress] = useState("");
 
   const [totpSetup, setTotpSetup] = useState<{
     secret: string;
@@ -560,7 +555,7 @@ export default function DashboardPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        branchId: user?.branch?.id || branches[0]?.id || "br_isb",
+        branchId: user?.branch?.id || branches[0]?.id || "br_ryk",
         code: newPropCode,
         name: newPropName,
         type: newPropType,
@@ -822,32 +817,6 @@ export default function DashboardPage() {
     fetchAudit();
   }
 
-  async function handleCreateBranch(e: React.FormEvent) {
-    e.preventDefault();
-    const res = await authFetch("/api/v1/admin/branches", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: newBranchCode,
-        name: newBranchName,
-        city: newBranchCity,
-        address: newBranchAddress,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      showNotification("error", data?.error?.message || "Failed to create branch.");
-      fetchAudit();
-      return;
-    }
-    setNewBranchCode("");
-    setNewBranchName("");
-    setNewBranchCity("");
-    setNewBranchAddress("");
-    showNotification("success", `Created branch ${data.branch.name}`);
-    fetchMe();
-    fetchAudit();
-  }
 
   async function handleInit2FA() {
     const res = await authFetch("/api/v1/auth/2fa", {
@@ -916,7 +885,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
         <div className="flex items-center gap-3">
           <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
-          <span className="font-medium">Loading PakLand Agentic REMS Workspace...</span>
+          <span className="font-medium">Loading Fahad Real Estate workspace...</span>
         </div>
       </div>
     );
@@ -989,7 +958,8 @@ export default function DashboardPage() {
               <div className="flex min-w-0 min-h-10 items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3">
                 <MapPin className="w-4 h-4 shrink-0 text-amber-400" />
                 <select
-                  aria-label="Switch Branch"
+                  aria-label="Office"
+                  disabled={branches.length === 1}
                   title={user.branch?.name || t(locale, "branch")}
                   data-testid="branch-switcher-select"
                   value={user.branch?.id || ""}
@@ -1132,7 +1102,7 @@ export default function DashboardPage() {
                   {summary.kpis.totalProperties}
                 </div>
                 <div className="text-xs text-slate-600 mt-1">
-                  {summary.kpis.totalOwners} Owners • {branches.length} Branches
+                  {summary.kpis.totalOwners} Owners • {branches.length} Office
                 </div>
               </div>
 
@@ -1183,7 +1153,7 @@ export default function DashboardPage() {
                     <span>Properties, Schemes & Multi-Owner Splits ({properties.length})</span>
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Click any property row to filter the Units/Plots browser below
+                    Sample inventory · Select a project to filter its units
                   </p>
                 </div>
 
@@ -1224,7 +1194,7 @@ export default function DashboardPage() {
                     <tr>
                       <th className="py-3 px-4">Code</th>
                       <th className="py-3 px-4">Project / Property</th>
-                      <th className="py-3 px-4">City & Branch</th>
+                      <th className="py-3 px-4">City & Office</th>
                       <th className="py-3 px-4">Ownership Splits</th>
                       <th className="py-3 px-4">Buildings</th>
                       <th className="py-3 px-4">Units (Avail / Rented / Maint)</th>
@@ -1416,7 +1386,7 @@ export default function DashboardPage() {
                         required
                         value={newPropCity}
                         onChange={(e) => setNewPropCity(e.target.value)}
-                        placeholder="Islamabad"
+                        placeholder="Rahim Yar Khan"
                         className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs"
                       />
                     </div>
@@ -1458,7 +1428,7 @@ export default function DashboardPage() {
                       required
                       value={newPropAddress}
                       onChange={(e) => setNewPropAddress(e.target.value)}
-                      placeholder="Main Expressway, Islamabad"
+                      placeholder="Rahim Yar Khan, Punjab, Pakistan"
                       className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs"
                     />
                   </div>
@@ -2320,7 +2290,7 @@ export default function DashboardPage() {
                       <tr>
                         <th className="py-3 px-4">Full Name & Email</th>
                         <th className="py-3 px-4">Role</th>
-                        <th className="py-3 px-4">Branch</th>
+                        <th className="py-3 px-4">Office</th>
                         <th className="py-3 px-4">2FA</th>
                         <th className="py-3 px-4">Status</th>
                       </tr>
@@ -2338,7 +2308,7 @@ export default function DashboardPage() {
                             </span>
                           </td>
                           <td className="py-3 px-4 text-xs text-slate-600">
-                            {u.branchName ? `${u.branchName} (${u.branchCity})` : "All Branches"}
+                            {u.branchName ? `${u.branchName} (${u.branchCity})` : "Rahim Yar Khan Office"}
                           </td>
                           <td className="py-3 px-4 text-xs">
                             {u.twoFactorEnabled ? (
@@ -2362,7 +2332,7 @@ export default function DashboardPage() {
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-200">
                   <h3 className="text-base font-bold text-slate-900">
-                    Organization Branches ({branches.length})
+                    Office ({branches.length})
                   </h3>
                 </div>
                 <div className="divide-y divide-slate-200">
@@ -2379,7 +2349,7 @@ export default function DashboardPage() {
                       </div>
                       {b.isHeadquarters ? (
                         <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-900">
-                          Headquarters
+                          Rahim Yar Khan
                         </span>
                       ) : null}
                     </div>
@@ -2419,7 +2389,7 @@ export default function DashboardPage() {
                     required
                     value={newUserEmail}
                     onChange={(e) => setNewUserEmail(e.target.value)}
-                    placeholder="saad@pakland.pk"
+                    placeholder="saad@fahadrealestate.test"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
                   />
                 </div>
@@ -2448,69 +2418,7 @@ export default function DashboardPage() {
                 </button>
               </form>
 
-              <form
-                onSubmit={handleCreateBranch}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4"
-              >
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Plus className="w-4 h-4 text-emerald-600" />
-                  <span>Add Regional Branch</span>
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Code</label>
-                    <input
-                      type="text"
-                      required
-                      value={newBranchCode}
-                      onChange={(e) => setNewBranchCode(e.target.value)}
-                      placeholder="MUL-01"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">City</label>
-                    <input
-                      type="text"
-                      required
-                      value={newBranchCity}
-                      onChange={(e) => setNewBranchCity(e.target.value)}
-                      placeholder="Multan"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Branch Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newBranchName}
-                    onChange={(e) => setNewBranchName(e.target.value)}
-                    placeholder="Multan Bosan Road Office"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Address</label>
-                  <input
-                    type="text"
-                    required
-                    value={newBranchAddress}
-                    onChange={(e) => setNewBranchAddress(e.target.value)}
-                    placeholder="Main Bosan Road, Multan"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
-                >
-                  Create Branch
-                </button>
-              </form>
+
             </div>
           </div>
         )}

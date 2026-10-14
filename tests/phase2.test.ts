@@ -262,9 +262,9 @@ describe("Phase 2: Listings, Public Site, Portal Syndication & CRM (Leads -> Vie
     expect(pubLeadRes.status).toBe(201);
     const pubLeadJson = await pubLeadRes.json();
 
-    // 5. Authenticate as Sales Agent ('agent@pakland.pk')
+    // 5. Authenticate as Sales Agent ('agent@fahadrealestate.test')
     const agentLogin = loginWithPassword({
-      email: "agent@pakland.pk",
+      email: "agent@fahadrealestate.test",
       password: DEMO_PASSWORD,
     });
     const headers = {

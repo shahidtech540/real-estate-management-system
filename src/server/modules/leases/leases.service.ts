@@ -225,7 +225,7 @@ export function createTenant(
     input.fullName.trim(),
     input.cnic.trim(),
     input.phone.trim(),
-    input.email?.trim() || `${id}@tenant.pakland.pk`,
+    input.email?.trim() || `${id}@tenant.fahadrealestate.test`,
     kyc,
     input.emergencyContactName?.trim() || null,
     input.emergencyContactPhone?.trim() || null,

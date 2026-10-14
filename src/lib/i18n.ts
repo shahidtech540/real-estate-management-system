@@ -2,8 +2,8 @@ export type Locale = "en" | "ur";
 
 export const DICTIONARY: Record<Locale, Record<string, string>> = {
   en: {
-    appName: "PakLand Agentic REMS",
-    tagline: "Multi-Tenant Real Estate, Town & Commercial Center Platform",
+    appName: "Fahad Real Estate",
+    tagline: "Property Management · Rahim Yar Khan",
     signIn: "Sign In",
     signOut: "Sign Out",
     email: "Email Address",
@@ -19,7 +19,7 @@ export const DICTIONARY: Record<Locale, Record<string, string>> = {
     documentsTab: "Document Vault",
     csvImportTab: "Bulk CSV Import",
     rbacMatrix: "RBAC Matrix",
-    usersBranches: "Users & Branches",
+    usersBranches: "Users & Office",
     security2fa: "2FA Security",
     auditLogs: "Audit Trail",
     activeRole: "Active Role",
@@ -41,8 +41,8 @@ export const DICTIONARY: Record<Locale, Record<string, string>> = {
     languageToggle: "اردو (RTL)",
   },
   ur: {
-    appName: "پاک لینڈ ایجنٹک رئیل اسٹیٹ سسٹم",
-    tagline: "ہاؤسنگ اسکیمز، کمرشل سینٹرز اور پراپرٹی مینجمنٹ پلیٹ فارم",
+    appName: "فہد رئیل اسٹیٹ",
+    tagline: "پراپرٹی مینجمنٹ · رحیم یار خان",
     signIn: "لاگ ان کریں",
     signOut: "لاگ آؤٹ",
     email: "ای میل ایڈریس",
@@ -58,7 +58,7 @@ export const DICTIONARY: Record<Locale, Record<string, string>> = {
     documentsTab: "ڈاکومنٹ والٹ",
     csvImportTab: "بلک CSV امپورٹ",
     rbacMatrix: "رولز اور اجازت نامے",
-    usersBranches: "یوزرز اور برانچز",
+    usersBranches: "صارفین اور دفتر",
     security2fa: "ٹو فیکٹر سیکیورٹی",
     auditLogs: "آڈٹ لاگز",
     activeRole: "موجودہ رول",

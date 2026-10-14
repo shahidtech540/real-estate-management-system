@@ -1,5 +1,22 @@
 # Project Build Progress (`PROGRESS.md`)
 
+## Current business profile correction
+
+The user confirmed **Fahad Real Estate** with **one Rahim Yar Khan office**;
+all five named projects are in Rahim Yar Khan. This supersedes the earlier demo
+company/branch/project assumptions in the historical logs below.
+
+- Rebranded login/dashboard/public portal, metadata, PDF producer and demo accounts.
+- One office and five projects in normal runtime; unrelated company suspended,
+  extra offices/sub-projects archived, retained inventory consolidated safely.
+- Removed guessed coordinates/addresses, old-city filters and false approval claims.
+- Preserved unit identities, leases, invoices, payments and immutable paid statements.
+- Six business-profile integration tests and three production browser checks added;
+  **90/90 unit/integration tests** and **19/19 browser tests** pass, with production
+  build/typecheck green (Phases 0–4 only).
+- Local backup made before preview migration. Details: [`docs/BUSINESS_PROFILE.md`](docs/BUSINESS_PROFILE.md).
+- **Phase 5 remains on hold. PR #2 remains unmerged.**
+
 ## Phase Summary Matrix
 
 | Phase | Scope | Status | Test Coverage | Checkpoint Deliverable |

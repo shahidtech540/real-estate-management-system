@@ -160,7 +160,7 @@ export default function PublicListingsPage() {
             </div>
             <div>
               <h1 className="font-bold text-lg tracking-tight">
-                {isRtl ? "پاک لینڈ پراپرٹی پورٹل" : "PakLand Public Property Portal"}
+                {isRtl ? "فہد رئیل اسٹیٹ پراپرٹی پورٹل" : "Fahad Real Estate"}
               </h1>
               <p className="text-xs text-emerald-300/90">
                 Fahad Garden • Abdullah City • Taj Commercial Center • VIP Block • University Centers
@@ -212,13 +212,13 @@ export default function PublicListingsPage() {
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold">
               {isRtl
-                ? "پاکستان کے بہترین رہائشی پلاٹس، ولاز اور کمرشل دکانیں تلاش کریں"
-                : "Verified Plots, Luxury Villas & Commercial Showrooms"}
+                ? "رحیم یار خان میں پراپرٹیز تلاش کریں"
+                : "Properties in Rahim Yar Khan"}
             </h2>
             <p className="text-sm text-slate-300 mt-1">
               {isRtl
-                ? "لاہور، راولپنڈی اور اسلام آباد میں منظور شدہ پراجیکٹس — فوری آن لائن بکنگ اور وزٹ شیڈولنگ"
-                : "Explore LDA, RDA & CDA approved inventory across Lahore, Rawalpindi & Islamabad with instant CRM inquiry."}
+                ? "رحیم یار خان میں ہمارے پراجیکٹس۔ پراپرٹی کی تفصیلات کی تصدیق کے لیے فہد رئیل اسٹیٹ سے رابطہ کریں۔"
+                : "Explore our projects in Rahim Yar Khan. Contact Fahad Real Estate to confirm property details."}
             </p>
           </div>
 
@@ -250,9 +250,7 @@ export default function PublicListingsPage() {
               className="px-3 py-2 rounded-xl bg-slate-900/90 border border-white/15 text-xs text-white"
             >
               <option value="">All Cities</option>
-              <option value="Islamabad">Islamabad</option>
-              <option value="Rawalpindi">Rawalpindi</option>
-              <option value="Lahore">Lahore</option>
+              <option value="Rahim Yar Khan">Rahim Yar Khan</option>
             </select>
 
             <select

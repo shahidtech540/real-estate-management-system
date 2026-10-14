@@ -193,7 +193,7 @@ export function verifyTotpCode(secret: string, code: string, timestampMs = Date.
   return false;
 }
 
-export function buildOtpAuthUri(email: string, secret: string, issuer = "PakLand-REMS"): string {
+export function buildOtpAuthUri(email: string, secret: string, issuer = "Fahad Real Estate-REMS"): string {
   const label = encodeURIComponent(`${issuer}:${email}`);
   const encodedIssuer = encodeURIComponent(issuer);
   return `otpauth://totp/${label}?secret=${secret}&issuer=${encodedIssuer}&algorithm=SHA1&digits=6&period=30`;

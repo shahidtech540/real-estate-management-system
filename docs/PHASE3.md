@@ -1,5 +1,9 @@
 # Phase 3 — Tenants, leases and billing
 
+Current business setup: **Fahad Real Estate, Rahim Yar Khan only**. The
+[business-profile correction](BUSINESS_PROFILE.md) supersedes earlier branch,
+company and sample project assumptions.
+
 ## Run
 
 Node.js 22+ is required for the existing native SQLite engine.
@@ -24,7 +28,7 @@ The seed is a reproducible October 2026 snapshot, not a clock frozen in producti
 
 ## UI walkthrough
 
-1. Sign in at `/login` as `admin@pakland.pk` / `Password123!`.
+1. Sign in at `/login` as `admin@fahadrealestate.test` / `Password123!`.
 2. Open **Tenants & Leases**. Onboard a tenant, verify KYC, then draft a lease on
    an available unreserved unit. Upload supporting ID records through Document Vault.
 3. Click its lease number. Progress `draft → pending_signature → active` after

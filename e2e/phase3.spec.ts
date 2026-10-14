@@ -6,7 +6,7 @@ test("tenant to lease, rent invoice, payment receipt and owner statement", async
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   const login = await page.request.post("/api/v1/auth/login", {
-    data: { email: "admin@pakland.pk", password: "Password123!" },
+    data: { email: "admin@fahadrealestate.test", password: "Password123!" },
   });
   expect(login.ok()).toBeTruthy();
   const unique = String(Date.now()).slice(-7);

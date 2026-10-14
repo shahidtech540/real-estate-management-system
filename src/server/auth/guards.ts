@@ -1,3 +1,4 @@
+import { getDb } from "@/server/db";
 import { ACCESS_TOKEN_HEADER } from "@/lib/auth-transport";
 import { NextRequest } from "next/server";
 import { JwtPayload, verifyAccessToken } from "./crypto";
@@ -14,7 +15,9 @@ export class HttpError extends Error {
   }
 }
 
-export function extractAuthContext(req: NextRequest | Request): JwtPayload | null {
+export function extractAuthContext(
+  req: NextRequest | Request,
+): JwtPayload | null {
   const authHeader = req.headers.get("authorization");
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.slice(7).trim();
@@ -44,13 +47,27 @@ export function extractAuthContext(req: NextRequest | Request): JwtPayload | nul
 
 export function requireAuth(req: NextRequest | Request): JwtPayload {
   const ctx = extractAuthContext(req);
-  if (!ctx) {
-    throw new HttpError(401, "UNAUTHORIZED", "Authentication required. Please log in.");
+  if (
+    !ctx ||
+    !getDb()
+      .prepare(
+        "SELECT u.id FROM users u JOIN organizations o ON o.id=u.organization_id WHERE u.id=? AND u.organization_id=? AND u.status='active' AND u.deleted_at IS NULL AND o.status='active' AND o.deleted_at IS NULL",
+      )
+      .get(ctx?.sub || "", ctx?.organizationId || "")
+  ) {
+    throw new HttpError(
+      401,
+      "UNAUTHORIZED",
+      "Authentication required. Please log in.",
+    );
   }
   return ctx;
 }
 
-export function requirePermission(ctx: JwtPayload, permissionCode: string): void {
+export function requirePermission(
+  ctx: JwtPayload,
+  permissionCode: string,
+): void {
   if (!ctx.permissions.includes(permissionCode)) {
     recordAuditLog({
       organizationId: ctx.organizationId,
@@ -66,7 +83,7 @@ export function requirePermission(ctx: JwtPayload, permissionCode: string): void
     throw new HttpError(
       403,
       "FORBIDDEN_PERMISSION",
-      `Role '${ctx.roleSlug}' does not have required permission '${permissionCode}'.`
+      `Role '${ctx.roleSlug}' does not have required permission '${permissionCode}'.`,
     );
   }
 }
@@ -75,7 +92,7 @@ export function assertTenantIsolation(
   ctx: JwtPayload,
   resourceOrganizationId: string,
   entityType = "resource",
-  entityId = "unknown"
+  entityId = "unknown",
 ): void {
   if (ctx.organizationId !== resourceOrganizationId) {
     recordAuditLog({
@@ -92,7 +109,7 @@ export function assertTenantIsolation(
     throw new HttpError(
       403,
       "FORBIDDEN_CROSS_TENANT",
-      "Cross-organization data access is strictly prohibited."
+      "Cross-organization data access is strictly prohibited.",
     );
   }
 }

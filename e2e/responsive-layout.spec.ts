@@ -2,12 +2,12 @@ import { test, expect, type Page } from "@playwright/test";
 
 async function signIn(page: Page) {
   const response = await page.request.post("/api/v1/auth/login", {
-    data: { email: "admin@pakland.pk", password: "Password123!" },
+    data: { email: "admin@fahadrealestate.test", password: "Password123!" },
   });
   expect(response.ok()).toBeTruthy();
   await page.goto("/dashboard");
   await expect(page.getByTestId("role-switcher-select")).toHaveValue(
-    "admin@pakland.pk",
+    "admin@fahadrealestate.test",
   );
   await page.waitForLoadState("networkidle");
 }

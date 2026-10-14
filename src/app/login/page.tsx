@@ -67,7 +67,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [locale, setLocale] = useState<Locale>("en");
   const [accounts, setAccounts] = useState<DemoAccount[]>([]);
-  const [email, setEmail] = useState("admin@pakland.pk");
+  const [email, setEmail] = useState("admin@fahadrealestate.test");
   const [password, setPassword] = useState("Password123!");
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
@@ -182,7 +182,7 @@ export default function LoginPage() {
             </a>
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Phase 3: Tenants, Leases + Billing
+              Rahim Yar Khan · One Office
             </span>
             <button
               type="button"
@@ -231,7 +231,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 data-testid="email-input"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm"
-                placeholder="admin@pakland.pk"
+                placeholder="admin@fahadrealestate.test"
               />
             </div>
 
@@ -287,7 +287,7 @@ export default function LoginPage() {
           {/* Portfolio Context Summary */}
           <div className="mt-6 pt-6 border-t border-slate-200">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-              Seeded Flagship Projects (PakLand Developers)
+              Our Projects · Rahim Yar Khan
             </h3>
             <div className="flex flex-wrap gap-1.5">
               {[
@@ -318,7 +318,7 @@ export default function LoginPage() {
               </h2>
               <p className="text-sm text-slate-300">
                 Click any role below to immediately log in and inspect its RBAC permissions, branch
-                scope, and tenant isolation.
+                scope, and permissions.
               </p>
             </div>
           </div>
@@ -326,7 +326,6 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {accounts.map((acc) => {
               const badge = ROLE_BADGE_STYLES[acc.roleSlug] || ROLE_BADGE_STYLES.admin;
-              const isSecondaryOrg = acc.organizationId === "org_indus";
               return (
                 <button
                   key={acc.id}
@@ -335,9 +334,7 @@ export default function LoginPage() {
                   onClick={() => handleQuickSelect(acc)}
                   data-testid={`quick-login-${acc.roleSlug}-${acc.organizationId}`}
                   className={`text-left p-4 rounded-xl border transition group ${
-                    isSecondaryOrg
-                      ? "bg-slate-900/90 border-amber-500/40 hover:border-amber-400"
-                      : "bg-slate-900/75 border-white/15 hover:border-emerald-400 hover:bg-slate-900"
+                    "bg-slate-900/75 border-white/15 hover:border-emerald-400 hover:bg-slate-900"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
@@ -359,7 +356,7 @@ export default function LoginPage() {
                   <p className="text-xs text-slate-300 line-clamp-2 mb-2">{acc.roleDescription}</p>
                   <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-white/10">
                     <span>
-                      Branch: <strong className="text-slate-200">{acc.branchName || "All"}</strong>
+                      Office: <strong className="text-slate-200">{acc.branchName || "All"}</strong>
                     </span>
                     <span className="text-emerald-400 font-semibold group-hover:translate-x-0.5 transition">
                       Click to Sign In →

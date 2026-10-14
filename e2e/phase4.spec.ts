@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-async function login(page: Page, email = "tenant@pakland.pk") {
+async function login(page: Page, email = "tenant@fahadrealestate.test") {
   await page.setViewportSize({ width: 1100, height: 900 });
   expect(
     (
@@ -57,7 +57,7 @@ test("tenant photo ticket flows through coordinator work order and tenant-rated 
   await form.getByRole("button", { name: "Submit ticket" }).click();
   await expect(page.getByTestId("ticket-status")).toHaveText("open");
   await expect(page.getByTestId("ticket-detail").locator("img")).toHaveCount(1);
-  await switchRole(page, "maintenance@pakland.pk");
+  await switchRole(page, "maintenance@fahadrealestate.test");
   await page.getByRole("button").filter({ hasText: title }).click();
   const triage = page.getByRole("form", { name: "Triage ticket", exact: true });
   await triage.getByLabel("Triage note").fill("Replace the pipe seal.");
@@ -87,7 +87,7 @@ test("tenant photo ticket flows through coordinator work order and tenant-rated 
   await expect(
     page.getByRole("button", { name: "Confirm & close" }),
   ).toHaveCount(0);
-  await switchRole(page, "tenant@pakland.pk");
+  await switchRole(page, "tenant@fahadrealestate.test");
   await page.getByRole("button").filter({ hasText: title }).click();
   const confirm = page.getByRole("form", {
     name: "Confirm completion",
@@ -115,7 +115,7 @@ test("tenant photo ticket flows through coordinator work order and tenant-rated 
 test("coordinator creates and pauses a preventive schedule and runs the scan idempotently", async ({
   page,
 }) => {
-  await login(page, "maintenance@pakland.pk");
+  await login(page, "maintenance@fahadrealestate.test");
   await workspace(page, "maintenance");
   await page
     .getByText("Preventive maintenance schedules", { exact: true })
@@ -152,7 +152,7 @@ test("coordinator creates and pauses a preventive schedule and runs the scan ide
 test("admin queues a consented mock email and tenant reads the inbox notification", async ({
   page,
 }) => {
-  await login(page, "admin@pakland.pk");
+  await login(page, "admin@fahadrealestate.test");
   await workspace(page, "notifications");
   await page.getByText("Send a single notification", { exact: true }).click();
   const form = page.getByRole("form", {
@@ -178,7 +178,7 @@ test("admin queues a consented mock email and tenant reads the inbox notificatio
   await expect(article).toContainText("queued");
   await page.getByRole("button", { name: "Process delivery queue" }).click();
   await expect(article).toContainText("mock sent");
-  await switchRole(page, "tenant@pakland.pk");
+  await switchRole(page, "tenant@fahadrealestate.test");
   article = page.getByRole("article").filter({ hasText: subject });
   await expect(article).toBeVisible();
   await article.getByRole("button", { name: "Mark read" }).click();
@@ -190,7 +190,7 @@ test("admin queues a consented mock email and tenant reads the inbox notificatio
 test("expanded Phase 4 forms fit mobile English and Urdu RTL", async ({
   page,
 }, info) => {
-  await login(page, "admin@pakland.pk");
+  await login(page, "admin@fahadrealestate.test");
   await page.setViewportSize({ width: 375, height: 812 });
   await workspace(page, "maintenance");
   for (const title of [

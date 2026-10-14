@@ -1,5 +1,9 @@
 # Phase 4 — Maintenance, Vendors & Notifications
 
+Current business setup: **Fahad Real Estate, Rahim Yar Khan only**. The
+[business-profile correction](BUSINESS_PROFILE.md) supersedes earlier branch,
+company and sample project assumptions.
+
 ## Run and explore
 
 ```bash
@@ -14,10 +18,10 @@ Use `/dashboard` → **Maintenance & Vendors** or **Notifications**. At narrow
 widths these are in the **Workspace** dropdown. All demo passwords are
 `Password123!`:
 
-1. `tenant@pakland.pk`: report an issue for the current leased unit; optionally
+1. `tenant@fahadrealestate.test`: report an issue for the current leased unit; optionally
    attach up to five JPEG/PNG/WebP photos. The tenant demo initially uses Urdu;
    switch to English using the header if preferred.
-2. `maintenance@pakland.pk`: select the issue, set category/priority with a triage
+2. `maintenance@fahadrealestate.test`: select the issue, set category/priority with a triage
    note, choose a matching available vendor, enter the estimate and schedule time.
 3. Start the work order, then complete it with notes and the actual cost.
 4. Switch back to the tenant; confirm with a 1–5 rating, or reopen with a reason.
