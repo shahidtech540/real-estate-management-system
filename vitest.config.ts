@@ -9,7 +9,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/server/**/*.ts", "src/lib/**/*.ts"],
-      exclude: ["src/server/db/seed-cli.ts", "src/server/modules/billing/cycle-cli.ts"],
+      exclude: ["src/server/db/seed-cli.ts", "src/server/modules/billing/cycle-cli.ts", "src/server/modules/maintenance/cycle-cli.ts"],
       thresholds: {
         lines: 70,
         functions: 70,

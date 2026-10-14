@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { SCHEMA_DDL } from "./schema";
 import { seedDatabase } from "./seed";
+import { migratePhase4, seedPhase4 } from "./phase4";
 
 const requireSqlite = createRequire(import.meta.url);
 const { DatabaseSync } = requireSqlite("node:sqlite") as {
@@ -33,6 +34,7 @@ export function getDb(): DatabaseSyncType {
   }
 
   dbInstance = new DatabaseSync(dbPath);
+  dbInstance.exec("PRAGMA busy_timeout = 5000;");
   dbInstance.exec(SCHEMA_DDL);
   // Additive Phase 3 migration: preserve previously created tenant records.
   if (
@@ -45,7 +47,9 @@ export function getDb(): DatabaseSyncType {
       "ALTER TABLE tenants ADD COLUMN references_json TEXT NOT NULL DEFAULT '[]'",
     );
   }
+  migratePhase4(dbInstance);
   seedDatabase(dbInstance);
+  seedPhase4(dbInstance);
 
   return dbInstance;
 }

@@ -15,7 +15,7 @@ export function canReadProperty(
   if (ctx.roleSlug === "owner")
     return !!getDb()
       .prepare(
-        "SELECT o.id FROM owners o JOIN property_owners po ON po.owner_id = o.id WHERE o.organization_id = ? AND o.user_id = ? AND po.property_id = ? AND o.deleted_at IS NULL",
+        "SELECT o.id FROM owners o JOIN property_owners po ON po.owner_id = o.id WHERE o.organization_id = ? AND o.user_id = ? AND po.property_id = ? AND o.deleted_at IS NULL AND po.deleted_at IS NULL AND po.organization_id = o.organization_id",
       )
       .get(ctx.organizationId, ctx.sub, propertyId);
   return true;

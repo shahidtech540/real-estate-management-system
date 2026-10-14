@@ -26,7 +26,7 @@ export const moneySchema = z
   .int()
   .nonnegative()
   .max(1_000_000_000_000);
-export function valid<T>(schema: z.ZodType<T>, value: unknown): T {
+export function valid<S extends z.ZodTypeAny>(schema: S, value: unknown): z.output<S> {
   const result = schema.safeParse(value);
   if (!result.success)
     throw new HttpError(

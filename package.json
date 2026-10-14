@@ -13,7 +13,9 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "db:seed": "tsx src/server/db/seed-cli.ts",
-    "billing:cycle": "tsx src/server/modules/billing/cycle-cli.ts"
+    "billing:cycle": "tsx src/server/modules/billing/cycle-cli.ts",
+    "maintenance:cycle": "tsx src/server/modules/maintenance/cycle-cli.ts",
+    "maintenance:worker": "tsx src/server/modules/maintenance/cycle-cli.ts --watch"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -583,6 +583,7 @@ model Vendor {
   baseRateMinor  BigInt       @map("base_rate_minor")
   currency       String       @default("PKR")
   slaHours       Int          @default(24) @map("sla_hours")
+  available      Boolean      @default(true)
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
   createdBy      String?      @map("created_by")
@@ -608,6 +609,9 @@ model MaintenanceTicket {
   status         String       @default("open")
   slaDueAt       DateTime     @map("sla_due_at")
   photosJson     String       @default("[]") @map("photos_json")
+  confirmedAt    DateTime?    @map("confirmed_at")
+  resolutionNotes String?     @map("resolution_notes")
+  rating         Int?
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
   createdBy      String?      @map("created_by")
@@ -631,6 +635,7 @@ model WorkOrder {
   currency           String    @default("PKR")
   scheduledAt        DateTime  @map("scheduled_at")
   completedAt        DateTime? @map("completed_at")
+  completionNotes String?   @map("completion_notes")
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
   createdBy          String?   @map("created_by")
@@ -677,6 +682,13 @@ model Notification {
   status         String       @default("sent")
   isAiDrafted    Boolean      @default(false) @map("is_ai_drafted")
   sentAt         DateTime?    @map("sent_at")
+  eventKey       String?      @map("event_key")
+  attemptCount   Int          @default(0) @map("attempt_count")
+  nextAttemptAt  DateTime?    @map("next_attempt_at")
+  lastError      String?      @map("last_error")
+  readAt         DateTime?    @map("read_at")
+  providerId     String?      @map("provider_id")
+  lockedAt       DateTime?    @map("locked_at")
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
   createdBy      String?      @map("created_by")
@@ -684,6 +696,8 @@ model Notification {
 
   organization   Organization @relation(fields: [organizationId], references: [id])
 
+  @@unique([organizationId, eventKey])
+  @@index([organizationId, status, nextAttemptAt])
   @@index([organizationId, userId])
   @@map("notifications")
 }
@@ -877,4 +891,72 @@ model RecurringChargeInvoice {
   invoiceId   String @map("invoice_id")
   @@id([chargeId, periodMonth])
   @@map("recurring_charge_invoices")
+}
+
+// Phase 4 domain additions. Runtime uses the additive SQLite migration in db/phase4.ts.
+model MaintenanceEvent {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  ticketId       String   @map("ticket_id")
+  type           String
+  note           String
+  sequence       Int
+  eventKey       String?  @map("event_key")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, ticketId, sequence])
+  @@unique([organizationId, eventKey])
+  @@map("maintenance_events")
+}
+model VendorReview {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  vendorId       String   @map("vendor_id")
+  ticketId       String   @unique @map("ticket_id")
+  rating         Int
+  note           String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  @@map("vendor_reviews")
+}
+model PreventiveSchedule {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  unitId         String   @map("unit_id")
+  title          String
+  category       String
+  intervalDays   Int      @map("interval_days")
+  nextDueAt      DateTime @map("next_due_at")
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  deletedAt      DateTime? @map("deleted_at")
+  @@index([organizationId, active, nextDueAt])
+  @@map("preventive_schedules")
+}
+model PreventiveRun {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  scheduleId     String   @map("schedule_id")
+  dueAt          DateTime @map("due_at")
+  ticketId       String   @map("ticket_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, scheduleId, dueAt])
+  @@map("preventive_runs")
+}
+model NotificationTemplate {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  event          String
+  locale         String
+  subject        String
+  body           String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, event, locale])
+  @@map("notification_templates")
 }
