@@ -1,0 +1,58 @@
+export type Locale = "en" | "ur";
+
+export const DICTIONARY: Record<Locale, Record<string, string>> = {
+  en: {
+    appName: "PakLand Agentic REMS",
+    tagline: "Multi-Tenant Real Estate, Town & Commercial Center Platform",
+    signIn: "Sign In",
+    signOut: "Sign Out",
+    email: "Email Address",
+    password: "Password",
+    twoFactorCode: "2FA Authenticator Code (6 digits)",
+    quickRoleLogin: "Instant Role Switcher (Demo Accounts)",
+    overview: "Portfolio Overview",
+    rbacMatrix: "RBAC & Permissions",
+    usersBranches: "Users, Branches & Multi-Tenancy",
+    security2fa: "2FA & Session Security",
+    auditLogs: "Security Audit Trail",
+    activeRole: "Active Role",
+    organization: "Organization",
+    branch: "Branch",
+    properties: "Properties & Schemes",
+    totalUnits: "Total Units / Plots",
+    occupancyRate: "Occupancy Rate",
+    rentCollected: "Rent Collected (12M)",
+    arrearsBalance: "Active Arrears",
+    switchRole: "Switch Role",
+    languageToggle: "اردو (RTL)",
+  },
+  ur: {
+    appName: "پاک لینڈ ایجنٹک رئیل اسٹیٹ سسٹم",
+    tagline: "ہاؤسنگ اسکیمز، کمرشل سینٹرز اور پراپرٹی مینجمنٹ پلیٹ فارم",
+    signIn: "لاگ ان کریں",
+    signOut: "لاگ آؤٹ",
+    email: "ای میل ایڈریس",
+    password: "پاس ورڈ",
+    twoFactorCode: "ٹو فیکٹر کوڈ (6 ہندسے)",
+    quickRoleLogin: "فوری رول سوئچر (ڈیمو اکاؤنٹس)",
+    overview: "پورٹ فولیو کا جائزہ",
+    rbacMatrix: "رولز اور اجازت نامے (RBAC)",
+    usersBranches: "یوزرز، برانچز اور ملٹی ٹیننسی",
+    security2fa: "ٹو فیکٹر سیکیورٹی (2FA)",
+    auditLogs: "سیکیورٹی آڈٹ لاگز",
+    activeRole: "موجودہ رول",
+    organization: "کمپنی / ادارہ",
+    branch: "برانچ آفس",
+    properties: "پروجیکٹس اور پراپرٹیز",
+    totalUnits: "کل یونٹس / پلاٹس",
+    occupancyRate: "آبادکاری کی شرح",
+    rentCollected: "وصول شدہ کرایہ (12 ماہ)",
+    arrearsBalance: "واجب الادا بقایاجات",
+    switchRole: "رول تبدیل کریں",
+    languageToggle: "English (LTR)",
+  },
+};
+
+export function t(locale: Locale, key: string): string {
+  return DICTIONARY[locale]?.[key] || DICTIONARY.en[key] || key;
+}
