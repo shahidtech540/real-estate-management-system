@@ -915,44 +915,55 @@ export default function DashboardPage() {
 
   const isRtl = locale === "ur";
 
+  const workspaceTabs = [
+    { id: "overview", label: t(locale, "overview"), icon: Building2 },
+    { id: "listings", label: t(locale, "listingsTab"), icon: Sparkles },
+    { id: "crm", label: t(locale, "crmTab"), icon: Users },
+    ...(user.permissions.includes("leases:read") ? [{ id: "tenancy", label: t(locale, "tenancyTab"), icon: FileText }] : []),
+    ...(user.permissions.includes("invoices:read") ? [{ id: "billing", label: t(locale, "billingTab"), icon: Briefcase }] : []),
+    { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
+    { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
+    { id: "csv", label: t(locale, "csvImportTab"), icon: FileSpreadsheet },
+    { id: "rbac", label: t(locale, "rbacMatrix"), icon: ShieldCheck },
+    { id: "users", label: t(locale, "usersBranches"), icon: Users },
+    { id: "security", label: t(locale, "security2fa"), icon: KeyRound },
+    { id: "audit", label: t(locale, "auditLogs"), icon: Activity },
+  ];
+
   return (
-    <div dir={isRtl ? "rtl" : "ltr"} className="min-h-screen bg-slate-50 flex flex-col">
+    <div dir={isRtl ? "rtl" : "ltr"} className="rems-dashboard min-h-screen min-w-0 w-full bg-slate-50 flex flex-col">
       {/* Top Navigation Header */}
-      <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-slate-950 font-bold">
-              <Building2 className="w-5 h-5" />
+      <header data-testid="dashboard-header" className="rems-dashboard-header bg-slate-900 text-white border-b border-slate-800 z-30">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 grid items-center gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
+          <div data-testid="dashboard-brand" className="flex min-w-0 items-center gap-3">
+            <div className="dashboard-brand-mark w-10 h-10 shrink-0 rounded-xl bg-emerald-500 flex items-center justify-center text-slate-950">
+              <Building2 className="w-6 h-6" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-base tracking-tight">{t(locale, "appName")}</span>
-                <span
-                  data-testid="active-org-badge"
-                  className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium"
-                >
+            <div className="min-w-0">
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                <h1 className="font-bold text-base leading-tight tracking-tight">{t(locale, "appName")}</h1>
+                <span data-testid="active-org-badge" title={user.organization.name}
+                  className="block max-w-full truncate rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-300">
                   {user.organization.name}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p data-testid="dashboard-identity" title={`${user.fullName} (${user.email})`} className="mt-1 truncate text-xs text-slate-400">
                 {user.fullName} ({user.email})
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div data-testid="dashboard-controls" className="grid min-w-0 w-full grid-cols-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_auto_auto] gap-2 xl:w-[700px]">
             {/* Instant Role Switcher */}
-            <div className="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-slate-400 hidden md:inline">
-                {t(locale, "switchRole")}:
-              </span>
+            <div className="flex min-w-0 min-h-10 items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
               <select
                 aria-label="Switch Role"
+                title={`${user.role.name} (${user.email})`}
                 data-testid="role-switcher-select"
                 value={user.email}
                 onChange={(e) => handleQuickSwitchRole(e.target.value)}
-                className="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer"
+                className="min-w-0 w-full flex-1 bg-transparent py-2 text-xs font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
               >
                 {QUICK_SWITCH_ACCOUNTS.map((acc) => (
                   <option key={acc.email} value={acc.email} className="bg-slate-900 text-white">
@@ -964,14 +975,15 @@ export default function DashboardPage() {
 
             {/* Branch Switcher */}
             {branches.length > 0 && (
-              <div className="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
-                <MapPin className="w-3.5 h-3.5 text-amber-400" />
+              <div className="flex min-w-0 min-h-10 items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3">
+                <MapPin className="w-4 h-4 shrink-0 text-amber-400" />
                 <select
                   aria-label="Switch Branch"
+                  title={user.branch?.name || t(locale, "branch")}
                   data-testid="branch-switcher-select"
                   value={user.branch?.id || ""}
                   onChange={(e) => handleBranchChange(e.target.value)}
-                  className="bg-transparent text-xs font-medium text-slate-200 focus:outline-none cursor-pointer"
+                  className="min-w-0 w-full flex-1 bg-transparent py-2 text-xs font-medium text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
                 >
                   {branches.map((b) => (
                     <option key={b.id} value={b.id} className="bg-slate-900 text-white">
@@ -987,7 +999,7 @@ export default function DashboardPage() {
               type="button"
               onClick={handleLocaleToggle}
               data-testid="locale-toggle-btn"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-400 transition"
             >
               <Globe className="w-3.5 h-3.5 text-emerald-400" />
               {t(locale, "languageToggle")}
@@ -998,7 +1010,7 @@ export default function DashboardPage() {
               type="button"
               onClick={handleLogout}
               data-testid="logout-btn"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 transition"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap px-3 py-2 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-300 transition"
             >
               <LogOut className="w-3.5 h-3.5" />
               {t(locale, "signOut")}
@@ -1031,43 +1043,41 @@ export default function DashboardPage() {
       )}
 
       {/* Active Role Context & Navigation Bar */}
-      <div className="bg-white border-b border-slate-200">
+      <div data-testid="dashboard-context" className="min-w-0 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div data-testid="dashboard-role-context" className="flex min-w-0 flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <div className="flex min-w-0 max-w-full items-center gap-2 flex-wrap">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 {t(locale, "activeRole")}:
               </span>
               <span
                 data-testid="active-role-badge"
-                className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300"
+                className="max-w-full break-words px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200"
               >
                 {user.role.name} ({user.role.slug})
               </span>
               <span className="text-xs text-slate-500">
-                • {user.permissions.length} Assigned Permissions
+                {user.permissions.length} {t(locale, "assignedPermissions")}
               </span>
             </div>
-            <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Phase 3 Active: Tenants, Leases, Rent, Payments & Owner Statements
+            <span className="shrink-0 inline-flex items-center gap-2 text-xs font-medium text-slate-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+              {t(locale, "phase3Status")}
             </span>
           </div>
 
-          <nav className="flex items-center gap-1.5 overflow-x-auto pb-1">
-            {[
-              { id: "overview", label: t(locale, "overview"), icon: Building2 },
-              { id: "listings", label: t(locale, "listingsTab"), icon: Sparkles },
-              { id: "crm", label: t(locale, "crmTab"), icon: Users },
-              ...(user.permissions.includes("leases:read") ? [{ id: "tenancy", label: t(locale, "tenancyTab"), icon: FileText }] : []),
-              ...(user.permissions.includes("invoices:read") ? [{ id: "billing", label: t(locale, "billingTab"), icon: Briefcase }] : []),
-              { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
-              { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
-              { id: "csv", label: t(locale, "csvImportTab"), icon: FileSpreadsheet },
-              { id: "rbac", label: t(locale, "rbacMatrix"), icon: ShieldCheck },
-              { id: "users", label: t(locale, "usersBranches"), icon: Users },
-              { id: "security", label: t(locale, "security2fa"), icon: KeyRound },
-              { id: "audit", label: t(locale, "auditLogs"), icon: Activity },
-            ].map((tab) => {
+          <nav aria-label={t(locale, "workspaceNavigation")} className="min-w-0">
+            <label className="flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 xl:hidden">
+              <Layers className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+              <span className="text-xs font-semibold text-slate-500">{t(locale, "workspace")}</span>
+              <select aria-label={t(locale, "workspace")} data-testid="workspace-select" value={activeTab}
+                onChange={e => setActiveTab(e.target.value as typeof activeTab)}
+                className="min-w-0 w-full flex-1 bg-transparent py-3 text-sm font-semibold text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+                {workspaceTabs.map(tab => <option key={tab.id} value={tab.id}>{tab.label}</option>)}
+              </select>
+            </label>
+            <div data-testid="desktop-workspaces" className="hidden xl:flex xl:flex-wrap items-center gap-2">
+            {workspaceTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -1075,6 +1085,7 @@ export default function DashboardPage() {
                   key={tab.id}
                   type="button"
                   data-testid={`tab-${tab.id}`}
+                  aria-current={isActive ? "page" : undefined}
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
                   className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
                     isActive
@@ -1087,12 +1098,13 @@ export default function DashboardPage() {
                 </button>
               );
             })}
+            </div>
           </nav>
         </div>
       </div>
 
       {/* Main Workspace Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main data-testid="dashboard-main" className="min-w-0 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* TAB 1: PORTFOLIO HIERARCHY (PROPERTY -> BUILDING -> UNIT) */}
         {activeTab === "overview" && (
           <div className="space-y-6">

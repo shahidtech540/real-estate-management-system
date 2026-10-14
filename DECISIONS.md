@@ -107,3 +107,18 @@ bearer token; it grants no special access and does not accept unsigned user/role
 claims. Standard bearer and cookie clients remain supported. Explicit caller
 bearer credentials are mirrored rather than replaced with a different identity.
 This header is never attached to external URLs and never placed in query strings.
+
+## 5. Responsive dashboard chrome
+
+- Replace the fixed-height, wrapping header with an intrinsic-height grid. Role,
+  branch, language and logout controls have bounded columns and minimum hit areas;
+  long account/organization text truncates instead of pushing adjacent controls.
+- Below 1280px, expose all existing workspaces through a labeled native selector.
+  At desktop widths, wrap navigation buttons into visible rows instead of hiding
+  modules in a horizontally scrolling strip. Active buttons expose `aria-current`.
+- Short, wide previews (at least 768px wide, at most 500px tall) use one compact
+  header row and omit secondary account/status metadata to leave the workspace
+  visible. Metadata remains present at ordinary viewport heights. The header is
+  sticky only on sufficiently tall desktop viewports, never trapping short previews.
+- Dashboard grid children may shrink; table overflow stays within its own panel.
+  No blanket `overflow-x: hidden` is used to mask inaccessible content.

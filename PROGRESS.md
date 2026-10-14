@@ -116,3 +116,22 @@ tests** pass. New negative tests reject missing, forged and expired custom-heade
 credentials and preserve RBAC/organization isolation. The browser regression now
 covers a proxy removing Authorization with cookies unavailable, including session
 verification, a protected workspace, reload and logout. PR #2 stays unmerged.
+
+## Post-Phase 3 correction — responsive dashboard UI
+
+- Fixed the screenshot's root cause: wrapped controls escaped a fixed 64px header
+  and overlapped role/status navigation. The header now sizes to its content and
+  arranges controls using bounded responsive grid columns.
+- Replaced the horizontal workspace scrollbar with a compact selector below
+  desktop widths and wrapping, fully visible buttons on desktop. Every workspace
+  remains reachable; role/branch/language/logout controls remain available.
+- Added compact chrome for short, wide embedded previews, shortened status text,
+  prevented grid children from widening the page, and retained Urdu/RTL behavior.
+- Reviewed actual browser screenshots at 375, 768, 940, 1280 and 1440px widths,
+  including the reported short-preview shape (940 × 260).
+- Verification: TypeScript, production build, **52/52 unit/integration tests** and
+  **12/12 browser tests** passed. Browser assertions check control containment,
+  no header/context overlap, no page-level horizontal overflow, all 12 workspaces
+  at mobile width in both English and Urdu, and short-preview content visibility.
+- Tightened a sign-in test locator to distinguish the error message from Next.js's
+  screen-reader route announcer. Authentication regressions continue to pass.

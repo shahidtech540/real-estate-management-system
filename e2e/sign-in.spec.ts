@@ -11,7 +11,9 @@ test("normal sign-in, wrong-password feedback, reload and sign-out", async ({
   await page.goto("/login");
   await page.getByTestId("password-input").fill("incorrect-password");
   await page.getByTestId("login-submit").click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Invalid email or password." }),
+  ).toBeVisible();
   await expect(page.getByTestId("login-submit")).toBeEnabled();
   await page.getByTestId("password-input").fill("Password123!");
   await page.getByTestId("login-submit").click();

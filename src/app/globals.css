@@ -10,3 +10,55 @@ body {
   @apply bg-slate-50 text-slate-900 antialiased;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
+
+
+/* Grid children must be allowed to shrink so data tables scroll inside their
+   own panels rather than widening the whole dashboard/embedded preview. */
+.rems-dashboard .grid > * {
+  min-width: 0;
+}
+.rems-dashboard input:not([type="checkbox"]),
+.rems-dashboard select,
+.rems-dashboard textarea {
+  max-width: 100%;
+}
+/* A sticky, multi-row header must not trap the content in a short preview. */
+@media (min-width: 1280px) and (min-height: 720px) {
+  .rems-dashboard-header {
+    position: sticky;
+    top: 0;
+  }
+}
+
+/* Embedded previews can be wide but only a few hundred pixels tall. Keep
+   secondary account metadata out of the way so actual work remains visible. */
+@media (min-width: 768px) and (max-height: 500px) {
+  .rems-dashboard-header > div {
+    grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+  }
+  .rems-dashboard-header h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  .rems-dashboard-header [data-testid="active-org-badge"],
+  .rems-dashboard-header [data-testid="dashboard-identity"],
+  .rems-dashboard [data-testid="dashboard-role-context"] {
+    display: none;
+  }
+  .rems-dashboard-header .dashboard-brand-mark {
+    width: 32px;
+    height: 32px;
+  }
+  .rems-dashboard-header [data-testid="dashboard-controls"] {
+    width: 100%;
+  }
+  .rems-dashboard [data-testid="dashboard-context"] > div {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .rems-dashboard [data-testid="dashboard-context"] nav {
+    margin-top: 0;
+  }
+}
