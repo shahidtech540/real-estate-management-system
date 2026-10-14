@@ -18,6 +18,9 @@ This document records all architectural, product, and domain defaults made for t
 | **Languages & Localization** | **English (`en`, LTR)** and **Urdu (`ur`, RTL)** | Full bilingual dictionary and instant LTR/RTL layout switching in the UI header. |
 | **Payment Gateways** | Adapter pattern supporting `bank_transfer`, `cash`, `jazzcash`, `easypaisa`, and `stripe` | Mock providers enabled by default for local dev/testing; production credentials configurable via `.env`. |
 | **Roles (RBAC)** | 6 built-in roles per organization: `admin`, `agent`, `accountant`, `maintenance_staff`, `owner`, `tenant` | Directly matches Section 1 ("admin, agents, accountants, maintenance staff, owners, tenants") with 36 granular permissions. |
+| **Multi-Owner Splits** | Properties support multiple owners via `property_owners` (`ownership_pct`, `is_primary`). Validated so total ownership per property is `> 0%` and `<= 100%`. |Seeded with co-owned flagship projects (`Fahad Garden Housing Scheme` 70%/30%, `Taj Commercial Center` 60%/40%). |
+| **CSV Import Format** | 11-column schema (`property_code,building_code,unit_number,type,area_sqft,area_display,bedrooms,bathrooms,status,market_price_pkr,monthly_rent_pkr`) with both `dryRun` and `commit` modes. | Validates property codes, duplicate unit numbers, unit types, status enums, positive area, and PKR values, returning a structured row-by-row error report. |
+| **Document Vault Versioning & Expiry** | Uploading a document with the same `entityType + entityId + title` auto-increments `version` (`v1 → v2 → v3`). Expiry status is computed (`valid`, `expiring_soon` <= 60 days, `expired`, `no_expiry`). | Every view or download generates a signed access URL and logs `document.viewed` or `document.downloaded` in `audit_logs`. |
 
 ---
 

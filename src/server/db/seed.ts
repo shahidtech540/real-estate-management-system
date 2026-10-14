@@ -429,7 +429,7 @@ export function seedDatabase(db: DatabaseSync): void {
     const insertPropOwner = db.prepare(`
       INSERT INTO property_owners (
         id, organization_id, property_id, owner_id, ownership_pct, is_primary, created_at, updated_at, created_by
-      ) VALUES (?, 'org_pakland', ?, ?, ?, 1, ?, ?, 'usr_admin')
+      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, ?, 'usr_admin')
     `);
     const insertBuilding = db.prepare(`
       INSERT INTO buildings (
@@ -452,7 +452,15 @@ export function seedDatabase(db: DatabaseSync): void {
         now,
         now
       );
-      insertPropOwner.run(`po_${p.id}`, p.id, p.ownerId, 100.0, now, now);
+      if (p.id === "prop_1") {
+        insertPropOwner.run(`po_${p.id}_1`, p.id, "own_1", 70.0, 1, now, now);
+        insertPropOwner.run(`po_${p.id}_2`, p.id, "own_2", 30.0, 0, now, now);
+      } else if (p.id === "prop_3") {
+        insertPropOwner.run(`po_${p.id}_1`, p.id, "own_3", 60.0, 1, now, now);
+        insertPropOwner.run(`po_${p.id}_2`, p.id, "own_1", 40.0, 0, now, now);
+      } else {
+        insertPropOwner.run(`po_${p.id}`, p.id, p.ownerId, 100.0, 1, now, now);
+      }
       insertBuilding.run(
         `bldg_${p.id}`,
         p.id,
@@ -706,6 +714,126 @@ export function seedDatabase(db: DatabaseSync): void {
         a.goal,
         a.autonomy,
         JSON.stringify(a.tools),
+        now,
+        now
+      );
+    }
+
+    // 9.5 Seed Initial Document Vault Records (Section 3.8)
+    const insertDoc = db.prepare(`
+      INSERT INTO documents (
+        id, organization_id, entity_type, entity_id, title, category, version, storage_key,
+        mime_type, size_bytes, tags_json, expiry_date, content_text, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'usr_admin')
+    `);
+
+    const seedDocs = [
+      {
+        id: "doc_1",
+        entityType: "property",
+        entityId: "prop_1",
+        title: "Fahad Garden Housing Scheme — LDA NOC & Town Planning Approval",
+        category: "noc_approval",
+        version: 2,
+        storageKey: "s3://rems-documents/org_pakland/prop_1/fghs-lda-noc-v2.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 2458000,
+        tags: ["NOC", "LDA", "Fahad Garden", "Town Planning"],
+        expiryDate: "2028-12-31",
+        contentText:
+          "Lahore Development Authority Final NOC for Fahad Garden Housing Scheme (FGHS-01) covering Residential Plots, Commercial Boulevard, Parks, and Underground Electrification.",
+      },
+      {
+        id: "doc_2",
+        entityType: "property",
+        entityId: "prop_2",
+        title: "Abdullah City — RDA Master Layout Plan & Environmental Clearance",
+        category: "floor_plan",
+        version: 1,
+        storageKey: "s3://rems-documents/org_pakland/prop_2/abdullah-city-masterplan.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 5120000,
+        tags: ["RDA", "Master Plan", "Abdullah City", "Chakri Road"],
+        expiryDate: "2029-06-30",
+        contentText:
+          "Rawalpindi Development Authority Master Layout Plan and EPA Clearance for Abdullah City Executive & Golf Sectors.",
+      },
+      {
+        id: "doc_3",
+        entityType: "property",
+        entityId: "prop_3",
+        title: "Taj Commercial Center — Trade Licence & Civil Defense Fire Safety Certificate",
+        category: "trade_licence",
+        version: 1,
+        storageKey: "s3://rems-documents/org_pakland/prop_3/taj-center-fire-safety.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 1280000,
+        tags: ["Trade Licence", "Fire Safety", "Taj Commercial Center"],
+        expiryDate: "2026-11-10", // Expiring soon (< 30 days from 2026-10-14)
+        contentText:
+          "Annual Commercial Trade Licence and Fire Fighting Inspection Certificate for Taj Commercial Center (TCC-01), Satellite Town Rawalpindi.",
+      },
+      {
+        id: "doc_4",
+        entityType: "property",
+        entityId: "prop_4",
+        title: "VIP Block — CDA Title Deed & Co-Ownership Registry",
+        category: "title_deed",
+        version: 1,
+        storageKey: "s3://rems-documents/org_pakland/prop_4/vip-block-title-deed.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 3140000,
+        tags: ["CDA", "Title Deed", "VIP Block", "Islamabad"],
+        expiryDate: null,
+        contentText:
+          "Registered Title Deed and Allotment Registry for VIP Block Residential Enclave, Zone IV Islamabad.",
+      },
+      {
+        id: "doc_5",
+        entityType: "property",
+        entityId: "prop_5",
+        title: "University Commercial Centers — Comprehensive Building & Liability Insurance",
+        category: "insurance",
+        version: 3,
+        storageKey: "s3://rems-documents/org_pakland/prop_5/ucc-insurance-policy-v3.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 1890000,
+        tags: ["Insurance", "EFU", "University Commercial Centers"],
+        expiryDate: "2026-09-30", // Already expired relative to 2026-10-14
+        contentText:
+          "Comprehensive Commercial Property & Public Liability Insurance Policy for University Commercial Centers (UCC-01), Sector H-11 Islamabad.",
+      },
+      {
+        id: "doc_6",
+        entityType: "owner",
+        entityId: "own_1",
+        title: "Malik Fahad Nawaz — FBR Active Taxpayer & KYC Verification Dossier",
+        category: "kyc_identity",
+        version: 1,
+        storageKey: "s3://rems-documents/org_pakland/own_1/malik-fahad-kyc.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 940000,
+        tags: ["KYC", "FBR", "CNIC", "Owner"],
+        expiryDate: "2027-06-30",
+        contentText:
+          "Verified CNIC, FBR Active Taxpayer Certificate, and Meezan Bank IBAN Mandate for Principal Owner Malik Fahad Nawaz.",
+      },
+    ];
+
+    for (const d of seedDocs) {
+      insertDoc.run(
+        d.id,
+        d.entityType,
+        d.entityId,
+        d.title,
+        d.category,
+        d.version,
+        d.storageKey,
+        d.mimeType,
+        d.sizeBytes,
+        JSON.stringify(d.tags),
+        d.expiryDate,
+        d.contentText,
         now,
         now
       );
