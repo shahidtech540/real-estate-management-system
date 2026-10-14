@@ -1,3 +1,16 @@
+import {
+  schemas,
+  actionSchemas,
+  type AgentKind,
+  type ActionName,
+} from "../domain-agents/contracts";
+import { assessDomain } from "../domain-agents/assess";
+import {
+  ACTION_PERMISSIONS,
+  actionSnapshot,
+  executeAction,
+} from "../domain-agents/actions";
+import { domainPermissions, fingerprint } from "../domain-agents/safety";
 import { z } from "zod";
 import type { JwtPayload } from "@/server/auth/crypto";
 import { HttpError, requirePermission } from "@/server/auth/guards";
@@ -19,6 +32,7 @@ import { canReadProperty } from "../shared/access";
 export interface Step {
   tool: string;
   input: unknown;
+  expectedSourceHash?: string;
 }
 interface Tool {
   name: string;
@@ -29,6 +43,7 @@ interface Tool {
   schema: z.ZodTypeAny;
   example: unknown;
   execute: (ctx: JwtPayload, input: unknown) => unknown;
+  requiredPermissions: (input: unknown) => string[];
 }
 const limit = z.number().int().min(1).max(50).default(20),
   id = z.string().min(1).max(180);
@@ -40,6 +55,7 @@ function define<S extends z.ZodTypeAny>(
   schema: S,
   example: z.input<S>,
   execute: (ctx: JwtPayload, input: z.output<S>) => unknown,
+  extraPermissions: (input: unknown) => string[] = () => [],
 ): Tool {
   return Object.freeze({
     name,
@@ -49,9 +65,15 @@ function define<S extends z.ZodTypeAny>(
     requiresApproval,
     schema,
     example,
+    requiredPermissions: (input) => [
+      ...new Set([permission, ...extraPermissions(input)]),
+    ],
     execute: (ctx, input) => {
-      requirePermission(ctx, permission);
-      return execute(ctx, valid(schema, input));
+      const parsed = valid(schema, input);
+      [...new Set([permission, ...extraPermissions(parsed)])].forEach((p) =>
+        requirePermission(ctx, p),
+      );
+      return execute(ctx, parsed);
     },
   });
 }
@@ -234,6 +256,97 @@ const tools: Tool[] = [
     (ctx, b) => createExpense(ctx, b),
   ),
 ];
+const domainExamples: Record<
+  AgentKind,
+  z.input<(typeof schemas)[AgentKind]>
+> = {
+  lead: { leadId: "lead_1", intent: "sale" },
+  listing: { unitId: "unit_30", purpose: "sale" },
+  rent: { invoiceId: "USE_EXISTING_INVOICE_ID" },
+  maintenance: { ticketId: "USE_EXISTING_TICKET_ID" },
+  lease: { leaseId: "lease_1" },
+  insights: { question: "What is the current occupancy?" },
+};
+for (const kind of Object.keys(schemas) as AgentKind[]) {
+  const permission = {
+    lead: "leads:read",
+    listing: "listings:read",
+    rent: "invoices:read",
+    maintenance: "maintenance:read",
+    lease: "leases:read",
+    insights: "properties:read",
+  }[kind];
+  tools.push(
+    define(
+      `domain.${kind}`,
+      `Local source-backed ${kind} assessment; recommendations only, no silent writes.`,
+      permission,
+      false,
+      schemas[kind],
+      domainExamples[kind],
+      (ctx, b) => assessDomain(ctx, kind, b),
+      (input) => domainPermissions(kind, input),
+    ),
+  );
+}
+const actionExamples: Record<
+  ActionName,
+  z.input<(typeof actionSchemas)[ActionName]>
+> = {
+  "crm.qualify": {
+    leadId: "lead_1",
+    stage: "contacted",
+    note: "Verify budget and timeline.",
+  },
+  "crm.viewing": {
+    leadId: "lead_1",
+    unitId: "unit_30",
+    agentId: "USE_ASSIGNED_AGENT",
+    scheduledAt: "2026-10-20T09:00:00Z",
+  },
+  "listings.draft": {
+    unitId: "unit_30",
+    purpose: "sale",
+    askingPriceMinor: 10000,
+  },
+  "rent.reminder": { invoiceId: "USE_EXISTING_INVOICE_ID" },
+  "maintenance.triage": {
+    ticketId: "USE_EXISTING_TICKET_ID",
+    category: "general",
+    priority: "medium",
+    note: "Coordinator inspection required.",
+  },
+  "leases.offer": {
+    leaseId: "lease_1",
+    newEndDate: "2027-10-15",
+    offeredRentMinor: 10000,
+  },
+};
+for (const name of Object.keys(actionSchemas) as ActionName[]) {
+  const readPermissions: Record<ActionName, string[]> = {
+    "crm.qualify": ["leads:read"],
+    "crm.viewing": ["leads:read", "properties:read"],
+    "listings.draft": ["properties:read", "listings:read"],
+    "rent.reminder": ["invoices:read", "payments:read"],
+    "maintenance.triage": ["maintenance:read"],
+    "leases.offer": ["leases:read"],
+  };
+  tools.push(
+    define(
+      name,
+      `Apply ${name} after independent approval; source-bound and local only.`,
+      ACTION_PERMISSIONS[name],
+      true,
+      actionSchemas[name],
+      actionExamples[name],
+      (ctx, b) => executeAction(ctx, name, b),
+      () => readPermissions[name],
+    ),
+  );
+}
+export function checkToolAccess(ctx: JwtPayload, tool: Tool, input: unknown) {
+  tool.requiredPermissions(input).forEach((p) => requirePermission(ctx, p));
+}
 export function getTool(name: string) {
   const tool = tools.find((t) => t.name === name);
   if (!tool)
@@ -271,12 +384,33 @@ export function validateStep(ctx: JwtPayload, step: Step, allowed: string[]) {
       "TOOL_NOT_ALLOWED",
       "Tool is not allowed for this agent.",
     );
-  requirePermission(ctx, tool.permission);
-  return { tool: tool.name, input: valid(tool.schema, step.input) };
+  const parsed = valid(tool.schema, step.input);
+  checkToolAccess(ctx, tool, parsed);
+  if (step.expectedSourceHash) {
+    if (
+      !tool.requiresApproval ||
+      fingerprint(sourceSnapshot(ctx, { tool: tool.name, input: parsed })) !==
+        step.expectedSourceHash
+    )
+      throw new HttpError(
+        409,
+        "STALE_RECOMMENDATION",
+        "Recommendation source changed; rerun the domain agent before requesting approval.",
+      );
+  }
+  return {
+    tool: tool.name,
+    input: parsed,
+    ...(step.expectedSourceHash
+      ? { expectedSourceHash: step.expectedSourceHash }
+      : {}),
+  };
 }
 
 /** Approval binds both exact arguments and the current source state. */
 export function sourceSnapshot(ctx: JwtPayload, step: Step): unknown {
+  if (Object.hasOwn(actionSchemas, step.tool))
+    return actionSnapshot(ctx, step.tool, step.input);
   const b = step.input as Record<string, unknown>,
     db = getDb(),
     org = ctx.organizationId;
@@ -292,12 +426,12 @@ export function sourceSnapshot(ctx: JwtPayload, step: Step): unknown {
   if (step.tool === "maintenance.assign") {
     const ticket = db
       .prepare(
-        "SELECT id,property_id,status,category,updated_at FROM maintenance_tickets WHERE organization_id=? AND id=? AND deleted_at IS NULL",
+        "SELECT id,property_id,status,category,priority,title,description,sla_due_at,updated_at FROM maintenance_tickets WHERE organization_id=? AND id=? AND deleted_at IS NULL",
       )
       .get(org, String(b.ticketId));
     const vendor = db
       .prepare(
-        "SELECT id,available,trade_category,updated_at FROM vendors WHERE organization_id=? AND id=? AND deleted_at IS NULL",
+        "SELECT id,available,trade_category,base_rate_minor,rating,sla_hours,updated_at FROM vendors WHERE organization_id=? AND id=? AND deleted_at IS NULL",
       )
       .get(org, String(b.vendorId));
     if (!ticket || !vendor)

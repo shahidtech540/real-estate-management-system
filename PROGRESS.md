@@ -15,7 +15,7 @@ company/branch/project assumptions in the historical logs below.
   **90/90 unit/integration tests** and **19/19 browser tests** pass, with production
   build/typecheck green (Phases 0–4 only).
 - Local backup made before preview migration. Details: [`docs/BUSINESS_PROFILE.md`](docs/BUSINESS_PROFILE.md).
-- **Phases 5 and 6 completed for their documented local scopes. Phase 7 not started. PR #2 remains unmerged.**
+- **Phases 5–7 completed for their documented local scopes. Phase 8 awaits approval. PR #2 remains unmerged.**
 
 ## Phase Summary Matrix
 
@@ -28,10 +28,38 @@ company/branch/project assumptions in the historical logs below.
 | **Phase 4** | Maintenance, vendors, notifications | ✅ **COMPLETED (local / mock-provider scope)** | **84/84** tests; **16/16** browser checks; **94.32%** statements | Tenant photo tickets → triage → vendor work order → actual cost → tenant confirmation; SLA alerts; preventive schedules; durable notification outbox |
 | **Phase 5** | Accounting, dashboards, reports, exports | ✅ Completed (property-operations / local scope) | 112 unit tests; 21 browser tests; 95.07% statements | Immutable balanced ledger, source posting/reconciliation, expenses/receipts, budgets, KPIs, CSV/XLSX/PDF, personal digests |
 | **Phase 6** | Agent orchestration layer, approval queue, audit, kill switch | ✅ Completed (local structured-plan scope) | 142 unit/integration; 24 browser workflows | Versioned allowlist, durable cursor, independent source-bound approvals, budgets, fresh RBAC and org/agent kill controls |
-| **Phase 7** | Lead, Listing, Rent, Maintenance, Lease & Insights agents + eval suite | ⏳ Pending | — | All 6 domain AI agents + 120+ scenario & adversarial prompt-injection evaluation tests |
+| **Phase 7** | Lead, Listing, Rent, Maintenance, Lease & Insights agents + eval suite | ✅ Completed (local rules / lexical-retrieval scope) | 125 domain evaluations + 20 integration tests; 287 total tests; 30 browser workflows | Six source-backed assessments, bilingual drafts, cited retrieval, private/nonbinding approved actions and stale-proposal/permission controls |
 | **Phase 8** | Tenant/owner portals, hardening, performance, docs, deployment guide | ⏳ Pending | — | Dedicated Owner & Tenant portals, OWASP security hardening, OpenAPI spec, runbook, user guides |
 
 ---
+
+## Phase 7 completion checkpoint
+
+- Six working source-backed local assessments on the durable engine, with guided
+  English/Urdu forms, structured results, citations, uncertainty and persisted proposals.
+- 22 strict tools: original 10, six assessments and six independently approved writes;
+  existing maintenance work-order assignment reused. Local cost/tokens remain zero.
+- Lead qualification/viewing, unsyndicated listing drafts, exact-paisa rent evidence
+  and inbox reminders, conservative hazard triage/explicit dispatch, unsigned lease
+  offers and typed/cited portfolio insights. No fake live AI, OCR or integrations.
+- Expected source hashes close analysis→submission→approval gaps. Dynamic secondary
+  read permissions protect execution, cached results and reviewer payloads after role
+  changes. Custom allowlists, autonomy, switches and budgets remain intact.
+- Additive private immutable offer artifacts and matching Prisma design; no business
+  financial reseed/reset. The live database was backed up before migration.
+- **125 domain scenario/adversarial evaluations + 20 integration tests; 287/287 total
+  tests pass. Coverage: 95.29% statements/lines, 84.45% branches, 100% functions.**
+- **30/30 production browser workflows**, typecheck, production build and executable
+  Prisma/Compose design validation pass. Browser tests use an isolated database.
+- Live Phase 7 preview and all three same-database workers restarted. All six
+  assessment smoke runs completed. Exact pre-migration equality verified for units,
+  leads, leases, invoices, payments, receipts, journals, ledger and owner statements:
+  **240 invoices, 17 payments/receipts, 20 leases, 474 journals/948 lines** unchanged.
+  Foreign keys clean; financial posting fully reconciled; legacy clearing remains
+  **2,052,000,000 paisa**, not cash. No business money fabricated or reset.
+- Run instructions, reviewer setup, local scope and exact limitations:
+  [`docs/PHASE7.md`](docs/PHASE7.md), `npm run test:agents`.
+- **STOP at Phase 7; Phase 8 requires the next approval. PR #2 is open/unmerged.**
 
 ## Phase 6 completion checkpoint
 
@@ -54,7 +82,7 @@ company/branch/project assumptions in the historical logs below.
 - Final verification: **142/142 unit/integration tests**, **24/24 browser tests**,
   typecheck/build/design validation green. Coverage **95.43% statements/lines**,
   **83.56% branches**, **100% functions**.
-- **STOP at Phase 6. Phase 7 not started/authorized. PR #2 remains unmerged.**
+- **Historical Phase 6 checkpoint. Phase 7 was subsequently authorized and completed; see above. PR #2 remains unmerged.**
 
 ## Phase 5 completion checkpoint
 

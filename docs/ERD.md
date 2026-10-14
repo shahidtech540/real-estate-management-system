@@ -222,3 +222,15 @@ Journals/ledger/allocation history is immutable. Source state tracks posting del
 reversals append new balanced journals. Run plan/intent are immutable; mutable run
 cursor and tool status commit **in the same transaction as source effects**. Approval
 SHA-256 binds organization, run, ordinal, tool/version, exact input and source snapshot.
+
+## Phase 7 additive domain-agent storage
+
+- `agents.domain_initialized`: one-time capability extension only for untouched
+  Phase 6 defaults; custom configuration and source history are preserved.
+- `agent_artifacts`: org-scoped immutable private unsigned offer drafts, unique
+  `(organization_id, reference)`, `kind`, `entity_id`, `content_json`, status,
+  `created_at`, `created_by`. They are **not** executed lease amendments or fake PDFs.
+- Assessment findings/citations/proposals remain durable tool output. Optional
+  immutable plan-level `expectedSourceHash` binds proposals before approval staging;
+  existing approved `tool_calls.source_hash` remains an execution check.
+- No new financial source table or synthetic cash/posting is introduced.

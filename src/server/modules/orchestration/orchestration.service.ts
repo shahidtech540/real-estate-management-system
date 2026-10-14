@@ -13,6 +13,7 @@ import {
 } from "../shared/domain";
 import { recordAuditLog } from "../audit/audit.service";
 import {
+  checkToolAccess,
   getTool,
   toolCatalog,
   validateStep,
@@ -208,7 +209,13 @@ export function startRun(ctx: JwtPayload, input: unknown) {
       steps = b.steps.map((s) =>
         validateStep(
           ctx,
-          { tool: s.tool, input: s.input },
+          {
+            tool: s.tool,
+            input: s.input,
+            ...(s.expectedSourceHash
+              ? { expectedSourceHash: s.expectedSourceHash }
+              : {}),
+          },
           JSON.parse(String(a.allowed_tools_json)),
         ),
       );
@@ -340,7 +347,7 @@ function validateCall(org: string, row: Row, call: Row, creator: JwtPayload) {
     const reviewer = freshContext(org, String(approval.reviewed_by));
     requirePermission(reviewer, "agents:approve");
     requirePermission(reviewer, "agents:read");
-    requirePermission(reviewer, tool.permission);
+    checkToolAccess(reviewer, tool, JSON.parse(String(call.input_json)));
     if (reviewer.sub === creator.sub)
       fail("SELF_APPROVAL", "Creator cannot approve their own write.", 403);
   }
@@ -603,7 +610,7 @@ export function reviewApproval(ctx: JwtPayload, input: unknown) {
     if (!approval) fail("NOT_FOUND", "Approval not found.", 404);
     const row = run(org, String(approval.agent_run_id)),
       tool = getTool(String(approval.action_type));
-    requirePermission(ctx, tool.permission);
+    checkToolAccess(ctx, tool, JSON.parse(String(approval.payload_json)).input);
     if (row.created_by === ctx.sub)
       fail(
         "SELF_APPROVAL",
@@ -688,7 +695,9 @@ export function orchestrationCatalog(ctx: JwtPayload) {
         )
         .all(org)
         .filter((a) =>
-          ctx.permissions.includes(getTool(String(a.action_type)).permission),
+          getTool(String(a.action_type))
+            .requiredPermissions(JSON.parse(String(a.payload_json)).input)
+            .every((p) => ctx.permissions.includes(p)),
         )
         .map((a) => ({
           id: String(a.id),
@@ -720,7 +729,7 @@ export function runDetail(ctx: JwtPayload, id: string) {
   const row = run(ctx.organizationId, id);
   visible(ctx, row);
   for (const step of JSON.parse(String(row.plan_json)) as Step[])
-    requirePermission(ctx, getTool(step.tool).permission);
+    checkToolAccess(ctx, getTool(step.tool), step.input);
   const calls = getDb()
     .prepare(
       "SELECT id,tool_name,input_json,output_json,status,step_index,requires_approval,input_hash,duration_ms,executed_at FROM tool_calls WHERE organization_id=? AND agent_run_id=? ORDER BY step_index",
@@ -741,6 +750,7 @@ export function runDetail(ctx: JwtPayload, id: string) {
   return {
     id,
     status: String(row.status),
+    createdBy: String(row.created_by),
     goal: String(row.input_text),
     summary: String(row.reasoning_summary),
     output: String(row.output_text),

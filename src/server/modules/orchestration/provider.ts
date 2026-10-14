@@ -10,7 +10,14 @@ export const planSchema = z
     steps: z
       .array(
         z
-          .object({ tool: z.string().min(1).max(100), input: z.unknown() })
+          .object({
+            tool: z.string().min(1).max(100),
+            input: z.unknown(),
+            expectedSourceHash: z
+              .string()
+              .regex(/^[a-f0-9]{64}$/)
+              .optional(),
+          })
           .strict(),
       )
       .min(1)
@@ -42,7 +49,7 @@ export function planningProvider(): PlanProvider {
         tokensUsed: 0,
         costMinor: 0,
         summary:
-          "Human-authored structured plan. Inputs and tool outputs are untrusted data, never executable instructions. No LLM cost incurred.",
+          "Local structured plan supplied by a user or domain workflow. Inputs and tool outputs are untrusted data, never executable instructions. No LLM cost incurred.",
       };
     },
   };

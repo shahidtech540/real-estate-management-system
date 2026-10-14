@@ -67,7 +67,7 @@ Phases 0–6 are complete for local/mock-provider use:
   See [`docs/PHASE5.md`](docs/PHASE5.md).
 - Durable local structured-plan orchestration, independent approval queues, fresh
   permission checks, immutable intent/source hashes, budgets and kill switches.
-  See [`docs/PHASE6.md`](docs/PHASE6.md). Domain reasoning agents remain Phase 7.
+  See [`docs/PHASE6.md`](docs/PHASE6.md). The six source-backed local assessments are now available in [Phase 7](docs/PHASE7.md).
 
 At narrow widths use the **Workspace** dropdown. Existing rent records and unit
 identities survive the business correction. The five invented sub-projects are
@@ -116,3 +116,22 @@ Until then exports use relative listing paths rather than an invented domain.
 - [Phase 4 walkthrough/API](docs/PHASE4.md)
 
 **Phase 5 is on hold** until the user approves continuing. PR #2 remains unmerged.
+
+## Phase 7: six domain agents
+
+Open **Agent orchestration → Six domain agents** for lead matching, bilingual listing
+copy, rent reconciliation/reminders, maintenance safety triage, lease text/offer
+review and cited portfolio insights. Queue an assessment, advance it (or run the
+same-database agent worker), inspect citations and request independent approval
+for a persisted proposal. No silent record changes, publication or contract execution.
+
+This is working **local rules / lexical retrieval**, not a configured live LLM,
+verified appraisal, neural semantic search or OCR. Offers remain unsigned/nonbinding;
+reminders are in-app only. An administrator cannot approve their own write.
+
+```bash
+npm run test:agents  # 125 evaluations + 20 guarded-engine integration tests
+```
+
+See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 7 complete; Phase 8
+awaits approval. PR #2 remains unmerged.**

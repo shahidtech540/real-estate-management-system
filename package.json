@@ -21,7 +21,8 @@
     "reports:worker": "tsx src/server/modules/accounting/cycle-cli.ts --watch",
     "agents:cycle": "tsx src/server/modules/orchestration/cycle-cli.ts",
     "agents:worker": "tsx src/server/modules/orchestration/cycle-cli.ts --watch",
-    "validate:design": "node scripts/validate-design.cjs"
+    "validate:design": "node scripts/validate-design.cjs",
+    "test:agents": "vitest run tests/domain-agents.eval.test.ts tests/phase7.test.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

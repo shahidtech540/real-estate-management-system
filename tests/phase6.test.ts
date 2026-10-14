@@ -523,7 +523,7 @@ describe("Phase 6 durable guarded orchestration", () => {
       });
       expect(a.advanceRun(admin, r.id).status).toBe("completed");
     }
-    expect(toolCatalog()).toHaveLength(10);
+    expect(toolCatalog()).toHaveLength(22);
   });
   it("source approvals cover payment records and expenses with no external side effects", () => {
     const inv = invoice();

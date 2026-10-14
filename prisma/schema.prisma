@@ -46,6 +46,7 @@ model Organization {
   notifications   Notification[]
   auditLogs       AuditLog[]
   agents          Agent[]
+  agentArtifacts  AgentArtifact[]
 
   @@map("organizations")
 }
@@ -748,6 +749,7 @@ model Agent {
   organization    Organization @relation(fields: [organizationId], references: [id])
 
   runtimeInitialized Boolean @default(false) @map("runtime_initialized")
+  domainInitialized Boolean @default(false) @map("domain_initialized")
 
   @@unique([organizationId, slug])
   @@map("agents")
@@ -1118,4 +1120,20 @@ model OrchestrationSettings {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdBy String @map("created_by")
   @@map("orchestration_settings")
+}
+
+// Private immutable unsigned offers; never amendments to an executed lease.
+model AgentArtifact {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  kind String
+  entityId String @map("entity_id")
+  reference String
+  contentJson String @map("content_json")
+  status String @default("draft")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  organization Organization @relation(fields: [organizationId], references: [id])
+  @@unique([organizationId, reference])
+  @@map("agent_artifacts")
 }

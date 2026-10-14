@@ -1,4 +1,6 @@
 "use client";
+import { DomainAgentsWorkspace } from "./DomainAgentsWorkspace";
+import type { Assessment } from "@/server/modules/domain-agents/contracts";
 import { useState, useEffect } from "react";
 import type { Locale } from "@/lib/i18n";
 import type {
@@ -124,8 +126,8 @@ export function OrchestrationWorkspace({
       </h1>
       <p className="text-sm text-slate-600">
         {tr(
-          "Local structured-plan engine · No LLM calls or external payments · Domain reasoning agents are Phase 7.",
-          "مقامی ساختی منصوبہ نظام · ماڈل یا بیرونی ادائیگیاں نہیں · شعبہ وار ذہین ایجنٹ فیز ۷ میں۔",
+          "Local domain agents and structured plans · Source-backed recommendations · Independent approval for writes · No LLM calls or external payments.",
+          "مقامی شعبہ وار ایجنٹ اور ساختی منصوبے · ذرائع پر مبنی تجاویز · تبدیلی کے لیے الگ منظوری · بیرونی ماڈل یا ادائیگیاں نہیں۔",
         )}
       </p>
       {error && (
@@ -168,6 +170,27 @@ export function OrchestrationWorkspace({
               {cash(Number(data.settings.daily_cost_budget_minor))}
             </p>
           </div>
+          <DomainAgentsWorkspace
+            canPropose={(tool) =>
+              detail?.createdBy === userId &&
+              !!data.tools.find(
+                (t) => t.name === tool && permissions.includes(t.permission),
+              )
+            }
+            locale={locale}
+            permissions={permissions}
+            refresh={refresh}
+            runId={selected}
+            assessment={
+              (detail?.calls.find(
+                (c) => c.tool.startsWith("domain.") && c.status === "executed",
+              )?.output as Assessment) || null
+            }
+            onRun={(id) => {
+              setSelected(id);
+              setRefresh((n) => n + 1);
+            }}
+          />
           {permissions.includes("agents:run") && (
             <Card
               title={tr("Submit a structured plan", "ساختی منصوبہ جمع کریں")}

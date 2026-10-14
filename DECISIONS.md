@@ -225,4 +225,42 @@ This header is never attached to external URLs and never placed in query strings
   date consistently; historical paid owner snapshots are never rewritten.
 - Static Prisma/WASM and Compose validation is now executable in CI. Docker runtime
   execution remains unavailable. No production-security certification is asserted.
-- Stop after Phase 6; Phase 7 has not been authorized. Do not merge PR #2.
+- Historical Phase 6 checkpoint: stopped and waited. Phase 7 was subsequently
+  authorized; current checkpoint is documented in section 10. Do not merge PR #2.
+
+## 10. Phase 7 domain-agent defaults
+
+- User authorized Phase 7. Implement all six as source-backed local rules/retrieval
+  on durable Phase 6 runs; do not fabricate live LLM reasoning/tokens, embeddings,
+  OCR, integrations, verified prices or legal conclusions. Nonlocal modes fail closed.
+- Guided English/Urdu workflows plus strict assessment contracts, structured findings,
+  citations, warnings and persisted proposals. Read assessment never changes business
+  records; each proposal creates a separate independently approved write plan.
+- Use org/slug lookup, not hardcoded seed agent IDs. Preserve custom allowlists and
+  all existing administrator controls; extend untouched defaults once, additively.
+- Bind derived proposals to immutable first-level expected source hashes before
+  submission and staging, retaining approved-source rechecks at execution. Never
+  accept replacement proposal arguments from clients. Fresh secondary permissions
+  also gate cached financial/document outputs and approval payloads.
+- Reuse existing CRM scoring/stage vocabulary and conflict-check explicit viewing
+  times. Listing drafts use recorded asking prices and never publish or syndicate.
+  Sparse comparables abstain; asking medians are not market appraisals.
+- Rent illustrations conserve exact paisa, do not agree dates or fabricate receipt
+  evidence. Reminders are courteous idempotent in-app messages only; no fees, bank
+  verification, external sending or automated legal action.
+- Maintenance is conservative safety advice, not diagnosis/credential verification.
+  Emergency users must contact emergency services immediately, never wait for agent
+  approval. Reject automatic priority downgrades; dispatch requires an explicit time.
+- Lease text extraction is anchored stored text, not PDF/OCR. Offers are immutable
+  private unsigned nonbinding artifacts, only within the current 0–90-day window;
+  no actual lease renewal, refund, damage deduction or financial source changes.
+- Insights supports typed current metrics, accrual finance or bounded Unicode lexical
+  retrieval of latest authorized source excerpts. It abstains unsupported questions;
+  no predictive forecasts or model-based semantic-search claim. Legacy clearing is
+  never cash. Financial filters are explicit, not inferred from arbitrary prose.
+- Keep separate-reader/initiator permissions. Do not seed extra privileged demo users
+  or weaken independence: admin-initiated lease writes require a second authorized
+  administrator created through existing user management.
+- Run 125 named local source-backed/adversarial evaluations plus engine integration
+  and browser regressions. Record defaults/limitations in docs/PHASE7.md.
+- Stop at Phase 7; do not start Phase 8 or merge PR #2 without authorization.
