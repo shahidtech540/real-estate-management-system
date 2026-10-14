@@ -1,5 +1,7 @@
 "use client";
 
+import { ACCESS_TOKEN_HEADER } from "@/lib/auth-transport";
+
 // Cookies remain the normal session transport. Embedded browsers may block them,
 // so retain only the short-lived access token in this tab (never a refresh token).
 const TOKEN_KEY = "rems_access_token";
@@ -60,6 +62,12 @@ export async function authFetch(
   const token = getAccessToken();
   if (token && !headers.has("Authorization"))
     headers.set("Authorization", `Bearer ${token}`);
+  // Some embedded preview proxies consume the standard Authorization header.
+  // Preserve the same credential in an app-specific header, still subject to
+  // normal signature, expiry and RBAC checks. Never place it in a URL.
+  const bearer = headers.get("Authorization");
+  if (bearer?.startsWith("Bearer ") && !headers.has(ACCESS_TOKEN_HEADER))
+    headers.set(ACCESS_TOKEN_HEADER, bearer.slice(7).trim());
   const response = await fetch(path, {
     ...init,
     credentials: "same-origin",

@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: "wait" });
+});
+
 test("normal sign-in, wrong-password feedback, reload and sign-out", async ({
   page,
 }) => {
@@ -86,7 +90,7 @@ test("disabled browser storage does not turn successful sign-in into a network e
   // Reject cookies as well as Web Storage; in-memory SPA auth must still work.
   await page.route("**/api/v1/**", async (route) => {
     const headers = { ...route.request().headers() };
-    delete headers.cookie;
+    headers.cookie = "";
     const response = await route.fetch({ headers });
     const responseHeaders = { ...response.headers() };
     delete responseHeaders["set-cookie"];
@@ -108,4 +112,36 @@ test("disabled browser storage does not turn successful sign-in into a network e
   await expect(page.getByText("Network error while signing in.")).toHaveCount(
     0,
   );
+});
+
+test("sign-in and protected APIs survive a preview proxy that strips Authorization and cookies", async ({
+  page,
+}) => {
+  // Reproduce an additional proxy layer: the standard Authorization header is
+  // reserved/removed by the proxy, and the embedded browser has no cookies.
+  await page.route("**/api/v1/**", async (route) => {
+    const headers = { ...route.request().headers() };
+    headers.cookie = "";
+    headers.authorization = "";
+    const response = await route.fetch({ headers });
+    const responseHeaders = { ...response.headers() };
+    delete responseHeaders["set-cookie"];
+    await route.fulfill({
+      status: response.status(),
+      body: await response.body(),
+      headers: responseHeaders,
+    });
+  });
+  await page.goto("/login");
+  await page.getByTestId("login-submit").click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByTestId("active-org-badge")).toContainText("PakLand");
+  await page.getByTestId("tab-tenancy").click();
+  await expect(
+    page.getByRole("heading", { name: "Lease register", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId("active-org-badge")).toBeVisible();
+  await page.getByRole("button", { name: "Sign Out", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
 });

@@ -64,6 +64,7 @@ describe("browser session transport", () => {
     });
     const options = fetcher.mock.calls[0][1];
     expect(options.headers.get("Authorization")).toBe("Bearer access");
+    expect(options.headers.get("X-REMS-Access-Token")).toBe("access");
     expect(options.headers.get("Content-Type")).toBe("application/json");
     expect(options.credentials).toBe("same-origin");
     await auth.authFetch("/api/v1/leases", {
@@ -71,6 +72,9 @@ describe("browser session transport", () => {
     });
     expect(fetcher.mock.calls[1][1].headers.get("Authorization")).toBe(
       "Bearer explicit",
+    );
+    expect(fetcher.mock.calls[1][1].headers.get("X-REMS-Access-Token")).toBe(
+      "explicit",
     );
   });
   it("never adds the access token to external URLs", async () => {
@@ -87,14 +91,12 @@ describe("browser session transport", () => {
       const auth = await import("@/lib/auth-client");
       vi.stubGlobal(
         "fetch",
-        vi
-          .fn()
-          .mockResolvedValue(
-            Response.json({
-              accessToken: "new-context-token",
-              refreshToken: "never-persist",
-            }),
-          ),
+        vi.fn().mockResolvedValue(
+          Response.json({
+            accessToken: "new-context-token",
+            refreshToken: "never-persist",
+          }),
+        ),
       );
       const res = await auth.authFetch(`/api/v1/auth/${endpoint}`, {
         method: "POST",

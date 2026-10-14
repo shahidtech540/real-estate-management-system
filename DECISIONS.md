@@ -95,3 +95,15 @@ Reproduced this using the actual sign-in form under a synthetic cross-site paren
 - If both cookies and storage are blocked, in-memory auth survives client-side
   navigation but not a full page reload. If refresh cookies are blocked, the
   short-lived token expires normally and the user must sign in again.
+
+### Proxy-reserved Authorization header follow-up
+
+The first embedded-preview test covered cookie blocking but not a proxy consuming
+`Authorization`. A separate browser regression removing both cookies and the
+standard authorization header reproduced the reported session-establishment
+error. The same signed access JWT is now also sent in `X-REMS-Access-Token` for
+same-origin API calls. Server guards verify its signature and expiry just like a
+bearer token; it grants no special access and does not accept unsigned user/role
+claims. Standard bearer and cookie clients remain supported. Explicit caller
+bearer credentials are mirrored rather than replaced with a different identity.
+This header is never attached to external URLs and never placed in query strings.

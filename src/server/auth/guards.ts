@@ -1,3 +1,4 @@
+import { ACCESS_TOKEN_HEADER } from "@/lib/auth-transport";
 import { NextRequest } from "next/server";
 import { JwtPayload, verifyAccessToken } from "./crypto";
 import { recordAuditLog } from "../modules/audit/audit.service";
@@ -18,6 +19,15 @@ export function extractAuthContext(req: NextRequest | Request): JwtPayload | nul
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.slice(7).trim();
     const verified = verifyAccessToken(token);
+    if (verified) return verified;
+  }
+
+  // Preview proxies may strip/replace Authorization, while iframe browsers
+  // reject third-party cookies. The application header carries the same JWT;
+  // it receives exactly the same cryptographic validation, never trusted claims.
+  const appToken = req.headers.get(ACCESS_TOKEN_HEADER)?.trim();
+  if (appToken) {
+    const verified = verifyAccessToken(appToken);
     if (verified) return verified;
   }
 

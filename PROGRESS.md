@@ -99,3 +99,20 @@ Live merchant charging/webhooks, electronic signature integration, dedicated por
   including actual sign-in form submission, wrong-password feedback, cookie-blocked
   cross-site iframe sign-in/reload, PDF download, role switching/sign-out, and
   operation with both Web Storage APIs disabled. Phase 3 workflow still passes.
+
+### Sign-in follow-up — proxy-reserved authorization transport
+
+The reported session-check error persisted after the cookie-only correction.
+Added a regression that strips both Authorization and cookies: it reproduced the
+failure before the change. The client now mirrors its signed access JWT in an
+application-specific header, and server guards apply the existing token signature,
+expiry, permissions and organization checks. No authentication bypass was added.
+Corrected the proxy-test harness to explicitly blank cookies (removing the header
+alone allowed Playwright's API cookie jar to add it back), and to finish outstanding
+intercepted requests before teardown.
+
+Verification: **52/52 unit/integration tests**, production build and **5/5 browser
+tests** pass. New negative tests reject missing, forged and expired custom-header
+credentials and preserve RBAC/organization isolation. The browser regression now
+covers a proxy removing Authorization with cookies unavailable, including session
+verification, a protected workspace, reload and logout. PR #2 stays unmerged.
