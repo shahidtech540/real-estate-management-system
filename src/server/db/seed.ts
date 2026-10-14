@@ -839,6 +839,434 @@ export function seedDatabase(db: DatabaseSync): void {
       );
     }
 
+    // 9.6 Seed Phase 2 Bilingual Listings (Section 3.2)
+    const insertListing = db.prepare(`
+      INSERT INTO listings (
+        id, organization_id, property_id, unit_id, slug, title_en, title_ur,
+        description_en, description_ur, purpose, asking_price_minor, currency,
+        status, syndicate_portals, published_at, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PKR', ?, ?, ?, ?, ?, 'usr_agent')
+    `);
+
+    const seedListings = [
+      {
+        id: "lst_1",
+        propertyId: "prop_1",
+        unitId: "unit_21",
+        slug: "fahad-garden-10-marla-corner-plot-lahore",
+        titleEn: "Prime 10 Marla Corner Plot in Fahad Garden Housing Scheme",
+        titleUr: "فہد گارڈن ہاؤسنگ اسکیم میں بہترین 10 مرلہ کارنر پلاٹ",
+        descEn:
+          "LDA-approved 10 Marla residential corner plot facing main boulevard park in Fahad Garden Housing Scheme, Kala Shah Kaku Interchange, Lahore. Underground electricity and 24/7 gated security.",
+        descUr:
+          "ایل ڈی اے سے منظور شدہ فہد گارڈن ہاؤسنگ اسکیم لاہور میں مین بلیوارڈ پارک فیسنگ 10 مرلہ رہائشی پلاٹ۔ زیر زمین بجلی اور 24 گھنٹے سیکیورٹی۔",
+        purpose: "sale",
+        askingPriceMinor: 24250000 * 100,
+        status: "published",
+        syndicate: 1,
+      },
+      {
+        id: "lst_2",
+        propertyId: "prop_2",
+        unitId: "unit_22",
+        slug: "abdullah-city-7-marla-luxury-villa-rawalpindi",
+        titleEn: "Brand New 7 Marla Designer Villa in Abdullah City Rawalpindi",
+        titleUr: "عبداللہ سٹی راولپنڈی میں نیا 7 مرلہ ڈیزائنر ولا",
+        descEn:
+          "Modern 3-bedroom luxury house near Ring Road Interchange in Abdullah City. Features imported fittings, solar backup readiness, and servant quarter.",
+        descUr:
+          "رنگ روڈ انٹرچینج کے قریب عبداللہ سٹی میں جدید 3 بیڈروم لگژری گھر۔ امپورٹڈ فٹنگز اور سولر بیک اپ کی سہولت۔",
+        purpose: "sale",
+        askingPriceMinor: 25000000 * 100,
+        status: "published",
+        syndicate: 1,
+      },
+      {
+        id: "lst_3",
+        propertyId: "prop_3",
+        unitId: "unit_23",
+        slug: "taj-commercial-center-ground-floor-showroom-rent",
+        titleEn: "High-Footfall Ground Floor Commercial Shop in Taj Commercial Center",
+        titleUr: "تاج کمرشل سینٹر راولپنڈی میں گراؤنڈ فلور کمرشل دکان کرایہ کے لیے",
+        descEn:
+          "450 Sq.Ft. front-facing commercial showroom in Taj Commercial Center, Satellite Town Rawalpindi. Ideal for banks, retail brands, and pharmacies.",
+        descUr:
+          "سیٹلائٹ ٹاؤن راولپنڈی کے تاج کمرشل سینٹر میں 450 مربع فٹ فرنٹ فیسنگ شوروم۔ بینکوں اور برانڈز کے لیے بہترین۔",
+        purpose: "rent",
+        askingPriceMinor: 150000 * 100,
+        status: "published",
+        syndicate: 1,
+      },
+      {
+        id: "lst_4",
+        propertyId: "prop_4",
+        unitId: "unit_24",
+        slug: "vip-block-islamabad-executive-family-residence",
+        titleEn: "Executive 3-Bed Residence for Rent in VIP Block Islamabad",
+        titleUr: "وی آئی پی بلاک اسلام آباد میں ایگزیکٹو 3 بیڈ رہائشی مکان",
+        descEn:
+          "Peaceful gated enclave in VIP Block, Zone IV Park Road Islamabad. Lush green surroundings, dedicated parking, and 24/7 security patrol.",
+        descUr:
+          "زون فور پارک روڈ اسلام آباد کے وی آئی پی بلاک میں پرسکون اور محفوظ رہائشی مکان۔",
+        purpose: "rent",
+        askingPriceMinor: 135000 * 100,
+        status: "published",
+        syndicate: 1,
+      },
+      {
+        id: "lst_5",
+        propertyId: "prop_5",
+        unitId: "unit_25",
+        slug: "university-commercial-centers-corporate-office-suite",
+        titleEn: "Corporate IT Office Suite in University Commercial Centers H-11",
+        titleUr: "یونیورسٹی کمرشل سینٹرز اسلام آباد میں کارپوریٹ آئی ٹی آفس",
+        descEn:
+          "Ready-to-move corporate office space in University Commercial Centers, Sector H-11 Link Islamabad. High-speed fiber optic and backup power.",
+        descUr:
+          "سیکٹر H-11 اسلام آباد کے یونیورسٹی کمرشل سینٹرز میں جدید کارپوریٹ آفس۔ ہائی اسپیڈ انٹرنیٹ اور جنریٹر بیک اپ۔",
+        purpose: "rent",
+        askingPriceMinor: 165000 * 100,
+        status: "under_offer",
+        syndicate: 1,
+      },
+      {
+        id: "lst_6",
+        propertyId: "prop_6",
+        unitId: "unit_26",
+        slug: "fahad-garden-overseas-block-plot-for-sale",
+        titleEn: "Overseas Block 10 Marla Residential Plot in Fahad Garden",
+        titleUr: "فہد گارڈن اوورسیز بلاک میں 10 مرلہ رہائشی پلاٹ برائے فروخت",
+        descEn:
+          "Direct possession plot in Fahad Garden Overseas Block with smart street lights, biometric gate entry, and community club access.",
+        descUr:
+          "فہد گارڈن اوورسیز بلاک میں فوری قبضہ کے ساتھ 10 مرلہ پلاٹ۔",
+        purpose: "sale",
+        askingPriceMinor: 28000000 * 100,
+        status: "published",
+        syndicate: 1,
+      },
+      {
+        id: "lst_7",
+        propertyId: "prop_8",
+        unitId: "unit_27",
+        slug: "taj-trade-tower-corner-retail-outlet",
+        titleEn: "Corner Retail Shop in Taj Trade Tower & Galleria",
+        titleUr: "تاج ٹریڈ ٹاور اینڈ گیلریا میں کارنر ریٹیل دکان",
+        descEn:
+          "Prime commercial retail unit on Murree Road corridor adjacent to Taj Commercial Center.",
+        descUr:
+          "مری روڈ راولپنڈی پر تاج ٹریڈ ٹاور میں کارنر کمرشل دکان۔",
+        purpose: "sale",
+        askingPriceMinor: 28750000 * 100,
+        status: "draft",
+        syndicate: 0,
+      },
+      {
+        id: "lst_8",
+        propertyId: "prop_9",
+        unitId: "unit_1",
+        slug: "vip-block-executive-villa-sold-archive",
+        titleEn: "VIP Block Signature Villa (Closed Deal)",
+        titleUr: "وی آئی پی بلاک سگنیچر ولا (فروخت شدہ)",
+        descEn: "Successfully leased/sold signature unit in VIP Block Islamabad.",
+        descUr: "وی آئی پی بلاک اسلام آباد کا کامیابی سے مکمل شدہ یونٹ۔",
+        purpose: "sale",
+        askingPriceMinor: 31000000 * 100,
+        status: "closed",
+        syndicate: 0,
+      },
+    ];
+
+    for (const lst of seedListings) {
+      insertListing.run(
+        lst.id,
+        lst.propertyId,
+        lst.unitId,
+        lst.slug,
+        lst.titleEn,
+        lst.titleUr,
+        lst.descEn,
+        lst.descUr,
+        lst.purpose,
+        lst.askingPriceMinor,
+        lst.status,
+        lst.syndicate,
+        lst.status === "published" || lst.status === "under_offer" ? now : null,
+        now,
+        now
+      );
+    }
+
+    // 9.7 Seed CRM Leads, Clients, Viewings & Deals (Section 3.3)
+    const insertLead = db.prepare(`
+      INSERT INTO leads (
+        id, organization_id, branch_id, listing_id, assigned_agent_id,
+        full_name, phone, email, source, stage, score, budget_minor, currency,
+        requirements_text, notes_json, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, 'usr_agent', ?, ?, ?, ?, ?, ?, ?, 'PKR', ?, ?, ?, ?, 'usr_agent')
+    `);
+
+    const seedLeads = [
+      {
+        id: "lead_1",
+        branchId: "br_lhr",
+        listingId: "lst_1",
+        fullName: "Dr. Kashif Mehmood",
+        phone: "+92-300-4112233",
+        email: "kashif.mehmood@hospital.pk",
+        source: "web",
+        stage: "new",
+        score: 78,
+        budgetMinor: 25000000 * 100,
+        requirements: "Looking for 10 Marla corner plot in Fahad Garden Housing Scheme with immediate possession.",
+        notes: [
+          {
+            id: "note_1",
+            type: "note",
+            text: "Submitted web inquiry on Fahad Garden 10 Marla Corner Plot.",
+            author: "System Web Capture",
+            createdAt: now,
+          },
+          {
+            id: "task_1",
+            type: "task",
+            text: "Send LDA NOC copy and schedule site visit this Saturday",
+            dueDate: "2026-10-17",
+            completed: false,
+            author: "Bilal Ahmed",
+            createdAt: now,
+          },
+        ],
+      },
+      {
+        id: "lead_2",
+        branchId: "br_rwp",
+        listingId: "lst_2",
+        fullName: "Brig. (R) Sohail Akhtar",
+        phone: "+92-321-5119988",
+        email: "sohail.akhtar@defence.pk",
+        source: "whatsapp",
+        stage: "viewing_scheduled",
+        score: 88,
+        budgetMinor: 26000000 * 100,
+        requirements: "Interested in 7 Marla Designer Villa in Abdullah City near Ring Road.",
+        notes: [
+          {
+            id: "note_2",
+            type: "note",
+            text: "Qualified via WhatsApp. Confirmed cash buyer, viewing scheduled.",
+            author: "Bilal Ahmed",
+            createdAt: now,
+          },
+        ],
+      },
+      {
+        id: "lead_3",
+        branchId: "br_rwp",
+        listingId: "lst_3",
+        fullName: "Shaheen Chemist & Pharmacy Group",
+        phone: "+92-333-5566778",
+        email: "expansion@shaheenpharmacy.pk",
+        source: "phone",
+        stage: "negotiation",
+        score: 92,
+        budgetMinor: 155000 * 100,
+        requirements: "Ground floor commercial showroom in Taj Commercial Center for flagship pharmacy branch.",
+        notes: [
+          {
+            id: "note_3",
+            type: "note",
+            text: "Viewing completed. Negotiating 3-year lease with 10% annual escalation.",
+            author: "Bilal Ahmed",
+            createdAt: now,
+          },
+        ],
+      },
+      {
+        id: "lead_4",
+        branchId: "br_isb",
+        listingId: "lst_5",
+        fullName: "TechVerse Software Solutions (Pvt) Ltd",
+        phone: "+92-345-8899001",
+        email: "ceo@techverse.io",
+        source: "email",
+        stage: "contacted",
+        score: 74,
+        budgetMinor: 170000 * 100,
+        requirements: "Corporate IT office suite in University Commercial Centers H-11.",
+        notes: [
+          {
+            id: "note_4",
+            type: "note",
+            text: "Shared floor plan and fiber connectivity specs via email.",
+            author: "Bilal Ahmed",
+            createdAt: now,
+          },
+        ],
+      },
+      {
+        id: "lead_5",
+        branchId: "br_isb",
+        listingId: "lst_8",
+        fullName: "Justice (R) Javed Iqbal",
+        phone: "+92-300-9112244",
+        email: "javed.iqbal@chambers.pk",
+        source: "walk_in",
+        stage: "won",
+        score: 99,
+        budgetMinor: 31000000 * 100,
+        requirements: "Purchased signature villa in VIP Block Islamabad.",
+        notes: [
+          {
+            id: "note_5",
+            type: "note",
+            text: "Deal closed and full token + transfer completed.",
+            author: "Bilal Ahmed",
+            createdAt: now,
+          },
+        ],
+      },
+      {
+        id: "lead_6",
+        branchId: "br_lhr",
+        listingId: "lst_6",
+        fullName: "Waqas Butt",
+        phone: "+92-302-4001122",
+        email: "waqas@example.pk",
+        source: "web",
+        stage: "lost",
+        score: 35,
+        budgetMinor: 12000000 * 100,
+        requirements: "Requested 5-year installment plan on cash-only Overseas Block plot.",
+        notes: [
+          {
+            id: "note_6",
+            type: "note",
+            text: "Budget mismatch for cash-only Overseas Block.",
+            author: "Bilal Ahmed",
+            createdAt: now,
+          },
+        ],
+      },
+    ];
+
+    for (const ld of seedLeads) {
+      insertLead.run(
+        ld.id,
+        ld.branchId,
+        ld.listingId,
+        ld.fullName,
+        ld.phone,
+        ld.email,
+        ld.source,
+        ld.stage,
+        ld.score,
+        ld.budgetMinor,
+        ld.requirements,
+        JSON.stringify(ld.notes),
+        now,
+        now
+      );
+    }
+
+    // Seed Clients
+    const insertClient = db.prepare(`
+      INSERT INTO clients (
+        id, organization_id, lead_id, full_name, cnic, phone, email, client_type, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, ?, ?, ?, 'usr_agent')
+    `);
+
+    insertClient.run(
+      "cli_1",
+      "lead_5",
+      "Justice (R) Javed Iqbal",
+      "61101-1234567-1",
+      "+92-300-9112244",
+      "javed.iqbal@chambers.pk",
+      "buyer",
+      now,
+      now
+    );
+    insertClient.run(
+      "cli_2",
+      "lead_3",
+      "Shaheen Chemist & Pharmacy Group",
+      "NTN-7766554-1",
+      "+92-333-5566778",
+      "expansion@shaheenpharmacy.pk",
+      "corporate_tenant",
+      now,
+      now
+    );
+
+    // Seed Viewings
+    const insertViewing = db.prepare(`
+      INSERT INTO viewings (
+        id, organization_id, lead_id, unit_id, agent_id, scheduled_at, status, calendar_event_id, feedback, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, 'usr_agent', ?, ?, ?, ?, ?, ?, 'usr_agent')
+    `);
+
+    insertViewing.run(
+      "vw_1",
+      "lead_2",
+      "unit_22",
+      "2026-10-16T11:00:00.000Z",
+      "scheduled",
+      "gcal_evt_abdullah_city_22",
+      "Client bringing family and architect for site inspection.",
+      now,
+      now
+    );
+    insertViewing.run(
+      "vw_2",
+      "lead_3",
+      "unit_23",
+      "2026-10-12T15:00:00.000Z",
+      "completed",
+      "gcal_evt_taj_center_23",
+      "Very positive feedback on front signage visibility and parking.",
+      now,
+      now
+    );
+
+    // Seed Deals with Commission Splits
+    const insertDeal = db.prepare(`
+      INSERT INTO deals (
+        id, organization_id, lead_id, client_id, unit_id, primary_agent_id,
+        deal_type, deal_value_minor, commission_pct, commission_minor,
+        agent_splits_json, currency, status, closed_at, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, ?, 'usr_agent', ?, ?, ?, ?, ?, 'PKR', ?, ?, ?, ?, 'usr_agent')
+    `);
+
+    insertDeal.run(
+      "deal_1",
+      "lead_5",
+      "cli_1",
+      "unit_1",
+      "sale",
+      31000000 * 100,
+      2.0,
+      620000 * 100, // 2% of 31M PKR = 620,000 PKR
+      JSON.stringify([
+        {
+          agentId: "usr_agent",
+          agentName: "Bilal Ahmed (Senior Sales Agent)",
+          splitPct: 70,
+          amountMinor: 434000 * 100,
+        },
+        {
+          agentId: "usr_admin",
+          agentName: "Tariq Mahmood (COO / Referral)",
+          splitPct: 30,
+          amountMinor: 186000 * 100,
+        },
+      ]),
+      "closed_won",
+      now,
+      now,
+      now
+    );
+
     // 10. Initial Audit Log entries
     const insertAudit = db.prepare(`
       INSERT INTO audit_logs (

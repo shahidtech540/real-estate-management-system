@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { formatCompactPkr, formatMinorCurrency } from "@/lib/format";
 import { Locale, t } from "@/lib/i18n";
+import { CrmWorkspace, ListingsWorkspace } from "@/components/Phase2Workspaces";
 
 interface UserProfile {
   id: string;
@@ -274,7 +275,16 @@ TCC-01,TCC-01-A,TCC-CSV-502,shop,-250,250 Sq.Ft.,0,1,available,9000000,55000`;
 export default function DashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "overview" | "owners" | "documents" | "csv" | "rbac" | "users" | "security" | "audit"
+    | "overview"
+    | "listings"
+    | "crm"
+    | "owners"
+    | "documents"
+    | "csv"
+    | "rbac"
+    | "users"
+    | "security"
+    | "audit"
   >("overview");
   const [user, setUser] = useState<UserProfile | null>(null);
   const [branches, setBranches] = useState<BranchItem[]>([]);
@@ -1030,13 +1040,15 @@ export default function DashboardPage() {
               </span>
             </div>
             <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Phase 1 Active: Portfolio Hierarchy, Multi-Owners, Document Vault & CSV Import
+              Phase 2 Active: Public Listings Portal, QR Codes, Syndication Feeds & CRM Deals
             </span>
           </div>
 
           <nav className="flex items-center gap-1.5 overflow-x-auto pb-1">
             {[
               { id: "overview", label: t(locale, "overview"), icon: Building2 },
+              { id: "listings", label: t(locale, "listingsTab"), icon: Sparkles },
+              { id: "crm", label: t(locale, "crmTab"), icon: Users },
               { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
               { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
               { id: "csv", label: t(locale, "csvImportTab"), icon: FileSpreadsheet },
@@ -1542,6 +1554,29 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* PHASE 2 TAB: LISTINGS & MARKETING */}
+        {activeTab === "listings" && (
+          <ListingsWorkspace
+            properties={properties}
+            units={units}
+            onNotify={showNotification}
+            onRefreshAudit={() => fetchAudit(auditFilter)}
+          />
+        )}
+
+        {/* PHASE 2 TAB: CRM (LEADS, VIEWINGS & DEALS) */}
+        {activeTab === "crm" && (
+          <CrmWorkspace
+            units={units}
+            onNotify={showNotification}
+            onRefreshAudit={() => fetchAudit(auditFilter)}
+            onRefreshPortfolio={() => {
+              fetchMe();
+              fetchPortfolio();
+            }}
+          />
         )}
 
         {/* TAB 2: OWNERS & MULTI-OWNER SPLITS */}

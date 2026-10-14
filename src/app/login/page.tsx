@@ -159,9 +159,16 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <a
+              href="/listings"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition"
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Public Listings Site (/listings)</span>
+            </a>
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Phase 0: Auth + RBAC + Multi-Tenancy
+              Phase 2: Listings + Public Site + CRM
             </span>
             <button
               type="button"
