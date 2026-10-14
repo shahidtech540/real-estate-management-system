@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { formatCompactPkr, formatMinorCurrency } from "@/lib/format";
 import { Locale, t } from "@/lib/i18n";
+import { TenancyWorkspace, BillingWorkspace } from "@/components/Phase3Workspaces";
 import { CrmWorkspace, ListingsWorkspace } from "@/components/Phase2Workspaces";
 
 interface UserProfile {
@@ -278,6 +279,8 @@ export default function DashboardPage() {
     | "overview"
     | "listings"
     | "crm"
+    | "tenancy"
+    | "billing"
     | "owners"
     | "documents"
     | "csv"
@@ -1040,7 +1043,7 @@ export default function DashboardPage() {
               </span>
             </div>
             <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Phase 2 Active: Public Listings Portal, QR Codes, Syndication Feeds & CRM Deals
+              Phase 3 Active: Tenants, Leases, Rent, Payments & Owner Statements
             </span>
           </div>
 
@@ -1049,6 +1052,8 @@ export default function DashboardPage() {
               { id: "overview", label: t(locale, "overview"), icon: Building2 },
               { id: "listings", label: t(locale, "listingsTab"), icon: Sparkles },
               { id: "crm", label: t(locale, "crmTab"), icon: Users },
+              ...(user.permissions.includes("leases:read") ? [{ id: "tenancy", label: t(locale, "tenancyTab"), icon: FileText }] : []),
+              ...(user.permissions.includes("invoices:read") ? [{ id: "billing", label: t(locale, "billingTab"), icon: Briefcase }] : []),
               { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
               { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
               { id: "csv", label: t(locale, "csvImportTab"), icon: FileSpreadsheet },
@@ -1579,6 +1584,8 @@ export default function DashboardPage() {
           />
         )}
 
+        {activeTab === "tenancy" && <TenancyWorkspace permissions={user.permissions} locale={locale} units={units} onRefresh={() => { fetchPortfolio(); fetchAudit(auditFilter); }} />}
+        {activeTab === "billing" && <BillingWorkspace permissions={user.permissions} locale={locale} onRefresh={() => { fetchMe(); fetchAudit(auditFilter); }} />}
         {/* TAB 2: OWNERS & MULTI-OWNER SPLITS */}
         {activeTab === "owners" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

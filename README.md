@@ -12,7 +12,7 @@ npm install
 npm run db:seed
 npm run dev
 ```
-Open `http://localhost:3000`. The embedded SQLite database (`./data/rems.sqlite`) initializes all 32 tables and seeds the full demo dataset automatically.
+Open `http://localhost:3000`. The embedded SQLite database (`./data/rems.sqlite`) initializes the schema and seeds the full demo dataset automatically.
 
 ### Option B: Docker Compose (PostgreSQL + pgvector, Redis, MinIO, App)
 ```bash
@@ -57,4 +57,18 @@ npm run build
 - [`DECISIONS.md`](./DECISIONS.md) — Architectural & domain defaults
 - [`PROGRESS.md`](./PROGRESS.md) — Phase-by-phase completion log
 - [`docs/PLAN.md`](./docs/PLAN.md) — Architecture diagram, stack justification, folder structure, and risk register
-- [`docs/ERD.md`](./docs/ERD.md) — Complete 32-table Entity-Relationship Diagram and data model specification
+- [`docs/ERD.md`](./docs/ERD.md) — Core Entity-Relationship Diagram and data model specification
+
+
+## Phase 3: Tenancy & Billing
+
+Open **Tenants & Leases** and **Rent & Payments** in `/dashboard`.
+See [`docs/PHASE3.md`](./docs/PHASE3.md) for the complete tenant-to-receipt
+walkthrough, API payloads, scheduled cycle command, browser test and explicit
+mock/live boundaries. Existing databases are preserved; to explore the expanded
+fixtures use `SQLITE_DB_PATH=./data/phase3-demo.sqlite npm run dev`.
+
+**Deployment note:** The current services run on SQLite even if `DATABASE_URL`
+is set. The Prisma PostgreSQL schema is a deployment design, not a functioning
+switchable repository. Live payment-provider processing is disabled; external
+verified payments may be recorded manually, or explicitly simulated locally.

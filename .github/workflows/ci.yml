@@ -33,3 +33,9 @@ jobs:
 
       - name: Production build check
         run: npm run build
+
+      - name: Install Chromium for browser workflow verification
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser test (isolated SQLite database)
+        run: npm run test:e2e

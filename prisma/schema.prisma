@@ -415,9 +415,10 @@ model Tenant {
   cnic                  String
   phone                 String
   email                 String
-  kycStatus             String       @default("verified") @map("kyc_status")
+  kycStatus             String       @default("pending") @map("kyc_status")
   emergencyContactName  String?      @map("emergency_contact_name")
   emergencyContactPhone String?      @map("emergency_contact_phone")
+  referencesJson        String       @default("[]") @map("references_json")
   createdAt             DateTime     @default(now()) @map("created_at")
   updatedAt             DateTime     @updatedAt @map("updated_at")
   createdBy             String?      @map("created_by")
@@ -788,4 +789,92 @@ model ApprovalRequest {
 
   @@index([organizationId, status])
   @@map("approval_requests")
+}
+
+// Phase 3 additive records. Runtime services currently use SQLite; this is the
+// equivalent PostgreSQL deployment design, not an active Prisma repository.
+model OwnerStatement {
+  id                 String   @id @default(cuid())
+  organizationId     String   @map("organization_id")
+  ownerId            String   @map("owner_id")
+  propertyId         String?  @map("property_id")
+  periodMonth        String   @map("period_month")
+  grossRentMinor     BigInt   @default(0) @map("gross_rent_minor")
+  expensesMinor      BigInt   @default(0) @map("expenses_minor")
+  managementFeePct   Float    @default(5) @map("management_fee_pct")
+  managementFeeMinor BigInt   @default(0) @map("management_fee_minor")
+  netPayoutMinor     BigInt   @default(0) @map("net_payout_minor")
+  currency           String   @default("PKR")
+  status             String   @default("issued")
+  lineItemsJson      String   @default("[]") @map("line_items_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  createdBy          String?  @map("created_by")
+  @@unique([organizationId, ownerId, periodMonth])
+  @@map("owner_statements")
+}
+model LeaseEvent {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  leaseId        String   @map("lease_id")
+  type           String
+  payloadJson    String   @map("payload_json")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@index([organizationId, leaseId])
+  @@map("lease_events")
+}
+model CreditNote {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  invoiceId      String   @map("invoice_id")
+  amountMinor    BigInt   @map("amount_minor")
+  reason         String
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@index([organizationId, invoiceId])
+  @@map("credit_notes")
+}
+model LeaseChecklist {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  leaseId        String   @map("lease_id")
+  kind           String
+  itemsJson      String   @map("items_json")
+  photosJson     String   @default("[]") @map("photos_json")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, leaseId, kind])
+  @@map("lease_checklists")
+}
+model StatementPayout {
+  id              String   @id @default(cuid())
+  organizationId  String   @map("organization_id")
+  statementId     String   @unique @map("statement_id")
+  amountMinor     BigInt   @map("amount_minor")
+  referenceNumber String   @map("reference_number")
+  paidAt          DateTime @default(now()) @map("paid_at")
+  createdBy       String   @map("created_by")
+  @@map("statement_payouts")
+}
+model RecurringCharge {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  leaseId        String   @map("lease_id")
+  type           String
+  amountMinor    BigInt   @map("amount_minor")
+  startMonth     String   @map("start_month")
+  endMonth       String   @map("end_month")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@index([organizationId, leaseId])
+  @@map("recurring_charges")
+}
+model RecurringChargeInvoice {
+  chargeId    String @map("charge_id")
+  periodMonth String @map("period_month")
+  invoiceId   String @map("invoice_id")
+  @@id([chargeId, periodMonth])
+  @@map("recurring_charge_invoices")
 }

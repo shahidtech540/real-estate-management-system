@@ -34,6 +34,17 @@ export function getDb(): DatabaseSyncType {
 
   dbInstance = new DatabaseSync(dbPath);
   dbInstance.exec(SCHEMA_DDL);
+  // Additive Phase 3 migration: preserve previously created tenant records.
+  if (
+    !dbInstance
+      .prepare("PRAGMA table_info(tenants)")
+      .all()
+      .some((c) => c.name === "references_json")
+  ) {
+    dbInstance.exec(
+      "ALTER TABLE tenants ADD COLUMN references_json TEXT NOT NULL DEFAULT '[]'",
+    );
+  }
   seedDatabase(dbInstance);
 
   return dbInstance;

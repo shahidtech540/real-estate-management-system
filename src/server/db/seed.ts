@@ -531,13 +531,23 @@ export function seedDatabase(db: DatabaseSync): void {
       INSERT INTO leases (
         id, organization_id, property_id, unit_id, tenant_id, lease_number, status, start_date, end_date,
         rent_minor, deposit_minor, escalation_pct, due_day, grace_days, late_fee_minor, currency, created_at, updated_at, created_by
-      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, 'active', '2025-11-01', '2026-12-31', ?, ?, 10.0, 5, 5, 500000, 'PKR', ?, ?, 'usr_admin')
+      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, '2025-11-01', ?, ?, ?, 10.0, 5, 5, 500000, 'PKR', ?, ?, 'usr_admin')
     `);
     const insertInvoice = db.prepare(`
       INSERT INTO invoices (
         id, organization_id, lease_id, property_id, unit_id, tenant_id, invoice_number, type, period_month,
         due_date, amount_minor, late_fee_minor, total_minor, paid_minor, currency, status, created_at, updated_at, created_by
       ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, 'rent', ?, ?, ?, ?, ?, ?, 'PKR', ?, ?, ?, 'usr_accountant')
+    `);
+    const insertPayment = db.prepare(`
+      INSERT INTO payments (
+        id, organization_id, invoice_id, tenant_id, method, reference_number, amount_minor, currency, status, paid_at, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, 'PKR', 'completed', ?, ?, ?, 'usr_accountant')
+    `);
+    const insertReceipt = db.prepare(`
+      INSERT INTO receipts (
+        id, organization_id, payment_id, invoice_id, tenant_id, receipt_number, amount_minor, currency, issued_at, pdf_url, created_at, updated_at, created_by
+      ) VALUES (?, 'org_pakland', ?, ?, ?, ?, ?, 'PKR', ?, ?, ?, ?, 'usr_accountant')
     `);
 
     const tenantNames = [
@@ -578,6 +588,8 @@ export function seedDatabase(db: DatabaseSync): void {
       "2026-10",
     ];
 
+    const paymentMethods = ["bank_transfer", "jazzcash", "easypaisa", "cash", "stripe"];
+
     for (let t = 1; t <= 20; t++) {
       const tenantId = `ten_${t}`;
       const propIndex = Math.floor((t - 1) / 3);
@@ -597,6 +609,18 @@ export function seedDatabase(db: DatabaseSync): void {
         now
       );
 
+      // Stagger lease end dates so 30/60/90-day expiry alerts are populated
+      const leaseEndDate =
+        t <= 3
+          ? "2026-11-10" // ~27 days -> 30-day alert window
+          : t <= 6
+          ? "2026-12-05" // ~52 days -> 60-day alert window
+          : t <= 10
+          ? "2026-12-31" // ~78 days -> 90-day alert window
+          : "2027-06-30"; // > 90 days -> safe active
+
+      const leaseStatus = t <= 3 ? "expiring" : "active";
+
       const leaseId = `lease_${t}`;
       insertLease.run(
         leaseId,
@@ -604,6 +628,8 @@ export function seedDatabase(db: DatabaseSync): void {
         `unit_${t}`,
         tenantId,
         `LSE-2026-${String(t).padStart(3, "0")}`,
+        leaseStatus,
+        leaseEndDate,
         rentMinor,
         rentMinor * 2,
         now,
@@ -615,11 +641,34 @@ export function seedDatabase(db: DatabaseSync): void {
         const period = months[m];
         const invId = `inv_${t}_${m + 1}`;
         const isCurrentMonth = m === months.length - 1;
-        const isOverdue = isCurrentMonth && t > 16;
-        const status = !isCurrentMonth ? "paid" : isOverdue ? "overdue" : "paid";
+
+        // Populate all 4 overdue aging buckets (0-30, 30-60, 60-90, 90+ days) on t=17..20
+        const isBucket0to30 = t === 17 && period === "2026-10"; // 9 days overdue
+        const isBucket30to60 = t === 18 && period === "2026-09"; // 39 days overdue
+        const isBucket60to90 = t === 19 && period === "2026-08"; // 70 days overdue
+        const isBucket90Plus = t === 20 && period === "2026-06"; // 131 days overdue
+        const isPartial = t === 18 && period === "2026-10";
+
+        const isOverdue =
+          isBucket0to30 ||
+          isBucket30to60 ||
+          isBucket60to90 ||
+          isBucket90Plus ||
+          (isCurrentMonth && t > 18);
+
+        const status = isPartial
+          ? "partially_paid"
+          : isOverdue
+          ? "overdue"
+          : "paid";
         const lateFee = isOverdue ? 250000 : 0; // PKR 2,500 in paisa
         const total = rentMinor + lateFee;
-        const paid = status === "paid" ? total : 0;
+        const paid =
+          status === "paid"
+            ? total
+            : status === "partially_paid"
+            ? Math.round(total * 0.5)
+            : 0;
 
         insertInvoice.run(
           invId,
@@ -638,6 +687,36 @@ export function seedDatabase(db: DatabaseSync): void {
           now,
           now
         );
+
+        // Seed payments & receipts for 2026-10 paid/partially_paid invoices
+        if (period === "2026-10" && paid > 0) {
+          const payId = `pay_${t}_12`;
+          const recId = `rec_${t}_12`;
+          const method = paymentMethods[t % paymentMethods.length];
+          insertPayment.run(
+            payId,
+            invId,
+            tenantId,
+            method,
+            `TXN-202610-${String(t).padStart(3, "0")}`,
+            paid,
+            `${period}-04T10:30:00.000Z`,
+            now,
+            now
+          );
+          insertReceipt.run(
+            recId,
+            payId,
+            invId,
+            tenantId,
+            `RCP-202610-${String(t).padStart(3, "0")}`,
+            paid,
+            `${period}-04T10:31:00.000Z`,
+            `/api/v1/billing/receipts/${recId}`,
+            now,
+            now
+          );
+        }
       }
     }
 

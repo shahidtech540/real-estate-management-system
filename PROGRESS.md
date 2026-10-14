@@ -7,12 +7,37 @@
 | **Phase 0** | Plan, ERD, repo scaffold, Docker, CI, auth + RBAC + multi-tenancy | ✅ **COMPLETED** | **93.26%** | Multi-role login (`admin`, `agent`, `accountant`, `maintenance_staff`, `owner`, `tenant`), TOTP 2FA, RBAC matrix, multi-tenant & branch isolation, 32-table ERD & seed dataset |
 | **Phase 1** | Properties, units, owners, documents vault, CSV import | ✅ **COMPLETED** | **91.44%** | Portfolio CRUD, hierarchy (`Property → Building → Unit`), multi-owner percentage splits (`<=100%`), Central Document Vault (`v1→v2` versioning, expiry alerts, view/download audit logs), Bulk CSV import with dry-run & row-by-row validation error report |
 | **Phase 2** | Listings, public site, CRM (leads, viewings, deals) | ✅ **COMPLETED** | **91.91%** (15/15 tests passing) | Bilingual public marketplace (`/listings`), SEO detail pages (`/listings/[slug]`), SVG QR code generator, JSON/CSV portal syndication feeds, public Web Lead Capture form, CRM Lead pipeline & scoring (`0–100`), viewing scheduler with Google Calendar links, and deal closing with multi-agent commission splits |
-| **Phase 3** | Tenants, leases, invoicing, payments, receipts, owner statements | ⏳ Next | — | Tenant KYC, lease lifecycle & PDF generator, recurring rent invoices, partial payments, arrears aging, owner statements |
-| **Phase 4** | Maintenance, vendors, notifications | ⏳ Pending | — | Maintenance ticket lifecycle, SLA timers, vendor directory & work orders, preventive schedules, multi-channel notifications |
+| **Phase 3** | Tenants, leases, invoicing, payments, receipts, owner statements | ✅ **COMPLETED (local / mock-provider scope)** | **93.29%** overall statements; **38/38** unit/integration tests + **1/1** browser workflow | Tenant KYC, validated lease lifecycle, PDF agreements/receipts, deposits, inspections, recurring rent/fees, partial payments, credits, arrears, owner statements/payout records |
+| **Phase 4** | Maintenance, vendors, notifications | ⏳ Next | — | Maintenance ticket lifecycle, SLA timers, vendor directory & work orders, preventive schedules, multi-channel notifications |
 | **Phase 5** | Accounting, dashboards, reports, exports | ⏳ Pending | — | Chart of accounts, double-entry ledger, budget vs actual, executive KPIs, CSV/PDF exports |
 | **Phase 6** | Agent orchestration layer, approval queue, audit, kill switch | ⏳ Pending | — | Tool registry, multi-step agent runner, human-in-the-loop approval queue, cost budgets, kill switches |
 | **Phase 7** | Lead, Listing, Rent, Maintenance, Lease & Insights agents + eval suite | ⏳ Pending | — | All 6 domain AI agents + 120+ scenario & adversarial prompt-injection evaluation tests |
 | **Phase 8** | Tenant/owner portals, hardening, performance, docs, deployment guide | ⏳ Pending | — | Dedicated Owner & Tenant portals, OWASP security hardening, OpenAPI spec, runbook, user guides |
+
+---
+
+## Phase 3 Detailed Completion Log
+
+### Delivered
+- Tenant profiles with CNIC validation/uniqueness, pending/verified/rejected KYC, emergency/reference contacts, search and payment totals; ID evidence uses the existing vault.
+- Lease reservations with overlap prevention, verified-KYC activation, explicit lifecycle transitions, one-time renewal escalation, security-deposit receipt/refund events, 90/60/30-day alerts and automatic expiry via the billing job.
+- Actual downloadable agreement PDFs (unsigned English templates), structured JSON contracts, move-in/out checklists and HTTPS evidence links.
+- Monthly rent and fixed recurring utilities/maintenance charges with transactionally idempotent generation, one-time charges, contractual grace periods/late fees, immutable reasoned credit notes, and accurate overdue aging.
+- Five payment-recording methods, partial/final payments, idempotent references, rejected excess payments, atomic receipt issuance, and audited access-controlled PDF receipt downloads. Mock checkout adapters clearly label simulated payments; live charging is not enabled.
+- Cash-basis owner statements honoring property ownership percentages and management fees, actual completed work-order expenses, PDF downloads, payout references, and immutable paid statements.
+- Permission-aware dashboard workspaces with English/Urdu headings and RTL support. Tenant/owner Phase 3 read endpoints are scoped to their own records.
+- Additive SQLite tables/indexes and corresponding PostgreSQL design models; no destructive database reset. Expanded fresh-demo fixtures preserve existing users' databases.
+- `npm run billing:cycle -- YYYY-MM` one-shot scheduler entry point; browser workflow added to CI. Setup and payload examples: [`docs/PHASE3.md`](docs/PHASE3.md).
+
+### Verification
+- `npm run typecheck` and `npm run build`: passed (Next.js 15.5.27).
+- `npm run test:coverage`: **38/38 passing**, **93.29%** statements, **76.71%** branches, **100%** functions.
+- Real Chromium browser workflow: **1/1 passed** (tenant onboarding/KYC → lease activation → invoice → partial payment → PDF receipt → owner statement); no page errors in the tested workflow.
+- In-memory CLI smoke: November cycle generated 20 PakLand invoices and zero secondary-organization invoices; late fees respected eligibility.
+- PR #2 remains open and unmerged. Phases 4–8 have not been started.
+
+### Boundaries
+Live merchant charging/webhooks, electronic signature integration, dedicated portals and production hardening are not claimed as implemented. The enabled local workflow uses explicit gateway simulators or records independently verified external transactions. Standard PDF fonts do not render Urdu identities; Unicode records remain intact in JSON/UI. Remaining dependency audit advisories are recorded in `DECISIONS.md`.
 
 ---
 

@@ -114,3 +114,39 @@ erDiagram
     - `agent_runs`: `id`, `organization_id`, `agent_id`, `trigger_type`, `input_text`, `reasoning_summary`, `output_text`, `status` (`running` | `awaiting_approval` | `completed` | `failed` | `killed`), `tokens_used`, `cost_minor`, `currency`, `approved_by`, `created_at`, `updated_at`, `created_by`.
     - `tool_calls`: `id`, `organization_id`, `agent_run_id`, `tool_name`, `input_json`, `output_json`, `requires_approval`, `status`, `duration_ms`, `created_at`, `updated_at`, `created_by`.
     - `approval_requests`: `id`, `organization_id`, `agent_run_id`, `tool_call_id`, `agent_slug`, `action_type`, `summary`, `payload_json`, `status` (`pending` | `approved` | `rejected`), `reviewed_by`, `reviewed_at`, `review_note`, `created_at`, `updated_at`, `created_by`.
+
+
+## Phase 3 additive financial records
+
+The runtime SQLite schema now has **41 tables** (the earlier catalog's 32-table
+label understated the original 34-table DDL). Phase 3 adds seven tables without
+deleting existing rows (tenant profiles also gain an additive `references_json` column):
+
+```mermaid
+erDiagram
+    OWNER ||--o{ OWNER_STATEMENT : receives
+    OWNER_STATEMENT ||--o| STATEMENT_PAYOUT : settles
+    LEASE ||--o{ LEASE_EVENT : records_lifecycle_and_deposits
+    LEASE ||--o{ LEASE_CHECKLIST : inspects
+    INVOICE ||--o{ CREDIT_NOTE : adjusts
+    LEASE ||--o{ RECURRING_CHARGE : configures
+    RECURRING_CHARGE ||--o{ RECURRING_CHARGE_INVOICE : generates
+    INVOICE ||--o| RECURRING_CHARGE_INVOICE : links
+```
+
+- `owner_statements`: unique organization/owner/month snapshot with owner-share
+  line items, gross collections, actual expenses, management fee and net balance.
+- `statement_payouts`: one settlement per statement, amount/reference/date/actor;
+  paid statements cannot regenerate.
+- `lease_events`: immutable lifecycle/escalation and deposit receipt/refund events.
+- `lease_checklists`: one editable move-in and move-out record per lease, with
+  condition notes and photo evidence URLs.
+- `credit_notes`: immutable invoice credit/reason/actor/date records.
+- `recurring_charges`: lease, charge type, integer amount and inclusive month range.
+- `recurring_charge_invoices`: charge/month → invoice mapping preventing duplicate
+  monthly generation; organization is inherited through the parent charge.
+
+Immutable event/credit/payout records use creation timestamps rather than soft
+updates/deletes. All operational amounts are PKR integer paisa. New partial
+unique indexes also enforce rent per lease/month, live tenant CNIC uniqueness
+and payment reference uniqueness per organization in SQLite.
