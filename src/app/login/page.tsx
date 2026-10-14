@@ -1,5 +1,7 @@
 "use client";
 
+import { authFetch, getAccessToken } from "@/lib/auth-client";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -73,7 +75,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/v1/auth/login")
+    authFetch("/api/v1/auth/login")
       .then((res) => res.json())
       .then((data) => {
         if (data.accounts) {
@@ -85,6 +87,16 @@ export default function LoginPage() {
       });
   }, []);
 
+  useEffect(() => {
+    // Reloading an embedded preview can reopen its original /login URL. Resume
+    // an existing tab session instead of asking an authenticated user to sign in.
+    if (getAccessToken()) {
+      authFetch("/api/v1/auth/me")
+        .then(res => { if (res.ok) router.replace("/dashboard"); })
+        .catch(() => { /* Keep the sign-in form available on network failure. */ });
+    }
+  }, [router]);
+
   async function handleLogin(
     e?: React.FormEvent,
     overrideEmail?: string,
@@ -95,7 +107,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const res = await fetch("/api/v1/auth/login", {
+      const res = await authFetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -118,12 +130,14 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.accessToken) {
-        localStorage.setItem("rems_access_token", data.accessToken);
-      }
-      router.push("/dashboard");
-    } catch {
-      setError("Network error while signing in.");
+      if (!data.accessToken) throw new Error("Sign-in did not create a session. Please try again.");
+      // Confirm authentication before leaving the form, rather than silently
+      // bouncing back here when an embedded browser rejects cookies.
+      const session = await authFetch("/api/v1/auth/me");
+      if (!session.ok) throw new Error("Unable to establish your session. Please try opening the preview in a new tab.");
+      router.replace("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error while signing in.");
       setLoading(false);
     }
   }
@@ -168,7 +182,7 @@ export default function LoginPage() {
             </a>
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Phase 2: Listings + Public Site + CRM
+              Phase 3: Tenants, Leases + Billing
             </span>
             <button
               type="button"
@@ -317,6 +331,7 @@ export default function LoginPage() {
                 <button
                   key={acc.id}
                   type="button"
+                  disabled={loading}
                   onClick={() => handleQuickSelect(acc)}
                   data-testid={`quick-login-${acc.roleSlug}-${acc.organizationId}`}
                   className={`text-left p-4 rounded-xl border transition group ${

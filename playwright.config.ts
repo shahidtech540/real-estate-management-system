@@ -13,11 +13,18 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
-    launchOptions: process.env.CHROMIUM_PATH
-      ? {
-          executablePath: process.env.CHROMIUM_PATH,
-          args: ["--no-sandbox", "--disable-dev-shm-usage", "--no-zygote"],
-        }
-      : undefined,
+    // Synthetic cross-site iframe tests never leave the intercepted test origin.
+    // Disable Chromium's local-network gate only for this local browser harness.
+    launchOptions: {
+      ...(process.env.CHROMIUM_PATH
+        ? { executablePath: process.env.CHROMIUM_PATH }
+        : {}),
+      args: [
+        ...(process.env.CHROMIUM_PATH
+          ? ["--no-sandbox", "--disable-dev-shm-usage", "--no-zygote"]
+          : []),
+        "--disable-features=LocalNetworkAccessChecks",
+      ],
+    },
   },
 });

@@ -1,5 +1,7 @@
 "use client";
 
+import { authFetch, clearAccessToken } from "@/lib/auth-client";
+
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -389,7 +391,7 @@ export default function DashboardPage() {
 
   const fetchMe = useCallback(async () => {
     try {
-      const res = await fetch("/api/v1/auth/me");
+      const res = await authFetch("/api/v1/auth/me");
       if (!res.ok) {
         router.push("/login");
         return;
@@ -411,8 +413,8 @@ export default function DashboardPage() {
     if (propTypeFilter) propParams.set("type", propTypeFilter);
 
     const [propRes, unitRes] = await Promise.all([
-      fetch(`/api/v1/properties?${propParams.toString()}`),
-      fetch(
+      authFetch(`/api/v1/properties?${propParams.toString()}`),
+      authFetch(
         `/api/v1/units?limit=100${selectedPropertyId ? `&propertyId=${selectedPropertyId}` : ""}${
           unitStatusFilter ? `&status=${unitStatusFilter}` : ""
         }${unitTypeFilter ? `&type=${unitTypeFilter}` : ""}`
@@ -430,7 +432,7 @@ export default function DashboardPage() {
   }, [propSearch, propTypeFilter, selectedPropertyId, unitStatusFilter, unitTypeFilter]);
 
   const fetchOwners = useCallback(async () => {
-    const res = await fetch("/api/v1/owners");
+    const res = await authFetch("/api/v1/owners");
     if (res.ok) {
       const data = await res.json();
       setOwners(data.owners || []);
@@ -443,7 +445,7 @@ export default function DashboardPage() {
     if (docCategoryFilter) params.set("category", docCategoryFilter);
     if (docExpiryFilter) params.set("expiryStatus", docExpiryFilter);
 
-    const res = await fetch(`/api/v1/documents?${params.toString()}`);
+    const res = await authFetch(`/api/v1/documents?${params.toString()}`);
     if (res.ok) {
       const data = await res.json();
       setDocuments(data.documents || []);
@@ -451,7 +453,7 @@ export default function DashboardPage() {
   }, [docSearch, docCategoryFilter, docExpiryFilter]);
 
   const fetchRbac = useCallback(async () => {
-    const res = await fetch("/api/v1/admin/roles");
+    const res = await authFetch("/api/v1/admin/roles");
     if (res.ok) {
       const data = await res.json();
       setRoles(data.roles || []);
@@ -460,7 +462,7 @@ export default function DashboardPage() {
   }, []);
 
   const fetchUsers = useCallback(async () => {
-    const res = await fetch("/api/v1/admin/users");
+    const res = await authFetch("/api/v1/admin/users");
     if (res.ok) {
       const data = await res.json();
       setOrgUsers(data.users || []);
@@ -469,7 +471,7 @@ export default function DashboardPage() {
 
   const fetchAudit = useCallback(async (actionFilter = "") => {
     const q = actionFilter ? `?action=${encodeURIComponent(actionFilter)}` : "";
-    const res = await fetch(`/api/v1/admin/audit-logs${q}`);
+    const res = await authFetch(`/api/v1/admin/audit-logs${q}`);
     if (res.ok) {
       const data = await res.json();
       setAuditLogs(data.items || []);
@@ -487,13 +489,18 @@ export default function DashboardPage() {
   }, [fetchMe, fetchPortfolio, fetchOwners, fetchDocuments, fetchRbac, fetchUsers, fetchAudit]);
 
   async function handleQuickSwitchRole(targetEmail: string) {
-    const res = await fetch("/api/v1/auth/login", {
+    const res = await authFetch("/api/v1/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: targetEmail, password: "Password123!" }),
     });
     if (res.ok) {
       const data = await res.json();
+      if (data.requiresTwoFactor || !data.user) {
+        clearAccessToken();
+        router.replace("/login");
+        return;
+      }
       showNotification(
         "success",
         `Switched active session to ${data.user.fullName} (${data.user.role.name})`
@@ -514,7 +521,7 @@ export default function DashboardPage() {
   }
 
   async function handleBranchChange(branchId: string) {
-    const res = await fetch("/api/v1/auth/context", {
+    const res = await authFetch("/api/v1/auth/context", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ branchId }),
@@ -530,7 +537,7 @@ export default function DashboardPage() {
   async function handleLocaleToggle() {
     const nextLocale: Locale = locale === "en" ? "ur" : "en";
     setLocale(nextLocale);
-    await fetch("/api/v1/auth/context", {
+    await authFetch("/api/v1/auth/context", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ locale: nextLocale }),
@@ -540,7 +547,7 @@ export default function DashboardPage() {
   // Phase 1 handlers
   async function handleCreateProperty(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/properties", {
+    const res = await authFetch("/api/v1/properties", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -568,7 +575,7 @@ export default function DashboardPage() {
 
   async function handleCreateUnit(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/units", {
+    const res = await authFetch("/api/v1/units", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -594,7 +601,7 @@ export default function DashboardPage() {
   }
 
   async function handleUpdateUnitStatus(unitId: string, status: string) {
-    const res = await fetch("/api/v1/units", {
+    const res = await authFetch("/api/v1/units", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ unitId, status }),
@@ -612,7 +619,7 @@ export default function DashboardPage() {
 
   async function handleCreateOwner(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/owners", {
+    const res = await authFetch("/api/v1/owners", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -656,7 +663,7 @@ export default function DashboardPage() {
       });
     }
 
-    const res = await fetch("/api/v1/owners", {
+    const res = await authFetch("/api/v1/owners", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -679,7 +686,7 @@ export default function DashboardPage() {
   }
 
   async function handleRunCsvImport(dryRun: boolean) {
-    const res = await fetch("/api/v1/portfolio/import-csv", {
+    const res = await authFetch("/api/v1/portfolio/import-csv", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ csvText, dryRun }),
@@ -712,7 +719,7 @@ export default function DashboardPage() {
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
-    const res = await fetch("/api/v1/documents", {
+    const res = await authFetch("/api/v1/documents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -741,7 +748,7 @@ export default function DashboardPage() {
   }
 
   async function handleAccessDocument(docId: string, accessType: "view" | "download") {
-    const res = await fetch(`/api/v1/documents/${docId}/access`, {
+    const res = await authFetch(`/api/v1/documents/${docId}/access`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accessType }),
@@ -761,7 +768,7 @@ export default function DashboardPage() {
 
   // Phase 0 handlers
   async function handleTogglePermission(roleSlug: string, permissionCode: string, enabled: boolean) {
-    const res = await fetch("/api/v1/admin/roles", {
+    const res = await authFetch("/api/v1/admin/roles", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ roleSlug, permissionCode, enabled }),
@@ -782,7 +789,7 @@ export default function DashboardPage() {
 
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/admin/users", {
+    const res = await authFetch("/api/v1/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -808,7 +815,7 @@ export default function DashboardPage() {
 
   async function handleCreateBranch(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/admin/branches", {
+    const res = await authFetch("/api/v1/admin/branches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -834,7 +841,7 @@ export default function DashboardPage() {
   }
 
   async function handleInit2FA() {
-    const res = await fetch("/api/v1/auth/2fa", {
+    const res = await authFetch("/api/v1/auth/2fa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "setup" }),
@@ -850,7 +857,7 @@ export default function DashboardPage() {
 
   async function handleVerify2FA(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/auth/2fa", {
+    const res = await authFetch("/api/v1/auth/2fa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "verify", code: totpVerifyCode }),
@@ -867,7 +874,7 @@ export default function DashboardPage() {
   }
 
   async function handleDisable2FA() {
-    const res = await fetch("/api/v1/auth/2fa", {
+    const res = await authFetch("/api/v1/auth/2fa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "disable" }),
@@ -881,7 +888,7 @@ export default function DashboardPage() {
   }
 
   async function handleRotateRefreshToken() {
-    const res = await fetch("/api/v1/auth/refresh", { method: "POST" });
+    const res = await authFetch("/api/v1/auth/refresh", { method: "POST" });
     if (res.ok) {
       showNotification("success", "Refresh token rotated and new JWT Access Token issued.");
       fetchAudit();
@@ -891,9 +898,8 @@ export default function DashboardPage() {
   }
 
   async function handleLogout() {
-    await fetch("/api/v1/auth/logout", { method: "POST" });
-    localStorage.removeItem("rems_access_token");
-    router.push("/login");
+    try { await authFetch("/api/v1/auth/logout", { method: "POST" }); }
+    finally { clearAccessToken(); router.replace("/login"); }
   }
 
   if (loading || !user || !summary) {

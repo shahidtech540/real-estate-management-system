@@ -1,5 +1,9 @@
 "use client";
 
+import { AuthenticatedDownload } from "@/components/AuthenticatedDownload";
+
+import { authFetch } from "@/lib/auth-client";
+
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -153,7 +157,7 @@ export function ListingsWorkspace({
     if (purposeFilter) params.set("purpose", purposeFilter);
     if (search) params.set("search", search);
 
-    const res = await fetch(`/api/v1/listings?${params.toString()}`);
+    const res = await authFetch(`/api/v1/listings?${params.toString()}`);
     if (res.ok) {
       const data = await res.json();
       setListings(data.listings || []);
@@ -169,7 +173,7 @@ export function ListingsWorkspace({
     const targetUnit = units.find((u) => u.id === unitId);
     const propertyId = targetUnit?.propertyId || properties[0]?.id || "prop_1";
 
-    const res = await fetch("/api/v1/listings", {
+    const res = await authFetch("/api/v1/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -200,7 +204,7 @@ export function ListingsWorkspace({
   }
 
   async function handleStatusChange(listingId: string, nextStatus: string) {
-    const res = await fetch("/api/v1/listings", {
+    const res = await authFetch("/api/v1/listings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ listingId, status: nextStatus }),
@@ -237,24 +241,20 @@ export function ListingsWorkspace({
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Open Public Portal (/listings)</span>
               </Link>
-              <a
+              <AuthenticatedDownload
                 href="/api/v1/listings/feed?format=json"
-                target="_blank"
-                rel="noreferrer"
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>JSON Feed</span>
-              </a>
-              <a
+              </AuthenticatedDownload>
+              <AuthenticatedDownload
                 href="/api/v1/listings/feed?format=csv"
-                target="_blank"
-                rel="noreferrer"
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>CSV Feed</span>
-              </a>
+              </AuthenticatedDownload>
             </div>
           </div>
 
@@ -527,9 +527,9 @@ export function CrmWorkspace({
   const fetchCrmData = useCallback(async () => {
     const leadQuery = stageFilter ? `?stage=${stageFilter}` : "";
     const [lRes, vRes, dRes] = await Promise.all([
-      fetch(`/api/v1/crm/leads${leadQuery}`),
-      fetch("/api/v1/crm/viewings"),
-      fetch("/api/v1/crm/deals"),
+      authFetch(`/api/v1/crm/leads${leadQuery}`),
+      authFetch("/api/v1/crm/viewings"),
+      authFetch("/api/v1/crm/deals"),
     ]);
 
     if (lRes.ok) {
@@ -553,7 +553,7 @@ export function CrmWorkspace({
   const selectedLead = leads.find((l) => l.id === selectedLeadId) || leads[0] || null;
 
   async function handleStageChange(leadId: string, stage: string) {
-    const res = await fetch("/api/v1/crm/leads", {
+    const res = await authFetch("/api/v1/crm/leads", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ leadId, stage }),
@@ -575,7 +575,7 @@ export function CrmWorkspace({
     e.preventDefault();
     if (!selectedLead) return;
 
-    const res = await fetch("/api/v1/crm/leads", {
+    const res = await authFetch("/api/v1/crm/leads", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -595,7 +595,7 @@ export function CrmWorkspace({
   }
 
   async function handleToggleTask(leadId: string, taskId: string) {
-    const res = await fetch("/api/v1/crm/leads", {
+    const res = await authFetch("/api/v1/crm/leads", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ leadId, toggleTaskId: taskId }),
@@ -607,7 +607,7 @@ export function CrmWorkspace({
 
   async function handleCreateLead(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/crm/leads", {
+    const res = await authFetch("/api/v1/crm/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -633,7 +633,7 @@ export function CrmWorkspace({
 
   async function handleScheduleViewing(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/crm/viewings", {
+    const res = await authFetch("/api/v1/crm/viewings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -665,7 +665,7 @@ export function CrmWorkspace({
       });
     }
 
-    const res = await fetch("/api/v1/crm/deals", {
+    const res = await authFetch("/api/v1/crm/deals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -73,3 +73,25 @@ This document records all architectural, product, and domain defaults made for t
 - **Owner statements:** Cash basis: collect actual completed payments dated in the statement month for rent invoices, allocate by current property ownership percentage, subtract actual completed work-order costs and the owner's management fee on gross share. No fabricated operating reserve. Negative balances are retained. Statements can refresh until a payout is recorded; paid statements are locked, and payout records are unique per statement. A payout records an independently executed transfer, not a bank API instruction.
 - **Access:** All Phase 3 routes require authentication and module permissions. Tenant lease/invoice/receipt views are restricted to their linked tenant profile. Owner views are restricted to their owned properties, and statements to their own owner profile. Organization scoping applies to every service mutation. Dedicated portals remain Phase 8; these restrictions already apply in the staff dashboard and APIs.
 - **Dependency update:** Added `pdf-lib` for real PDF generation and updated Next.js from 15.1.6 to 15.5.27 within the existing major version. `npm audit --omit=dev` still reports one high and one moderate advisory (Next.js/transitive PostCSS); the suggested full fix requires a Next.js major upgrade. These remain deployment blockers for the Phase 8 hardening pass, not claims of a completed production security audit.
+
+## 4. Embedded-preview sign-in correction
+
+The browser UI previously wrote an access token to `localStorage` but never
+attached it to dashboard API calls. A cross-site iframe rejects the existing
+`SameSite=Lax` cookies, yielding login 200 → `/auth/me` 401 → `/login`.
+Reproduced this using the actual sign-in form under a synthetic cross-site parent.
+
+- Preserve HttpOnly/SameSite cookie protections; do not loosen CORS or put tokens in URLs.
+- Use a shared `authFetch` for same-origin `/api/v1/*` requests. It attaches the
+  existing short-lived access JWT, captures rotated/context-switched tokens,
+  and clears stale tokens on 401 or logout. Never attach it to external URLs.
+- Keep the access token tab-scoped in `sessionStorage`, with an in-memory fallback
+  if Web Storage throws. Delete the old persistent `localStorage` copy. Refresh
+  tokens remain in HttpOnly cookies and are never persisted by the browser helper.
+- Verify `/auth/me` before leaving the sign-in form, resume existing tab sessions
+  on preview reload, and show a visible error if session establishment fails.
+- Protected downloads use authenticated fetch + Blob downloads, not token query
+  parameters. Original cookie-based API clients and backend RBAC are unchanged.
+- If both cookies and storage are blocked, in-memory auth survives client-side
+  navigation but not a full page reload. If refresh cookies are blocked, the
+  short-lived token expires normally and the user must sign in again.

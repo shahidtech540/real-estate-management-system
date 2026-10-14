@@ -82,3 +82,20 @@ Live merchant charging/webhooks, electronic signature integration, dedicated por
 4. **Authentication, RBAC, Optional 2FA & Multi-Tenancy (`src/server/auth/`, `src/server/modules/`)**
 5. **Responsive Bilingual UI (`src/app/login/page.tsx`, `src/app/dashboard/page.tsx`)**
 6. **Docker, CI & Automated Tests (`Dockerfile`, `docker-compose.yml`, `.github/workflows/ci.yml`, `tests/phase0.test.ts`)**
+
+## Post-Phase 3 correction — embedded-preview sign-in
+
+- Reproduced the reported sign-in loop: login succeeded, but iframe cookie
+  restrictions caused the dashboard's `/auth/me` request to return 401.
+- Added a shared tab-scoped bearer transport with storage-denied memory fallback;
+  wired sign-in, dashboard, Phase 2/3 API calls, token rotation, role/context
+  switching, logout and protected file downloads through it. Cookies/RBAC retain
+  their existing protections. No credentials are added to URLs.
+- Sign-in now verifies the session before navigation and restores an existing
+  tab session after the preview reloads. Storage exceptions no longer masquerade
+  as network failures.
+- Verification: **49/49 unit/integration tests**, **93.37% statement coverage**,
+  TypeScript and production build passed; **4/4 Chromium browser tests** passed,
+  including actual sign-in form submission, wrong-password feedback, cookie-blocked
+  cross-site iframe sign-in/reload, PDF download, role switching/sign-out, and
+  operation with both Web Storage APIs disabled. Phase 3 workflow still passes.

@@ -1,4 +1,8 @@
 "use client";
+
+import { AuthenticatedDownload } from "@/components/AuthenticatedDownload";
+
+import { authFetch } from "@/lib/auth-client";
 import {
   useCallback,
   useEffect,
@@ -32,7 +36,7 @@ const currentMonth = () =>
     .format(new Date())
     .slice(0, 7);
 async function api(path: string, method = "GET", body?: unknown) {
-  const response = await fetch(`/api/v1/${path}`, {
+  const response = await authFetch(`/api/v1/${path}`, {
     method,
     headers: { "Content-Type": "application/json" },
     ...(body ? { body: JSON.stringify(body) } : {}),
@@ -514,14 +518,12 @@ export function TenancyWorkspace({
                       </span>
                     </td>
                     <td className="p-3">
-                      <a
+                      <AuthenticatedDownload
                         className="text-emerald-700 underline"
                         href={`/api/v1/leases/${l.id}/agreement`}
-                        target="_blank"
-                        rel="noreferrer"
                       >
                         Agreement PDF ↗
-                      </a>
+                      </AuthenticatedDownload>
                     </td>
                   </tr>
                 ))}
@@ -1133,14 +1135,12 @@ export function BillingWorkspace({
                     </td>
                     <td className="p-3">{cash(p.amountMinor)}</td>
                     <td className="p-3">
-                      <a
+                      <AuthenticatedDownload
                         href={p.pdfUrl}
-                        target="_blank"
-                        rel="noreferrer"
                         className="text-emerald-700 underline"
                       >
                         PDF ↗
-                      </a>
+                      </AuthenticatedDownload>
                     </td>
                   </tr>
                 ))}
@@ -1184,14 +1184,12 @@ export function BillingWorkspace({
                       {cash(l.ownerShareGrossRentMinor)}
                     </p>
                   ))}
-                  <a
+                  <AuthenticatedDownload
                     href={`/api/v1/billing/statements?id=${s.id}&format=pdf`}
-                    target="_blank"
-                    rel="noreferrer"
                     className="text-sm text-emerald-700 underline"
                   >
                     Download statement PDF ↗
-                  </a>
+                  </AuthenticatedDownload>
                   {permissions.includes("payments:write") &&
                     s.status !== "paid" &&
                     s.netPayoutMinor > 0 && (

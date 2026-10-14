@@ -135,3 +135,12 @@ Unit/integration tests use fresh in-memory databases and a fixed clock.
   fixtures. Statements deliberately use actual payment rows, not invoice paid totals.
 - Current dependency audit advisories and broader deployment security hardening
   remain tracked in `DECISIONS.md` for Phase 8. Do not deploy demo credentials.
+
+### Embedded preview sign-in
+
+The dashboard supports preview browsers that block third-party session cookies.
+A short-lived access token is retained only in this tab and sent with authenticated
+API calls/downloads. A preview refresh can resume that tab session. If all browser
+storage is disabled, sign-in still works during client navigation, but a full page
+reload requires signing in again. Refresh tokens are never stored by JavaScript;
+when refresh cookies are blocked, sign in again after the access token expires.
