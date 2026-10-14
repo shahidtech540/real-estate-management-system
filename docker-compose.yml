@@ -46,6 +46,7 @@ services:
       - minio_data:/data
 
   app:
+    image: rems-app:local
     build:
       context: .
       dockerfile: Dockerfile
@@ -55,6 +56,8 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: production
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+      NOTIFICATION_PROVIDER_MODE: ${NOTIFICATION_PROVIDER_MODE:-mock}
       PORT: 3000
       DATABASE_URL: postgresql://rems_user:rems_password@postgres:5432/rems_db?schema=public
       REDIS_URL: redis://redis:6379
@@ -63,13 +66,39 @@ services:
       S3_SECRET_KEY: minioadminpassword
       JWT_ACCESS_SECRET: rems-prod-jwt-access-secret-2026
       JWT_REFRESH_SECRET: rems-prod-jwt-refresh-secret-2026
+    volumes:
+      - sqlite_data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/v1/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
 
+  maintenance-worker:
+    image: rems-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["npm", "run", "maintenance:worker"]
+    environment:
+      NODE_ENV: production
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+      NOTIFICATION_PROVIDER_MODE: ${NOTIFICATION_PROVIDER_MODE:-mock}
+    volumes:
+      - sqlite_data:/app/data
+    depends_on:
+      app:
+        condition: service_healthy
+
 volumes:
+  sqlite_data:
   postgres_data:
   redis_data:
   minio_data:

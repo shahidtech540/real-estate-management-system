@@ -8,11 +8,50 @@
 | **Phase 1** | Properties, units, owners, documents vault, CSV import | ✅ **COMPLETED** | **91.44%** | Portfolio CRUD, hierarchy (`Property → Building → Unit`), multi-owner percentage splits (`<=100%`), Central Document Vault (`v1→v2` versioning, expiry alerts, view/download audit logs), Bulk CSV import with dry-run & row-by-row validation error report |
 | **Phase 2** | Listings, public site, CRM (leads, viewings, deals) | ✅ **COMPLETED** | **91.91%** (15/15 tests passing) | Bilingual public marketplace (`/listings`), SEO detail pages (`/listings/[slug]`), SVG QR code generator, JSON/CSV portal syndication feeds, public Web Lead Capture form, CRM Lead pipeline & scoring (`0–100`), viewing scheduler with Google Calendar links, and deal closing with multi-agent commission splits |
 | **Phase 3** | Tenants, leases, invoicing, payments, receipts, owner statements | ✅ **COMPLETED (local / mock-provider scope)** | **93.29%** overall statements; **38/38** unit/integration tests + **1/1** browser workflow | Tenant KYC, validated lease lifecycle, PDF agreements/receipts, deposits, inspections, recurring rent/fees, partial payments, credits, arrears, owner statements/payout records |
-| **Phase 4** | Maintenance, vendors, notifications | ⏳ Next | — | Maintenance ticket lifecycle, SLA timers, vendor directory & work orders, preventive schedules, multi-channel notifications |
+| **Phase 4** | Maintenance, vendors, notifications | ✅ **COMPLETED (local / mock-provider scope)** | **84/84** tests; **16/16** browser checks; **94.32%** statements | Tenant photo tickets → triage → vendor work order → actual cost → tenant confirmation; SLA alerts; preventive schedules; durable notification outbox |
 | **Phase 5** | Accounting, dashboards, reports, exports | ⏳ Pending | — | Chart of accounts, double-entry ledger, budget vs actual, executive KPIs, CSV/PDF exports |
 | **Phase 6** | Agent orchestration layer, approval queue, audit, kill switch | ⏳ Pending | — | Tool registry, multi-step agent runner, human-in-the-loop approval queue, cost budgets, kill switches |
 | **Phase 7** | Lead, Listing, Rent, Maintenance, Lease & Insights agents + eval suite | ⏳ Pending | — | All 6 domain AI agents + 120+ scenario & adversarial prompt-injection evaluation tests |
 | **Phase 8** | Tenant/owner portals, hardening, performance, docs, deployment guide | ⏳ Pending | — | Dedicated Owner & Tenant portals, OWASP security hardening, OpenAPI spec, runbook, user guides |
+
+---
+
+## Phase 4 Detailed Completion Log
+
+### Delivered
+- Validated, organization/RBAC-scoped maintenance requests with private raster
+  photos, current-lease tenant submission, owned-property reads and ordered history.
+- Triage, priority SLA deadlines, trade/availability-aware vendor assignment,
+  scheduled/in-progress/completed/cancelled work orders and immutable actual costs.
+- Tenant completion ratings, rejection/reopen flow, audited reasoned admin override,
+  directory rates/availability, calculated ratings and paginated vendor work history.
+- Preventive schedules with pause/resume, idempotent due-ticket generation and
+  missed-interval coalescing; deduplicated SLA alerts and a serial 60s worker/cron CLI.
+- Transactional in-app notifications; consented single-recipient email/SMS/WhatsApp
+  mock adapters, durable outbox, backoff, claim recovery, dead letters and admin retry.
+- Private inbox/read acknowledgements, admin delivery log, English/Urdu templates,
+  responsive dashboard workspaces and locally bundled licensed Urdu font coverage.
+- Non-destructive old-schema migration and corresponding PostgreSQL design records.
+  Setup, role walkthrough, API examples and integration boundaries: [`docs/PHASE4.md`](docs/PHASE4.md).
+
+### Verification
+- TypeScript and production build passed. **84/84** unit/integration tests passed;
+  overall coverage **94.32%** statements/lines, **80.84%** branches, **100%** functions.
+- **16/16** browser tests passed: existing rent and proxy-safe sign-in regressions,
+  photo ticket through role switches and rated closure, preventive scheduling,
+  mock email delivery/read acknowledgement, all 14 workspaces and expanded mobile/RTL forms.
+- CLI smoke on a copy of the existing demo database: one SLA escalation on the
+  first run, zero repeats on the second; secondary organization remained isolated.
+- Old Phase 3-schema migration preserves every invoice row; completed maintenance
+  actual costs are verified in owner statements, with estimates excluded.
+- Reviewed real screenshots for completed work, desktop navigation and mobile Urdu
+  forms; font coverage corrected after identifying missing Urdu fallback glyphs.
+
+### Boundaries / checkpoint
+- Real external messaging is **not enabled**; `mock_sent` is visibly simulated.
+  Live mode fails closed. No automatic bulk messages, payments or AI dispatch.
+- SQLite is the active runtime; production hardening/dedicated portals remain later.
+- Keep PR #2 open/unmerged. **Stop here; Phase 5 requires the user's “continue”.**
 
 ---
 
@@ -34,7 +73,7 @@
 - `npm run test:coverage`: **38/38 passing**, **93.29%** statements, **76.71%** branches, **100%** functions.
 - Real Chromium browser workflow: **1/1 passed** (tenant onboarding/KYC → lease activation → invoice → partial payment → PDF receipt → owner statement); no page errors in the tested workflow.
 - In-memory CLI smoke: November cycle generated 20 PakLand invoices and zero secondary-organization invoices; late fees respected eligibility.
-- PR #2 remains open and unmerged. Phases 4–8 have not been started.
+- At the Phase 3 checkpoint, PR #2 remained open and unmerged; later phase status is tracked in the matrix above.
 
 ### Boundaries
 Live merchant charging/webhooks, electronic signature integration, dedicated portals and production hardening are not claimed as implemented. The enabled local workflow uses explicit gateway simulators or records independently verified external transactions. Standard PDF fonts do not render Urdu identities; Unicode records remain intact in JSON/UI. Remaining dependency audit advisories are recorded in `DECISIONS.md`.

@@ -30,6 +30,8 @@ import {
 } from "lucide-react";
 import { formatCompactPkr, formatMinorCurrency } from "@/lib/format";
 import { Locale, t } from "@/lib/i18n";
+import { MaintenanceWorkspace } from "@/components/MaintenanceWorkspace";
+import { NotificationsWorkspace } from "@/components/NotificationsWorkspace";
 import { TenancyWorkspace, BillingWorkspace } from "@/components/Phase3Workspaces";
 import { CrmWorkspace, ListingsWorkspace } from "@/components/Phase2Workspaces";
 
@@ -282,6 +284,8 @@ export default function DashboardPage() {
     | "listings"
     | "crm"
     | "tenancy"
+    | "maintenance"
+    | "notifications"
     | "billing"
     | "owners"
     | "documents"
@@ -293,6 +297,11 @@ export default function DashboardPage() {
   >("overview");
   const [user, setUser] = useState<UserProfile | null>(null);
   const [branches, setBranches] = useState<BranchItem[]>([]);
+  useEffect(() => {
+    if (user && activeTab === "maintenance" && !user.permissions.includes("maintenance:read")) {
+      setActiveTab("notifications");
+    }
+  }, [user, activeTab]);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [locale, setLocale] = useState<Locale>("en");
   const [loading, setLoading] = useState(true);
@@ -921,6 +930,8 @@ export default function DashboardPage() {
     { id: "crm", label: t(locale, "crmTab"), icon: Users },
     ...(user.permissions.includes("leases:read") ? [{ id: "tenancy", label: t(locale, "tenancyTab"), icon: FileText }] : []),
     ...(user.permissions.includes("invoices:read") ? [{ id: "billing", label: t(locale, "billingTab"), icon: Briefcase }] : []),
+    ...(user.permissions.includes("maintenance:read") ? [{ id: "maintenance", label: t(locale, "maintenanceTab"), icon: Activity }] : []),
+    { id: "notifications", label: t(locale, "notificationsTab"), icon: Activity },
     { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
     { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
     { id: "csv", label: t(locale, "csvImportTab"), icon: FileSpreadsheet },
@@ -931,7 +942,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div dir={isRtl ? "rtl" : "ltr"} className="rems-dashboard min-h-screen min-w-0 w-full bg-slate-50 flex flex-col">
+    <div lang={locale} dir={isRtl ? "rtl" : "ltr"} className="rems-dashboard min-h-screen min-w-0 w-full bg-slate-50 flex flex-col">
       {/* Top Navigation Header */}
       <header data-testid="dashboard-header" className="rems-dashboard-header bg-slate-900 text-white border-b border-slate-800 z-30">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 grid items-center gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
@@ -1062,7 +1073,7 @@ export default function DashboardPage() {
             </div>
             <span className="shrink-0 inline-flex items-center gap-2 text-xs font-medium text-slate-500">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              {t(locale, "phase3Status")}
+              {t(locale, "phase4Status")}
             </span>
           </div>
 
@@ -1604,6 +1615,8 @@ export default function DashboardPage() {
 
         {activeTab === "tenancy" && <TenancyWorkspace permissions={user.permissions} locale={locale} units={units} onRefresh={() => { fetchPortfolio(); fetchAudit(auditFilter); }} />}
         {activeTab === "billing" && <BillingWorkspace permissions={user.permissions} locale={locale} onRefresh={() => { fetchMe(); fetchAudit(auditFilter); }} />}
+        {activeTab === "maintenance" && <MaintenanceWorkspace key={user.id} permissions={user.permissions} locale={locale} roleSlug={user.role.slug} />}
+        {activeTab === "notifications" && <NotificationsWorkspace key={user.id} permissions={user.permissions} locale={locale} />}
         {/* TAB 2: OWNERS & MULTI-OWNER SPLITS */}
         {activeTab === "owners" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

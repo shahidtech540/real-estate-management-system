@@ -1,5 +1,5 @@
-// Prisma Schema for Production PostgreSQL + pgvector deployment
-// Covers all 32 entities in docs/ERD.md with multi-tenancy (organizationId),
+// PostgreSQL + pgvector deployment design (active runtime is SQLite).
+// Phased entities from docs/ERD.md with multi-tenancy (organizationId),
 // audit fields (createdAt, updatedAt, createdBy, deletedAt), and integer minor units.
 
 generator client {

@@ -1,6 +1,6 @@
 # PakLand Agentic Real Estate Management System (REMS)
 
-A production-grade, multi-tenant **Real Estate Management System (REMS)** with **Agentic AI** capabilities built for housing scheme developers, commercial centers, property managers, and real estate agencies.
+A phased, multi-tenant **Real Estate Management System (REMS)** with planned **Agentic AI** capabilities, built for housing scheme developers, commercial centers, property managers, and real estate agencies.
 
 ---
 
@@ -12,6 +12,9 @@ npm install
 npm run db:seed
 npm run dev
 ```
+Phases 0–4 are implemented for local use; external integrations use explicit mocks.
+See `PROGRESS.md` for current capabilities and remaining production hardening.
+
 Open `http://localhost:3000`. The embedded SQLite database (`./data/rems.sqlite`) initializes the schema and seeds the full demo dataset automatically.
 
 ### Option B: Docker Compose (PostgreSQL + pgvector, Redis, MinIO, App)
@@ -72,3 +75,27 @@ fixtures use `SQLITE_DB_PATH=./data/phase3-demo.sqlite npm run dev`.
 is set. The Prisma PostgreSQL schema is a deployment design, not a functioning
 switchable repository. Live payment-provider processing is disabled; external
 verified payments may be recorded manually, or explicitly simulated locally.
+
+
+## Phase 4: Maintenance, Vendors & Notifications
+
+Open **Maintenance & Vendors** and **Notifications** in the dashboard (or the
+**Workspace** dropdown on smaller screens). Report a tenant issue with photos,
+triage/assign it as maintenance staff, complete work with actual PKR costs, then
+confirm/rate it as the tenant. Administrators can review delivery logs and templates.
+
+Run the background scheduler in a second terminal using the app's database path:
+
+```bash
+npm run maintenance:worker  # every 60 seconds; Ctrl+C stops it
+# Or one scan (also suitable for cron):
+npm run maintenance:cycle
+```
+
+In-app notifications are real; **email/SMS/WhatsApp are simulated by default** and
+shown as `mock_sent`. No external message is sent in mock mode. Switching to live
+mode fails closed until a real provider adapter is implemented and validated.
+
+Walkthrough, SLA defaults, consent/retry rules, API reference and provider
+requirements: [`docs/PHASE4.md`](docs/PHASE4.md). Existing databases migrate without
+resetting rent/portfolio records. PR #2 remains unmerged; Phase 5 awaits approval.

@@ -2,12 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Self-hosted Noto Sans Arabic (SIL OFL); no external font request is needed.
+   Unicode scoping preserves the existing Latin UI face while covering Urdu. */
+@font-face {
+  font-family: "REMS Arabic";
+  src: url("/fonts/NotoSansArabic.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200D, U+FB50-FDFF, U+FE70-FEFF;
+}
+
 :root {
   color-scheme: light;
 }
 
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
+  font-family: "REMS Arabic", ui-sans-serif, system-ui, sans-serif;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 

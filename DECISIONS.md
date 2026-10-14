@@ -122,3 +122,40 @@ This header is never attached to external URLs and never placed in query strings
   sticky only on sufficiently tall desktop viewports, never trapping short previews.
 - Dashboard grid children may shrink; table overflow stays within its own panel.
   No blanket `overflow-x: hidden` is used to mask inaccessible content.
+
+## 6. Phase 4 — maintenance, vendors and notifications
+
+- Use existing granular maintenance/vendor permissions. Tenants create against a
+  current leased unit and confirm only linked completed tickets. Coordinators
+  triage and manage work, but cannot impersonate tenant confirmation. Admin
+  overrides require a reason and are separately audited; owners are read-only.
+- SLA deadlines are measured from original creation: emergency 1h, high 4h,
+  medium 24h, low 72h. Reopening resumes the original SLA; completion stops it.
+  Escalations are transactional, per-deadline idempotent in-app notifications.
+- Preserve every work order and its immutable completed actual cost. Rejection
+  creates a new work cycle instead of erasing the prior expense. Only real tenant
+  confirmations contribute to calculated vendor ratings. Actual expenses feed
+  the existing owner-statement calculation; no vendor bank payout is performed.
+- Preventive schedules use UTC instants and day-based intervals. Missed occurrences
+  coalesce into one due ticket, then advance on the original cadence. A durable
+  occurrence key prevents duplicate tickets. Pause/resume is explicit.
+- Store up to five validated raster photo data URIs (max 1MB each) privately with
+  the ticket for this local SQLite phase. Browser uploads resize to 1200px. No
+  arbitrary URLs, remote image fetches, SVG uploads or public photo endpoint.
+- Use a durable SQLite notification outbox instead of claiming a Redis integration.
+  In-app messages deliver transactionally. External channels use functional mock
+  adapters and distinct `mock_sent` status. Live mode fails closed; provider
+  credentials alone never enable external sends. Consent is explicitly asserted
+  for human-composed external messages; automatic events are in-app only.
+- Delivery uses claim leases, five attempts with exponential backoff, dead-letter
+  state, admin retry and stable provider idempotency keys. The 60s serial worker
+  and one-shot cron command share the app's database; run a single worker locally.
+- Template interpolation is one pass over four allowlisted variables, not executable
+  template code. User text is rendered plainly. English/Urdu overrides are scoped
+  to the organization; all accounts have a private communications inbox.
+- Self-host SIL-OFL Noto Sans Arabic, scoped to Arabic Unicode ranges, after visual
+  browser checks revealed missing Urdu glyphs in sandbox fallback fonts. Preserve
+  the existing Latin UI font; do not depend on Google Fonts network access.
+- Phase 4 is local/mock-provider complete, not a production-security certification.
+  Dedicated portals, production object storage/provider callbacks, accounting and
+  agent approval/orchestration remain in their planned later phases.

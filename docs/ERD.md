@@ -150,3 +150,42 @@ Immutable event/credit/payout records use creation timestamps rather than soft
 updates/deletes. All operational amounts are PKR integer paisa. New partial
 unique indexes also enforce rent per lease/month, live tenant CNIC uniqueness
 and payment reference uniqueness per organization in SQLite.
+
+## Phase 4 additive maintenance and communications records
+
+Phase 4 adds five domain tables and an operational `feature_migrations` marker
+(**47 runtime SQLite tables total**). Existing vendor/ticket/work-order/notification
+records gain additive availability, confirmation, completion-note and delivery
+state columns. The marker prevents repeated demo inserts, not business writes.
+
+```mermaid
+erDiagram
+    MAINTENANCE_TICKET ||--o{ MAINTENANCE_EVENT : records_ordered_activity
+    MAINTENANCE_TICKET ||--o{ WORK_ORDER : dispatches
+    VENDOR ||--o{ WORK_ORDER : performs
+    VENDOR ||--o{ VENDOR_REVIEW : receives
+    MAINTENANCE_TICKET ||--o| VENDOR_REVIEW : tenant_confirms
+    UNIT ||--o{ PREVENTIVE_SCHEDULE : maintains
+    PREVENTIVE_SCHEDULE ||--o{ PREVENTIVE_RUN : generates_idempotently
+    MAINTENANCE_TICKET ||--o| PREVENTIVE_RUN : originates_from
+    ORGANIZATION ||--o{ NOTIFICATION_TEMPLATE : configures
+    USER ||--o{ NOTIFICATION : receives
+```
+
+- `maintenance_events`: immutable type/note/actor/time and per-ticket sequence;
+  unique organization/event key deduplicates deadline escalations.
+- `vendor_reviews`: unique ticket confirmation with final vendor, 1–5 rating,
+  note, actor and timestamps. Directory ratings aggregate real reviews.
+- `preventive_schedules`: unit, title, trade, interval days, next due UTC instant,
+  active/paused state, timestamps/actor and soft deletion.
+- `preventive_runs`: immutable organization/schedule/due instant → generated ticket
+  mapping, unique per occurrence.
+- `notification_templates`: organization/event/locale unique override, plain-text
+  subject/body, timestamps/actor. Code supplies bilingual defaults when absent.
+- `notifications`: unique organization/event key, delivery attempts, next retry,
+  processing lease, provider reference, last error and recipient read timestamp.
+  `mock_sent` is distinct from genuine delivery.
+
+Immutable events/reviews/runs are retained rather than soft-deleted. Operational
+choices and lifecycle/RBAC guarantees are detailed in [`PHASE4.md`](PHASE4.md).
+Prisma mirrors the design; SQLite is still the implemented database engine.
