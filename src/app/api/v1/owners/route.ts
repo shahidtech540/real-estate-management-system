@@ -1,3 +1,5 @@
+import {canReadOwner} from "@/server/modules/shared/access";
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "owners:read");
 
-    const owners = listOwners(ctx.organizationId);
+    const owners = listOwners(ctx.organizationId).filter(o=>canReadOwner(ctx,o.id));
     return NextResponse.json({ owners });
   } catch (err) {
     return handleApiError(err);
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "owners:write");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = createOwnerSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -67,7 +69,7 @@ export async function PUT(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "owners:write");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = assignOwnersSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

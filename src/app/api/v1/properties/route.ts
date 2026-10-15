@@ -1,3 +1,5 @@
+import {canReadProperty,canReadOwner} from "@/server/modules/shared/access";
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -44,7 +46,7 @@ export async function GET(req: NextRequest) {
       search: searchParams.get("search") || undefined,
     });
 
-    return NextResponse.json({ properties });
+    return NextResponse.json({properties:properties.filter(p=>canReadProperty(ctx,p.id)).map(p=>ctx.roleSlug==="owner"?{...p,owners:p.owners.filter(o=>canReadOwner(ctx,o.ownerId))}:p)});
   } catch (err) {
     return handleApiError(err);
   }
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "properties:write");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = createPropertySchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

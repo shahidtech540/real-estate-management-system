@@ -1,3 +1,4 @@
+import {productionDeployment} from "../../security/config";
 import crypto from "node:crypto";
 import { getDb } from "../../db";
 import { hashPassword } from "../../auth/crypto";
@@ -120,6 +121,7 @@ export function createOrganizationUser(
 ) {
   const db = getDb();
   const normalizedEmail = input.email.trim().toLowerCase();
+  if (productionDeployment() && (input.password.length < 14 || /\.test$/i.test(normalizedEmail))) throw new HttpError(400,"PRODUCTION_CREDENTIALS","Production accounts require a real email and a 14+ character password.");
 
   const existing = db
     .prepare("SELECT id FROM users WHERE organization_id = ? AND LOWER(email) = ?")
@@ -408,6 +410,13 @@ export function getDashboardSummary(params: {
   const db = getDb();
   const orgId = params.organizationId;
 
+  if(['tenant','owner'].includes(params.roleSlug)){
+   const tenant=params.roleSlug==='tenant',scope=tenant?"r.tenant_id IN (SELECT id FROM tenants WHERE organization_id=? AND user_id=? AND deleted_at IS NULL)":"r.property_id IN (SELECT po.property_id FROM property_owners po JOIN owners o ON o.id=po.owner_id AND o.organization_id=po.organization_id WHERE o.organization_id=? AND o.user_id=? AND o.deleted_at IS NULL AND po.deleted_at IS NULL)";
+   const inv=db.prepare(`SELECT COUNT(*) n,COALESCE(SUM(total_minor),0) billed,COALESCE(SUM(paid_minor),0) paid,COALESCE(SUM(CASE WHEN status!='cancelled' THEN total_minor-paid_minor ELSE 0 END),0) balance FROM invoices r WHERE r.organization_id=? AND r.deleted_at IS NULL AND ${scope}`).get(orgId,orgId,params.userId)!;
+   const leases=db.prepare(`SELECT r.property_id,r.unit_id,r.status FROM leases r WHERE r.organization_id=? AND r.deleted_at IS NULL AND ${scope}`).all(orgId,orgId,params.userId);
+   const properties=new Set(leases.map(l=>l.property_id)),units=new Set(leases.map(l=>l.unit_id)),active=leases.filter(l=>['active','expiring','renewed'].includes(String(l.status))).length;
+   return {kpis:{totalProperties:properties.size,totalUnits:units.size,occupiedUnits:active,occupancyRatePct:units.size?Math.round(active/units.size*100):0,totalOwners:tenant?0:1,totalTenants:tenant?1:0,activeLeases:active,totalInvoices:Number(inv.n),totalBilledMinor:Number(inv.billed),totalCollectedMinor:Number(inv.paid),arrearsMinor:Number(inv.balance),currency:'PKR'},properties:[],agents:[]};
+  }
   const totalProperties = (
     db
       .prepare("SELECT COUNT(*) as c FROM properties WHERE organization_id = ? AND deleted_at IS NULL")

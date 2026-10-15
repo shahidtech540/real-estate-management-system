@@ -1,3 +1,5 @@
+import {canReadProperty} from "@/server/modules/shared/access";
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -20,7 +22,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const propertyId = searchParams.get("propertyId") || undefined;
     const buildings = listBuildings(ctx.organizationId, propertyId);
-    return NextResponse.json({ buildings });
+    return NextResponse.json({buildings:buildings.filter(b=>canReadProperty(ctx,String(b.propertyId)))});
   } catch (err) {
     return handleApiError(err);
   }
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "properties:write");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = createBuildingSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

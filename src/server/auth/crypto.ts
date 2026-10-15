@@ -1,10 +1,20 @@
 import crypto from "node:crypto";
 
-const ACCESS_SECRET =
-  process.env.JWT_ACCESS_SECRET || "rems-dev-jwt-access-secret-change-in-production-2026";
-const REFRESH_SECRET =
-  process.env.JWT_REFRESH_SECRET || "rems-dev-jwt-refresh-secret-change-in-production-2026";
-
+import { validateDeployment } from "../security/config";
+function accessSecret() {
+  validateDeployment();
+  return (
+    process.env.JWT_ACCESS_SECRET ||
+    "rems-dev-jwt-access-secret-change-in-production-2026"
+  );
+}
+function refreshSecret() {
+  validateDeployment();
+  return (
+    process.env.JWT_REFRESH_SECRET ||
+    "rems-dev-jwt-refresh-secret-change-in-production-2026"
+  );
+}
 export interface JwtPayload {
   sub: string; // userId
   email: string;
@@ -15,6 +25,7 @@ export interface JwtPayload {
   roleId: string;
   roleSlug: string;
   permissions: string[];
+  tokenVersion?: number;
   iat?: number;
   exp?: number;
 }
@@ -24,8 +35,11 @@ export interface JwtPayload {
  */
 export function hashPassword(password: string, explicitSalt?: string): string {
   const salt = explicitSalt || crypto.randomBytes(16).toString("hex");
-  const derived = crypto.pbkdf2Sync(password, salt, 10000, 32, "sha256").toString("hex");
-  return `pbkdf2$10000$${salt}$${derived}`;
+  const iterations = explicitSalt ? 10000 : 600000;
+  const derived = crypto
+    .pbkdf2Sync(password, salt, iterations, 32, "sha256")
+    .toString("hex");
+  return `pbkdf2$${iterations}$${salt}$${derived}`;
 }
 
 /**
@@ -37,6 +51,14 @@ export function verifyPassword(password: string, storedHash: string): boolean {
     return false;
   }
   const iterations = parseInt(parts[1], 10);
+  if (
+    !Number.isInteger(iterations) ||
+    iterations < 10000 ||
+    iterations > 600000 ||
+    !/^[a-z0-9_-]{1,128}$/i.test(parts[2]) ||
+    !/^[a-f0-9]{64}$/i.test(parts[3])
+  )
+    return false;
   const salt = parts[2];
   const originalHex = parts[3];
   const candidateHex = crypto
@@ -71,7 +93,7 @@ function base64UrlDecode(input: string): string {
  */
 export function signAccessToken(
   payload: Omit<JwtPayload, "iat" | "exp">,
-  expiresInSeconds = 900
+  expiresInSeconds = 900,
 ): string {
   const now = Math.floor(Date.now() / 1000);
   const fullPayload: JwtPayload = {
@@ -82,7 +104,10 @@ export function signAccessToken(
   const header = base64UrlEncode(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const body = base64UrlEncode(JSON.stringify(fullPayload));
   const signature = base64UrlEncode(
-    crypto.createHmac("sha256", ACCESS_SECRET).update(`${header}.${body}`).digest()
+    crypto
+      .createHmac("sha256", accessSecret())
+      .update(`${header}.${body}`)
+      .digest(),
   );
   return `${header}.${body}.${signature}`;
 }
@@ -96,16 +121,33 @@ export function verifyAccessToken(token: string): JwtPayload | null {
     if (parts.length !== 3) return null;
     const [header, body, sig] = parts;
     const expectedSig = base64UrlEncode(
-      crypto.createHmac("sha256", ACCESS_SECRET).update(`${header}.${body}`).digest()
+      crypto
+        .createHmac("sha256", accessSecret())
+        .update(`${header}.${body}`)
+        .digest(),
     );
     const sigBuf = Buffer.from(sig);
     const expBuf = Buffer.from(expectedSig);
-    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+    if (
+      sigBuf.length !== expBuf.length ||
+      !crypto.timingSafeEqual(sigBuf, expBuf)
+    ) {
       return null;
     }
     const decoded = JSON.parse(base64UrlDecode(body)) as JwtPayload;
     const now = Math.floor(Date.now() / 1000);
-    if (decoded.exp && decoded.exp < now) {
+    if (
+      JSON.parse(base64UrlDecode(header)).alg !== "HS256" ||
+      !decoded.sub ||
+      !decoded.organizationId ||
+      !decoded.roleId ||
+      !Array.isArray(decoded.permissions) ||
+      !Number.isInteger(decoded.exp) ||
+      !Number.isInteger(decoded.iat) ||
+      Number(decoded.iat) > now + 60
+    )
+      return null;
+    if (Number(decoded.exp) <= now) {
       return null;
     }
     return decoded;
@@ -117,14 +159,20 @@ export function verifyAccessToken(token: string): JwtPayload | null {
 /**
  * Generate a cryptographically random refresh token and its SHA-256 hash.
  */
-export function generateRefreshToken(): { rawToken: string; tokenHash: string } {
+export function generateRefreshToken(): {
+  rawToken: string;
+  tokenHash: string;
+} {
   const rawToken = crypto.randomBytes(40).toString("hex");
   const tokenHash = hashRefreshToken(rawToken);
   return { rawToken, tokenHash };
 }
 
 export function hashRefreshToken(rawToken: string): string {
-  return crypto.createHmac("sha256", REFRESH_SECRET).update(rawToken).digest("hex");
+  return crypto
+    .createHmac("sha256", refreshSecret())
+    .update(rawToken)
+    .digest("hex");
 }
 
 // ============================================================================
@@ -161,7 +209,11 @@ function base32ToBuffer(base32: string): Buffer {
 /**
  * Generate a 6-digit TOTP code for a given Base32 secret and timestamp.
  */
-export function generateTotpCode(secret: string, timestampMs = Date.now(), stepSeconds = 30): string {
+export function generateTotpCode(
+  secret: string,
+  timestampMs = Date.now(),
+  stepSeconds = 30,
+): string {
   const counter = Math.floor(timestampMs / 1000 / stepSeconds);
   const counterBuf = Buffer.alloc(8);
   counterBuf.writeBigInt64BE(BigInt(counter), 0);
@@ -181,11 +233,18 @@ export function generateTotpCode(secret: string, timestampMs = Date.now(), stepS
 /**
  * Verify a 6-digit TOTP code allowing +/- 1 time step window for clock skew.
  */
-export function verifyTotpCode(secret: string, code: string, timestampMs = Date.now()): boolean {
+export function verifyTotpCode(
+  secret: string,
+  code: string,
+  timestampMs = Date.now(),
+): boolean {
   const normalized = code.trim();
   if (!/^\d{6}$/.test(normalized)) return false;
   for (const offsetSteps of [-1, 0, 1]) {
-    const candidate = generateTotpCode(secret, timestampMs + offsetSteps * 30000);
+    const candidate = generateTotpCode(
+      secret,
+      timestampMs + offsetSteps * 30000,
+    );
     if (candidate === normalized) {
       return true;
     }
@@ -193,7 +252,11 @@ export function verifyTotpCode(secret: string, code: string, timestampMs = Date.
   return false;
 }
 
-export function buildOtpAuthUri(email: string, secret: string, issuer = "PakLand-REMS"): string {
+export function buildOtpAuthUri(
+  email: string,
+  secret: string,
+  issuer = "Fahad Real Estate-REMS",
+): string {
   const label = encodeURIComponent(`${issuer}:${email}`);
   const encodedIssuer = encodeURIComponent(issuer);
   return `otpauth://totp/${label}?secret=${secret}&issuer=${encodedIssuer}&algorithm=SHA1&digits=6&period=30`;

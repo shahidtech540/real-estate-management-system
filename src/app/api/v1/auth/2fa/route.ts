@@ -1,3 +1,4 @@
+import {readJson,rateLimit} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth } from "@/server/auth/guards";
@@ -16,7 +17,8 @@ const actionSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const ctx = requireAuth(req);
-    const body = await req.json();
+    rateLimit(`2fa:${ctx.organizationId}:${ctx.sub}`,30);
+    const body = await readJson(req);
     const parsed = actionSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

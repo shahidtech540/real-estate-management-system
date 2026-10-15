@@ -1,4 +1,9 @@
 "use client";
+import Link from "next/link";
+import { OrchestrationWorkspace } from "@/components/OrchestrationWorkspace";
+import { AccountingWorkspace } from "@/components/AccountingWorkspace";
+
+import { authFetch, clearAccessToken } from "@/lib/auth-client";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,6 +33,10 @@ import {
 } from "lucide-react";
 import { formatCompactPkr, formatMinorCurrency } from "@/lib/format";
 import { Locale, t } from "@/lib/i18n";
+import { MaintenanceWorkspace } from "@/components/MaintenanceWorkspace";
+import { NotificationsWorkspace } from "@/components/NotificationsWorkspace";
+import { TenancyWorkspace, BillingWorkspace } from "@/components/Phase3Workspaces";
+import { CrmWorkspace, ListingsWorkspace } from "@/components/Phase2Workspaces";
 
 interface UserProfile {
   id: string;
@@ -250,13 +259,12 @@ interface AuditLogItem {
 }
 
 const QUICK_SWITCH_ACCOUNTS = [
-  { label: "Admin (PakLand)", email: "admin@pakland.pk" },
-  { label: "Sales Agent (PakLand)", email: "agent@pakland.pk" },
-  { label: "Accountant (PakLand)", email: "accountant@pakland.pk" },
-  { label: "Maintenance (PakLand)", email: "maintenance@pakland.pk" },
-  { label: "Owner (PakLand)", email: "owner@pakland.pk" },
-  { label: "Tenant (PakLand)", email: "tenant@pakland.pk" },
-  { label: "Admin (Indus Valley Org 2)", email: "admin@indusvalley.pk" },
+  { label: "Admin (Demo)", email: "admin@fahadrealestate.test" },
+  { label: "Sales Agent (Demo)", email: "agent@fahadrealestate.test" },
+  { label: "Accountant (Demo)", email: "accountant@fahadrealestate.test" },
+  { label: "Maintenance (Demo)", email: "maintenance@fahadrealestate.test" },
+  { label: "Owner (Demo)", email: "owner@fahadrealestate.test" },
+  { label: "Tenant (Demo)", email: "tenant@fahadrealestate.test" },
 ];
 
 const SAMPLE_VALID_CSV = `property_code,building_code,unit_number,type,area_sqft,area_display,bedrooms,bathrooms,status,market_price_pkr,monthly_rent_pkr
@@ -273,11 +281,34 @@ TCC-01,TCC-01-A,TCC-CSV-502,shop,-250,250 Sq.Ft.,0,1,available,9000000,55000`;
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [demoEnabled,setDemoEnabled]=useState(false);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "owners" | "documents" | "csv" | "rbac" | "users" | "security" | "audit"
+    | "overview"
+    | "listings"
+    | "crm"
+    | "tenancy"
+    | "orchestration"
+    | "accounting"
+    | "maintenance"
+    | "notifications"
+    | "billing"
+    | "owners"
+    | "documents"
+    | "csv"
+    | "rbac"
+    | "users"
+    | "security"
+    | "audit"
   >("overview");
   const [user, setUser] = useState<UserProfile | null>(null);
   const [branches, setBranches] = useState<BranchItem[]>([]);
+  useEffect(() => {
+    if(user && activeTab === "orchestration" && !user.permissions.includes("agents:read")) setActiveTab("overview");
+    if(user && activeTab === "accounting" && !user.permissions.includes("accounting:read")) setActiveTab("overview");
+    if (user && activeTab === "maintenance" && !user.permissions.includes("maintenance:read")) {
+      setActiveTab("notifications");
+    }
+  }, [user, activeTab]);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [locale, setLocale] = useState<Locale>("en");
   const [loading, setLoading] = useState(true);
@@ -296,7 +327,7 @@ export default function DashboardPage() {
   const [newPropCode, setNewPropCode] = useState("");
   const [newPropName, setNewPropName] = useState("");
   const [newPropType, setNewPropType] = useState("housing_scheme");
-  const [newPropCity, setNewPropCity] = useState("Islamabad");
+  const [newPropCity, setNewPropCity] = useState("Rahim Yar Khan");
   const [newPropAddress, setNewPropAddress] = useState("");
 
   const [newUnitPropId, setNewUnitPropId] = useState("prop_1");
@@ -354,11 +385,8 @@ export default function DashboardPage() {
   const [orgUsers, setOrgUsers] = useState<OrgUserItem[]>([]);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserName, setNewUserName] = useState("");
+  const [newUserPassword,setNewUserPassword]=useState("");
   const [newUserRole, setNewUserRole] = useState("agent");
-  const [newBranchCode, setNewBranchCode] = useState("");
-  const [newBranchName, setNewBranchName] = useState("");
-  const [newBranchCity, setNewBranchCity] = useState("");
-  const [newBranchAddress, setNewBranchAddress] = useState("");
 
   const [totpSetup, setTotpSetup] = useState<{
     secret: string;
@@ -376,13 +404,14 @@ export default function DashboardPage() {
 
   const fetchMe = useCallback(async () => {
     try {
-      const res = await fetch("/api/v1/auth/me");
+      const res = await authFetch("/api/v1/auth/me");
       if (!res.ok) {
         router.push("/login");
         return;
       }
       const data = await res.json();
       setUser(data.user);
+      setDemoEnabled(data.demoEnabled!==false);
       setBranches(data.branches || []);
       setSummary(data.summary);
       setLocale(data.user.locale || "en");
@@ -398,8 +427,8 @@ export default function DashboardPage() {
     if (propTypeFilter) propParams.set("type", propTypeFilter);
 
     const [propRes, unitRes] = await Promise.all([
-      fetch(`/api/v1/properties?${propParams.toString()}`),
-      fetch(
+      authFetch(`/api/v1/properties?${propParams.toString()}`),
+      authFetch(
         `/api/v1/units?limit=100${selectedPropertyId ? `&propertyId=${selectedPropertyId}` : ""}${
           unitStatusFilter ? `&status=${unitStatusFilter}` : ""
         }${unitTypeFilter ? `&type=${unitTypeFilter}` : ""}`
@@ -417,7 +446,7 @@ export default function DashboardPage() {
   }, [propSearch, propTypeFilter, selectedPropertyId, unitStatusFilter, unitTypeFilter]);
 
   const fetchOwners = useCallback(async () => {
-    const res = await fetch("/api/v1/owners");
+    const res = await authFetch("/api/v1/owners");
     if (res.ok) {
       const data = await res.json();
       setOwners(data.owners || []);
@@ -430,7 +459,7 @@ export default function DashboardPage() {
     if (docCategoryFilter) params.set("category", docCategoryFilter);
     if (docExpiryFilter) params.set("expiryStatus", docExpiryFilter);
 
-    const res = await fetch(`/api/v1/documents?${params.toString()}`);
+    const res = await authFetch(`/api/v1/documents?${params.toString()}`);
     if (res.ok) {
       const data = await res.json();
       setDocuments(data.documents || []);
@@ -438,7 +467,7 @@ export default function DashboardPage() {
   }, [docSearch, docCategoryFilter, docExpiryFilter]);
 
   const fetchRbac = useCallback(async () => {
-    const res = await fetch("/api/v1/admin/roles");
+    const res = await authFetch("/api/v1/admin/roles");
     if (res.ok) {
       const data = await res.json();
       setRoles(data.roles || []);
@@ -447,7 +476,7 @@ export default function DashboardPage() {
   }, []);
 
   const fetchUsers = useCallback(async () => {
-    const res = await fetch("/api/v1/admin/users");
+    const res = await authFetch("/api/v1/admin/users");
     if (res.ok) {
       const data = await res.json();
       setOrgUsers(data.users || []);
@@ -456,7 +485,7 @@ export default function DashboardPage() {
 
   const fetchAudit = useCallback(async (actionFilter = "") => {
     const q = actionFilter ? `?action=${encodeURIComponent(actionFilter)}` : "";
-    const res = await fetch(`/api/v1/admin/audit-logs${q}`);
+    const res = await authFetch(`/api/v1/admin/audit-logs${q}`);
     if (res.ok) {
       const data = await res.json();
       setAuditLogs(data.items || []);
@@ -474,13 +503,18 @@ export default function DashboardPage() {
   }, [fetchMe, fetchPortfolio, fetchOwners, fetchDocuments, fetchRbac, fetchUsers, fetchAudit]);
 
   async function handleQuickSwitchRole(targetEmail: string) {
-    const res = await fetch("/api/v1/auth/login", {
+    const res = await authFetch("/api/v1/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: targetEmail, password: "Password123!" }),
     });
     if (res.ok) {
       const data = await res.json();
+      if (data.requiresTwoFactor || !data.user) {
+        clearAccessToken();
+        router.replace("/login");
+        return;
+      }
       showNotification(
         "success",
         `Switched active session to ${data.user.fullName} (${data.user.role.name})`
@@ -501,7 +535,7 @@ export default function DashboardPage() {
   }
 
   async function handleBranchChange(branchId: string) {
-    const res = await fetch("/api/v1/auth/context", {
+    const res = await authFetch("/api/v1/auth/context", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ branchId }),
@@ -517,7 +551,7 @@ export default function DashboardPage() {
   async function handleLocaleToggle() {
     const nextLocale: Locale = locale === "en" ? "ur" : "en";
     setLocale(nextLocale);
-    await fetch("/api/v1/auth/context", {
+    await authFetch("/api/v1/auth/context", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ locale: nextLocale }),
@@ -527,11 +561,11 @@ export default function DashboardPage() {
   // Phase 1 handlers
   async function handleCreateProperty(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/properties", {
+    const res = await authFetch("/api/v1/properties", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        branchId: user?.branch?.id || branches[0]?.id || "br_isb",
+        branchId: user?.branch?.id || branches[0]?.id || "br_ryk",
         code: newPropCode,
         name: newPropName,
         type: newPropType,
@@ -555,7 +589,7 @@ export default function DashboardPage() {
 
   async function handleCreateUnit(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/units", {
+    const res = await authFetch("/api/v1/units", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -581,7 +615,7 @@ export default function DashboardPage() {
   }
 
   async function handleUpdateUnitStatus(unitId: string, status: string) {
-    const res = await fetch("/api/v1/units", {
+    const res = await authFetch("/api/v1/units", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ unitId, status }),
@@ -599,7 +633,7 @@ export default function DashboardPage() {
 
   async function handleCreateOwner(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/owners", {
+    const res = await authFetch("/api/v1/owners", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -643,7 +677,7 @@ export default function DashboardPage() {
       });
     }
 
-    const res = await fetch("/api/v1/owners", {
+    const res = await authFetch("/api/v1/owners", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -666,7 +700,7 @@ export default function DashboardPage() {
   }
 
   async function handleRunCsvImport(dryRun: boolean) {
-    const res = await fetch("/api/v1/portfolio/import-csv", {
+    const res = await authFetch("/api/v1/portfolio/import-csv", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ csvText, dryRun }),
@@ -699,7 +733,7 @@ export default function DashboardPage() {
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
-    const res = await fetch("/api/v1/documents", {
+    const res = await authFetch("/api/v1/documents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -728,7 +762,7 @@ export default function DashboardPage() {
   }
 
   async function handleAccessDocument(docId: string, accessType: "view" | "download") {
-    const res = await fetch(`/api/v1/documents/${docId}/access`, {
+    const res = await authFetch(`/api/v1/documents/${docId}/access`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accessType }),
@@ -748,7 +782,7 @@ export default function DashboardPage() {
 
   // Phase 0 handlers
   async function handleTogglePermission(roleSlug: string, permissionCode: string, enabled: boolean) {
-    const res = await fetch("/api/v1/admin/roles", {
+    const res = await authFetch("/api/v1/admin/roles", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ roleSlug, permissionCode, enabled }),
@@ -769,13 +803,13 @@ export default function DashboardPage() {
 
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/admin/users", {
+    const res = await authFetch("/api/v1/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: newUserEmail,
         fullName: newUserName,
-        password: "Password123!",
+        password: newUserPassword || (demoEnabled ? "Password123!" : ""),
         roleSlug: newUserRole,
         branchId: user?.branch?.id,
       }),
@@ -788,40 +822,15 @@ export default function DashboardPage() {
     }
     setNewUserEmail("");
     setNewUserName("");
+    setNewUserPassword("");
     showNotification("success", `Created user ${data.user.email} (${data.user.roleName})`);
     fetchUsers();
     fetchAudit();
   }
 
-  async function handleCreateBranch(e: React.FormEvent) {
-    e.preventDefault();
-    const res = await fetch("/api/v1/admin/branches", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: newBranchCode,
-        name: newBranchName,
-        city: newBranchCity,
-        address: newBranchAddress,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      showNotification("error", data?.error?.message || "Failed to create branch.");
-      fetchAudit();
-      return;
-    }
-    setNewBranchCode("");
-    setNewBranchName("");
-    setNewBranchCity("");
-    setNewBranchAddress("");
-    showNotification("success", `Created branch ${data.branch.name}`);
-    fetchMe();
-    fetchAudit();
-  }
 
   async function handleInit2FA() {
-    const res = await fetch("/api/v1/auth/2fa", {
+    const res = await authFetch("/api/v1/auth/2fa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "setup" }),
@@ -837,7 +846,7 @@ export default function DashboardPage() {
 
   async function handleVerify2FA(e: React.FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/v1/auth/2fa", {
+    const res = await authFetch("/api/v1/auth/2fa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "verify", code: totpVerifyCode }),
@@ -854,7 +863,7 @@ export default function DashboardPage() {
   }
 
   async function handleDisable2FA() {
-    const res = await fetch("/api/v1/auth/2fa", {
+    const res = await authFetch("/api/v1/auth/2fa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "disable" }),
@@ -868,7 +877,7 @@ export default function DashboardPage() {
   }
 
   async function handleRotateRefreshToken() {
-    const res = await fetch("/api/v1/auth/refresh", { method: "POST" });
+    const res = await authFetch("/api/v1/auth/refresh", { method: "POST" });
     if (res.ok) {
       showNotification("success", "Refresh token rotated and new JWT Access Token issued.");
       fetchAudit();
@@ -878,9 +887,8 @@ export default function DashboardPage() {
   }
 
   async function handleLogout() {
-    await fetch("/api/v1/auth/logout", { method: "POST" });
-    localStorage.removeItem("rems_access_token");
-    router.push("/login");
+    try { await authFetch("/api/v1/auth/logout", { method: "POST" }); }
+    finally { clearAccessToken(); router.replace("/login"); }
   }
 
   if (loading || !user || !summary) {
@@ -888,7 +896,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
         <div className="flex items-center gap-3">
           <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
-          <span className="font-medium">Loading PakLand Agentic REMS Workspace...</span>
+          <span className="font-medium">Loading Fahad Real Estate workspace...</span>
         </div>
       </div>
     );
@@ -896,46 +904,63 @@ export default function DashboardPage() {
 
   const isRtl = locale === "ur";
 
+  const workspaceTabs = [
+    { id: "overview", label: t(locale, "overview"), icon: Building2 },
+    { id: "listings", label: t(locale, "listingsTab"), icon: Sparkles },
+    { id: "crm", label: t(locale, "crmTab"), icon: Users },
+    ...(user.permissions.includes("leases:read") ? [{ id: "tenancy", label: t(locale, "tenancyTab"), icon: FileText }] : []),
+    ...(user.permissions.includes("invoices:read") ? [{ id: "billing", label: t(locale, "billingTab"), icon: Briefcase }] : []),
+    ...(user.permissions.includes("maintenance:read") ? [{ id: "maintenance", label: t(locale, "maintenanceTab"), icon: Activity }] : []),
+    ...(user.permissions.includes("accounting:read") ? [{id:"accounting",label:locale==="ur"?"اکاؤنٹنگ اور رپورٹس":"Accounting & reports",icon:FileSpreadsheet}] : []),
+    ...(user.permissions.includes("agents:read") ? [{id:"orchestration",label:locale==="ur"?"ایجنٹ آرکیسٹریشن":"Agent orchestration",icon:Sparkles}] : []),
+    { id: "notifications", label: t(locale, "notificationsTab"), icon: Activity },
+    { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
+    { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
+    { id: "csv", label: t(locale, "csvImportTab"), icon: FileSpreadsheet },
+    { id: "rbac", label: t(locale, "rbacMatrix"), icon: ShieldCheck },
+    { id: "users", label: t(locale, "usersBranches"), icon: Users },
+    { id: "security", label: t(locale, "security2fa"), icon: KeyRound },
+    { id: "audit", label: t(locale, "auditLogs"), icon: Activity },
+  ];
+
   return (
-    <div dir={isRtl ? "rtl" : "ltr"} className="min-h-screen bg-slate-50 flex flex-col">
+    <div lang={locale} dir={isRtl ? "rtl" : "ltr"} className="rems-dashboard min-h-screen min-w-0 w-full bg-slate-50 flex flex-col">
       {/* Top Navigation Header */}
-      <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-slate-950 font-bold">
-              <Building2 className="w-5 h-5" />
+      <header data-testid="dashboard-header" className="rems-dashboard-header bg-slate-900 text-white border-b border-slate-800 z-30">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 grid items-center gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
+          <div data-testid="dashboard-brand" className="flex min-w-0 items-center gap-3">
+            <div className="dashboard-brand-mark w-10 h-10 shrink-0 rounded-xl bg-emerald-500 flex items-center justify-center text-slate-950">
+              <Building2 className="w-6 h-6" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-base tracking-tight">{t(locale, "appName")}</span>
-                <span
-                  data-testid="active-org-badge"
-                  className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium"
-                >
+            <div className="min-w-0">
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                <h1 className="font-bold text-base leading-tight tracking-tight">{t(locale, "appName")}</h1>
+                <span data-testid="active-org-badge" title={user.organization.name}
+                  className="block max-w-full truncate rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-300">
                   {user.organization.name}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p data-testid="dashboard-identity" title={`${user.fullName} (${user.email})`} className="mt-1 truncate text-xs text-slate-400">
                 {user.fullName} ({user.email})
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div data-testid="dashboard-controls" className="grid min-w-0 w-full grid-cols-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_auto_auto] gap-2 xl:w-[700px]">
             {/* Instant Role Switcher */}
-            <div className="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-slate-400 hidden md:inline">
-                {t(locale, "switchRole")}:
-              </span>
+            <div className="flex min-w-0 min-h-10 items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
               <select
                 aria-label="Switch Role"
+                title={`${user.role.name} (${user.email})`}
                 data-testid="role-switcher-select"
+                disabled={!demoEnabled}
                 value={user.email}
                 onChange={(e) => handleQuickSwitchRole(e.target.value)}
-                className="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer"
+                className="min-w-0 w-full flex-1 bg-transparent py-2 text-xs font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
               >
-                {QUICK_SWITCH_ACCOUNTS.map((acc) => (
+                {!demoEnabled&&<option value={user.email}>{user.fullName}</option>}
+                {demoEnabled&&QUICK_SWITCH_ACCOUNTS.map((acc) => (
                   <option key={acc.email} value={acc.email} className="bg-slate-900 text-white">
                     {acc.label}
                   </option>
@@ -945,14 +970,16 @@ export default function DashboardPage() {
 
             {/* Branch Switcher */}
             {branches.length > 0 && (
-              <div className="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
-                <MapPin className="w-3.5 h-3.5 text-amber-400" />
+              <div className="flex min-w-0 min-h-10 items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3">
+                <MapPin className="w-4 h-4 shrink-0 text-amber-400" />
                 <select
-                  aria-label="Switch Branch"
+                  aria-label="Office"
+                  disabled={branches.length === 1}
+                  title={user.branch?.name || t(locale, "branch")}
                   data-testid="branch-switcher-select"
                   value={user.branch?.id || ""}
                   onChange={(e) => handleBranchChange(e.target.value)}
-                  className="bg-transparent text-xs font-medium text-slate-200 focus:outline-none cursor-pointer"
+                  className="min-w-0 w-full flex-1 bg-transparent py-2 text-xs font-medium text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
                 >
                   {branches.map((b) => (
                     <option key={b.id} value={b.id} className="bg-slate-900 text-white">
@@ -968,7 +995,7 @@ export default function DashboardPage() {
               type="button"
               onClick={handleLocaleToggle}
               data-testid="locale-toggle-btn"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-400 transition"
             >
               <Globe className="w-3.5 h-3.5 text-emerald-400" />
               {t(locale, "languageToggle")}
@@ -979,7 +1006,7 @@ export default function DashboardPage() {
               type="button"
               onClick={handleLogout}
               data-testid="logout-btn"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 transition"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap px-3 py-2 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-300 transition"
             >
               <LogOut className="w-3.5 h-3.5" />
               {t(locale, "signOut")}
@@ -1012,39 +1039,41 @@ export default function DashboardPage() {
       )}
 
       {/* Active Role Context & Navigation Bar */}
-      <div className="bg-white border-b border-slate-200">
+      <div data-testid="dashboard-context" className="min-w-0 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div data-testid="dashboard-role-context" className="flex min-w-0 flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <div className="flex min-w-0 max-w-full items-center gap-2 flex-wrap">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 {t(locale, "activeRole")}:
               </span>
               <span
                 data-testid="active-role-badge"
-                className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300"
+                className="max-w-full break-words px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200"
               >
                 {user.role.name} ({user.role.slug})
               </span>
               <span className="text-xs text-slate-500">
-                • {user.permissions.length} Assigned Permissions
+                {user.permissions.length} {t(locale, "assignedPermissions")}
               </span>
             </div>
-            <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Phase 1 Active: Portfolio Hierarchy, Multi-Owners, Document Vault & CSV Import
+            <span className="min-w-0 max-w-full inline-flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+              {t(locale, "phase6Status")} <Link className="ms-3 underline" href="/portal">{locale==="ur"?"ذاتی پورٹل / رضامندی":"Personal portal / owner consent"}</Link>
             </span>
           </div>
 
-          <nav className="flex items-center gap-1.5 overflow-x-auto pb-1">
-            {[
-              { id: "overview", label: t(locale, "overview"), icon: Building2 },
-              { id: "owners", label: t(locale, "ownersTab"), icon: Briefcase },
-              { id: "documents", label: t(locale, "documentsTab"), icon: FileText },
-              { id: "csv", label: t(locale, "csvImportTab"), icon: FileSpreadsheet },
-              { id: "rbac", label: t(locale, "rbacMatrix"), icon: ShieldCheck },
-              { id: "users", label: t(locale, "usersBranches"), icon: Users },
-              { id: "security", label: t(locale, "security2fa"), icon: KeyRound },
-              { id: "audit", label: t(locale, "auditLogs"), icon: Activity },
-            ].map((tab) => {
+          <nav aria-label={t(locale, "workspaceNavigation")} className="min-w-0">
+            <label className="flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 xl:hidden">
+              <Layers className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+              <span className="text-xs font-semibold text-slate-500">{t(locale, "workspace")}</span>
+              <select aria-label={t(locale, "workspace")} data-testid="workspace-select" value={activeTab}
+                onChange={e => setActiveTab(e.target.value as typeof activeTab)}
+                className="min-w-0 w-full flex-1 bg-transparent py-3 text-sm font-semibold text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+                {workspaceTabs.map(tab => <option key={tab.id} value={tab.id}>{tab.label}</option>)}
+              </select>
+            </label>
+            <div data-testid="desktop-workspaces" className="hidden xl:flex xl:flex-wrap items-center gap-2">
+            {workspaceTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -1052,6 +1081,7 @@ export default function DashboardPage() {
                   key={tab.id}
                   type="button"
                   data-testid={`tab-${tab.id}`}
+                  aria-current={isActive ? "page" : undefined}
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
                   className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
                     isActive
@@ -1064,12 +1094,13 @@ export default function DashboardPage() {
                 </button>
               );
             })}
+            </div>
           </nav>
         </div>
       </div>
 
       {/* Main Workspace Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main data-testid="dashboard-main" className="min-w-0 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* TAB 1: PORTFOLIO HIERARCHY (PROPERTY -> BUILDING -> UNIT) */}
         {activeTab === "overview" && (
           <div className="space-y-6">
@@ -1086,7 +1117,7 @@ export default function DashboardPage() {
                   {summary.kpis.totalProperties}
                 </div>
                 <div className="text-xs text-slate-600 mt-1">
-                  {summary.kpis.totalOwners} Owners • {branches.length} Branches
+                  {summary.kpis.totalOwners} Owners • {branches.length} Office
                 </div>
               </div>
 
@@ -1137,7 +1168,7 @@ export default function DashboardPage() {
                     <span>Properties, Schemes & Multi-Owner Splits ({properties.length})</span>
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Click any property row to filter the Units/Plots browser below
+                    Sample inventory · Select a project to filter its units
                   </p>
                 </div>
 
@@ -1178,7 +1209,7 @@ export default function DashboardPage() {
                     <tr>
                       <th className="py-3 px-4">Code</th>
                       <th className="py-3 px-4">Project / Property</th>
-                      <th className="py-3 px-4">City & Branch</th>
+                      <th className="py-3 px-4">City & Office</th>
                       <th className="py-3 px-4">Ownership Splits</th>
                       <th className="py-3 px-4">Buildings</th>
                       <th className="py-3 px-4">Units (Avail / Rented / Maint)</th>
@@ -1370,7 +1401,7 @@ export default function DashboardPage() {
                         required
                         value={newPropCity}
                         onChange={(e) => setNewPropCity(e.target.value)}
-                        placeholder="Islamabad"
+                        placeholder="Rahim Yar Khan"
                         className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs"
                       />
                     </div>
@@ -1412,7 +1443,7 @@ export default function DashboardPage() {
                       required
                       value={newPropAddress}
                       onChange={(e) => setNewPropAddress(e.target.value)}
-                      placeholder="Main Expressway, Islamabad"
+                      placeholder="Rahim Yar Khan, Punjab, Pakistan"
                       className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs"
                     />
                   </div>
@@ -1544,6 +1575,35 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* PHASE 2 TAB: LISTINGS & MARKETING */}
+        {activeTab === "listings" && (
+          <ListingsWorkspace
+            properties={properties}
+            units={units}
+            onNotify={showNotification}
+            onRefreshAudit={() => fetchAudit(auditFilter)}
+          />
+        )}
+
+        {/* PHASE 2 TAB: CRM (LEADS, VIEWINGS & DEALS) */}
+        {activeTab === "crm" && (
+          <CrmWorkspace
+            units={units}
+            onNotify={showNotification}
+            onRefreshAudit={() => fetchAudit(auditFilter)}
+            onRefreshPortfolio={() => {
+              fetchMe();
+              fetchPortfolio();
+            }}
+          />
+        )}
+
+        {activeTab === "tenancy" && <TenancyWorkspace permissions={user.permissions} locale={locale} units={units} onRefresh={() => { fetchPortfolio(); fetchAudit(auditFilter); }} />}
+        {activeTab === "billing" && <BillingWorkspace permissions={user.permissions} locale={locale} onRefresh={() => { fetchMe(); fetchAudit(auditFilter); }} />}
+        {activeTab === "orchestration" && <OrchestrationWorkspace key={user.id} userId={user.id} locale={locale} permissions={user.permissions} />}
+        {activeTab === "accounting" && <AccountingWorkspace key={user.id} locale={locale} permissions={user.permissions} />}
+        {activeTab === "maintenance" && <MaintenanceWorkspace key={user.id} permissions={user.permissions} locale={locale} roleSlug={user.role.slug} />}
+        {activeTab === "notifications" && <NotificationsWorkspace key={user.id} permissions={user.permissions} locale={locale} />}
         {/* TAB 2: OWNERS & MULTI-OWNER SPLITS */}
         {activeTab === "owners" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -2247,7 +2307,7 @@ export default function DashboardPage() {
                       <tr>
                         <th className="py-3 px-4">Full Name & Email</th>
                         <th className="py-3 px-4">Role</th>
-                        <th className="py-3 px-4">Branch</th>
+                        <th className="py-3 px-4">Office</th>
                         <th className="py-3 px-4">2FA</th>
                         <th className="py-3 px-4">Status</th>
                       </tr>
@@ -2265,7 +2325,7 @@ export default function DashboardPage() {
                             </span>
                           </td>
                           <td className="py-3 px-4 text-xs text-slate-600">
-                            {u.branchName ? `${u.branchName} (${u.branchCity})` : "All Branches"}
+                            {u.branchName ? `${u.branchName} (${u.branchCity})` : "Rahim Yar Khan Office"}
                           </td>
                           <td className="py-3 px-4 text-xs">
                             {u.twoFactorEnabled ? (
@@ -2289,7 +2349,7 @@ export default function DashboardPage() {
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-200">
                   <h3 className="text-base font-bold text-slate-900">
-                    Organization Branches ({branches.length})
+                    Office ({branches.length})
                   </h3>
                 </div>
                 <div className="divide-y divide-slate-200">
@@ -2306,7 +2366,7 @@ export default function DashboardPage() {
                       </div>
                       {b.isHeadquarters ? (
                         <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-900">
-                          Headquarters
+                          Rahim Yar Khan
                         </span>
                       ) : null}
                     </div>
@@ -2346,9 +2406,13 @@ export default function DashboardPage() {
                     required
                     value={newUserEmail}
                     onChange={(e) => setNewUserEmail(e.target.value)}
-                    placeholder="saad@pakland.pk"
+                    placeholder="User account email"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
                   />
+                </div>
+                <div>
+                  <label htmlFor="new-user-password" className="block text-xs font-semibold text-slate-700 mb-1">Initial password</label>
+                  <input id="new-user-password" type="password" autoComplete="new-password" required={!demoEnabled} minLength={demoEnabled?8:14} maxLength={256} value={newUserPassword} onChange={e=>setNewUserPassword(e.target.value)} placeholder={demoEnabled?"Blank uses demo password":"14+ characters; share securely"} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Role</label>
@@ -2375,69 +2439,7 @@ export default function DashboardPage() {
                 </button>
               </form>
 
-              <form
-                onSubmit={handleCreateBranch}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4"
-              >
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Plus className="w-4 h-4 text-emerald-600" />
-                  <span>Add Regional Branch</span>
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Code</label>
-                    <input
-                      type="text"
-                      required
-                      value={newBranchCode}
-                      onChange={(e) => setNewBranchCode(e.target.value)}
-                      placeholder="MUL-01"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">City</label>
-                    <input
-                      type="text"
-                      required
-                      value={newBranchCity}
-                      onChange={(e) => setNewBranchCity(e.target.value)}
-                      placeholder="Multan"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Branch Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newBranchName}
-                    onChange={(e) => setNewBranchName(e.target.value)}
-                    placeholder="Multan Bosan Road Office"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Address</label>
-                  <input
-                    type="text"
-                    required
-                    value={newBranchAddress}
-                    onChange={(e) => setNewBranchAddress(e.target.value)}
-                    placeholder="Main Bosan Road, Multan"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
-                >
-                  Create Branch
-                </button>
-              </form>
+
             </div>
           </div>
         )}

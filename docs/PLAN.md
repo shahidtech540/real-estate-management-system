@@ -1,5 +1,11 @@
 # Engineering Master Plan (`docs/PLAN.md`)
 
+> Historical Phase 0 design, not a runtime capability claim. Through Phase 8,
+> the implemented runtime is same-host SQLite, local rules/lexical retrieval,
+> mocked notification/payment adapters and metadata-only vault storage. PostgreSQL,
+> Redis, S3, external LLMs and neural embeddings remain designs. See PHASE8.md and
+> DEPLOYMENT.md for the current verified scope.
+
 ## 1. System Architecture Diagram
 
 ```mermaid
@@ -69,7 +75,7 @@ graph TB
 2. **Backend:** Modular TypeScript Server Architecture (`src/server/`) integrated with Next.js Route Handlers (`/api/v1/*`).
    - *Why:* Eliminates cross-container CORS issues in preview environments while maintaining strict layered boundaries (Controllers → Services → Repositories → Adapters), full Zod schema validation, and fast Vitest execution.
 3. **Database:** PostgreSQL 16 + `pgvector` (`prisma/schema.prisma` + Docker Compose) with a zero-config `node:sqlite` repository engine for local sandbox & CI runs.
-   - *Why:* Guarantees production readiness with `pgvector` embeddings and ACID transactions while enabling instant one-command startup (`npm run dev` and `npm test`) even where Docker daemons are unavailable.
+   - *Why:* Describes the proposed PostgreSQL/embedding target while enabling instant one-command startup (`npm run dev` and `npm test`) even where Docker daemons are unavailable.
 4. **Authentication & Security:** Custom HMAC-SHA256 JWT + stateful Refresh Token rotation + RFC 6238 TOTP 2FA + granular RBAC (`36` permissions across `6` roles) + strict row-level `organization_id` isolation.
 5. **AI Layer:** Anthropic Claude Tool-Use Orchestrator with a typed Tool Registry, Human-in-the-Loop `ApprovalRequest` queue, per-agent kill switches, token/cost tracking in PKR/USD minor units, and deterministic policy-aware simulation when `ANTHROPIC_API_KEY` is not set.
 

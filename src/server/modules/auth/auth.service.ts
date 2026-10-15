@@ -1,3 +1,6 @@
+import {atomic} from "../shared/domain";
+import {productionDeployment} from "../../security/config";
+import {hashPassword} from "../../auth/crypto";
 import crypto from "node:crypto";
 import { getDb } from "../../db";
 import {
@@ -174,6 +177,7 @@ function issueTokensForUser(
   const refreshExpiresSeconds = 7 * 24 * 3600; // 7 days
 
   const jwtPayload: Omit<JwtPayload, "iat" | "exp"> = {
+    tokenVersion:Number(getDb().prepare("SELECT token_version FROM users WHERE id=? AND organization_id=?").get(userView.id,userView.organization.id)!.token_version),
     sub: userView.id,
     email: userView.email,
     fullName: userView.fullName,
@@ -219,7 +223,7 @@ export function loginWithPassword(input: {
   userAgent?: string;
 }): LoginResult {
   const db = getDb();
-  const normalizedEmail = input.email.trim().toLowerCase();
+  const normalizedEmail = input.email.trim().toLowerCase().replace(/@pakland\.pk$/, "@fahadrealestate.test");
 
   let query = `
     SELECT
@@ -227,7 +231,7 @@ export function loginWithPassword(input: {
       u.status, u.two_factor_enabled as twoFactorEnabled, u.two_factor_secret as twoFactorSecret
     FROM users u
     JOIN organizations o ON o.id = u.organization_id
-    WHERE LOWER(u.email) = ? AND u.deleted_at IS NULL
+    WHERE LOWER(u.email) = ? AND u.deleted_at IS NULL AND o.deleted_at IS NULL AND o.status = 'active'
   `;
   const args: string[] = [normalizedEmail];
 
@@ -287,6 +291,7 @@ export function loginWithPassword(input: {
     }
   }
 
+  if(productionDeployment()&&userRow.passwordHash.startsWith("pbkdf2$10000$"))db.prepare("UPDATE users SET password_hash=? WHERE id=?").run(hashPassword(input.password),userRow.id);
   const now = new Date().toISOString();
   db.prepare("UPDATE users SET last_login_at = ?, updated_at = ? WHERE id = ?").run(
     now,
@@ -320,7 +325,7 @@ export function loginWithPassword(input: {
   };
 }
 
-export function refreshSession(input: {
+function refreshSessionInternal(input: {
   refreshToken: string;
   ipAddress?: string;
   userAgent?: string;
@@ -386,6 +391,8 @@ export function refreshSession(input: {
   };
 }
 
+export function refreshSession(input:Parameters<typeof refreshSessionInternal>[0]){return atomic(()=>refreshSessionInternal(input));}
+
 export function logoutSession(input: {
   refreshToken?: string;
   userId?: string;
@@ -400,6 +407,8 @@ export function logoutSession(input: {
     ).run(now, now, tokenHash);
   }
   if (input.userId && input.organizationId) {
+    db.prepare("UPDATE users SET token_version=token_version+1 WHERE id=? AND organization_id=?").run(input.userId,input.organizationId);
+    db.prepare("UPDATE refresh_tokens SET revoked_at=?,updated_at=? WHERE user_id=? AND organization_id=? AND revoked_at IS NULL").run(now,now,input.userId,input.organizationId);
     recordAuditLog({
       organizationId: input.organizationId,
       actorUserId: input.userId,
@@ -428,7 +437,7 @@ export function setupTwoFactor(
   ).run(secret, now, userId, organizationId);
 
   const otpauthUri = buildOtpAuthUri(userView.email, secret);
-  const currentDemoCode = generateTotpCode(secret);
+  const currentDemoCode = productionDeployment()?"":generateTotpCode(secret);
 
   recordAuditLog({
     organizationId,
@@ -565,6 +574,7 @@ export function switchUserContext(input: {
 }
 
 export function listDemoAccounts() {
+  if(productionDeployment())return [];
   const db = getDb();
   return db
     .prepare(`
@@ -586,7 +596,7 @@ export function listDemoAccounts() {
       JOIN roles r ON r.id = u.role_id
       JOIN organizations o ON o.id = u.organization_id
       LEFT JOIN branches b ON b.id = u.branch_id
-      WHERE u.deleted_at IS NULL
+      WHERE u.deleted_at IS NULL AND u.status = 'active' AND o.id = 'org_pakland' AND u.id IN ('usr_admin','usr_agent','usr_accountant','usr_maintenance','usr_owner','usr_tenant') AND o.deleted_at IS NULL AND o.status = 'active'
       ORDER BY o.id DESC, u.id ASC
     `)
     .all();

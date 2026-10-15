@@ -114,3 +114,139 @@ erDiagram
     - `agent_runs`: `id`, `organization_id`, `agent_id`, `trigger_type`, `input_text`, `reasoning_summary`, `output_text`, `status` (`running` | `awaiting_approval` | `completed` | `failed` | `killed`), `tokens_used`, `cost_minor`, `currency`, `approved_by`, `created_at`, `updated_at`, `created_by`.
     - `tool_calls`: `id`, `organization_id`, `agent_run_id`, `tool_name`, `input_json`, `output_json`, `requires_approval`, `status`, `duration_ms`, `created_at`, `updated_at`, `created_by`.
     - `approval_requests`: `id`, `organization_id`, `agent_run_id`, `tool_call_id`, `agent_slug`, `action_type`, `summary`, `payload_json`, `status` (`pending` | `approved` | `rejected`), `reviewed_by`, `reviewed_at`, `review_note`, `created_at`, `updated_at`, `created_by`.
+
+
+## Phase 3 additive financial records
+
+The runtime SQLite schema now has **41 tables** (the earlier catalog's 32-table
+label understated the original 34-table DDL). Phase 3 adds seven tables without
+deleting existing rows (tenant profiles also gain an additive `references_json` column):
+
+```mermaid
+erDiagram
+    OWNER ||--o{ OWNER_STATEMENT : receives
+    OWNER_STATEMENT ||--o| STATEMENT_PAYOUT : settles
+    LEASE ||--o{ LEASE_EVENT : records_lifecycle_and_deposits
+    LEASE ||--o{ LEASE_CHECKLIST : inspects
+    INVOICE ||--o{ CREDIT_NOTE : adjusts
+    LEASE ||--o{ RECURRING_CHARGE : configures
+    RECURRING_CHARGE ||--o{ RECURRING_CHARGE_INVOICE : generates
+    INVOICE ||--o| RECURRING_CHARGE_INVOICE : links
+```
+
+- `owner_statements`: unique organization/owner/month snapshot with owner-share
+  line items, gross collections, actual expenses, management fee and net balance.
+- `statement_payouts`: one settlement per statement, amount/reference/date/actor;
+  paid statements cannot regenerate.
+- `lease_events`: immutable lifecycle/escalation and deposit receipt/refund events.
+- `lease_checklists`: one editable move-in and move-out record per lease, with
+  condition notes and photo evidence URLs.
+- `credit_notes`: immutable invoice credit/reason/actor/date records.
+- `recurring_charges`: lease, charge type, integer amount and inclusive month range.
+- `recurring_charge_invoices`: charge/month → invoice mapping preventing duplicate
+  monthly generation; organization is inherited through the parent charge.
+
+Immutable event/credit/payout records use creation timestamps rather than soft
+updates/deletes. All operational amounts are PKR integer paisa. New partial
+unique indexes also enforce rent per lease/month, live tenant CNIC uniqueness
+and payment reference uniqueness per organization in SQLite.
+
+## Phase 4 additive maintenance and communications records
+
+Phase 4 adds five domain tables and an operational `feature_migrations` marker
+(**47 runtime SQLite tables total**). Existing vendor/ticket/work-order/notification
+records gain additive availability, confirmation, completion-note and delivery
+state columns. The marker prevents repeated demo inserts, not business writes.
+
+```mermaid
+erDiagram
+    MAINTENANCE_TICKET ||--o{ MAINTENANCE_EVENT : records_ordered_activity
+    MAINTENANCE_TICKET ||--o{ WORK_ORDER : dispatches
+    VENDOR ||--o{ WORK_ORDER : performs
+    VENDOR ||--o{ VENDOR_REVIEW : receives
+    MAINTENANCE_TICKET ||--o| VENDOR_REVIEW : tenant_confirms
+    UNIT ||--o{ PREVENTIVE_SCHEDULE : maintains
+    PREVENTIVE_SCHEDULE ||--o{ PREVENTIVE_RUN : generates_idempotently
+    MAINTENANCE_TICKET ||--o| PREVENTIVE_RUN : originates_from
+    ORGANIZATION ||--o{ NOTIFICATION_TEMPLATE : configures
+    USER ||--o{ NOTIFICATION : receives
+```
+
+- `maintenance_events`: immutable type/note/actor/time and per-ticket sequence;
+  unique organization/event key deduplicates deadline escalations.
+- `vendor_reviews`: unique ticket confirmation with final vendor, 1–5 rating,
+  note, actor and timestamps. Directory ratings aggregate real reviews.
+- `preventive_schedules`: unit, title, trade, interval days, next due UTC instant,
+  active/paused state, timestamps/actor and soft deletion.
+- `preventive_runs`: immutable organization/schedule/due instant → generated ticket
+  mapping, unique per occurrence.
+- `notification_templates`: organization/event/locale unique override, plain-text
+  subject/body, timestamps/actor. Code supplies bilingual defaults when absent.
+- `notifications`: unique organization/event key, delivery attempts, next retry,
+  processing lease, provider reference, last error and recipient read timestamp.
+  `mock_sent` is distinct from genuine delivery.
+
+Immutable events/reviews/runs are retained rather than soft-deleted. Operational
+choices and lifecycle/RBAC guarantees are detailed in [`PHASE4.md`](PHASE4.md).
+Prisma mirrors the design; SQLite is still the implemented database engine.
+
+## Phase 5/6 additive runtime schema
+
+`src/server/db/phase5.ts` and `phase6.ts` are the authoritative tested SQLite
+migrations; Prisma mirrors the deployment design but is not an active database
+switch. PostgreSQL must explicitly port SQLite CHECKs, partial indexes and triggers.
+
+```mermaid
+erDiagram
+  organizations ||--o{ journal_batches : scopes
+  journal_batches ||--|{ ledger_entries : paired_lines
+  ledger_entries ||--o{ ledger_owner_allocations : snapshots
+  owners ||--o{ ledger_owner_allocations : attributed
+  accounts ||--o{ ledger_entries : posts
+  properties ||--o{ journal_batches : scopes
+  organizations ||--o{ accounting_source_state : idempotency
+  journal_batches ||--o| accounting_expenses : evidence
+  accounts ||--o{ accounting_budgets : plans
+  properties ||--o{ accounting_budgets : plans
+  work_orders ||--o| accounting_vendor_payments : settled
+  users ||--o{ report_schedules : owns
+  report_schedules ||--o{ report_deliveries : snapshots
+  notifications ||--o| report_deliveries : announces
+  organizations ||--|| orchestration_settings : kill_quotas
+  agents ||--o{ agent_runs : plans
+  agent_runs ||--o{ tool_calls : ordered_cursor
+  tool_calls ||--o| approval_requests : bound_intent
+```
+
+Journals/ledger/allocation history is immutable. Source state tracks posting deltas;
+reversals append new balanced journals. Run plan/intent are immutable; mutable run
+cursor and tool status commit **in the same transaction as source effects**. Approval
+SHA-256 binds organization, run, ordinal, tool/version, exact input and source snapshot.
+
+## Phase 7 additive domain-agent storage
+
+- `agents.domain_initialized`: one-time capability extension only for untouched
+  Phase 6 defaults; custom configuration and source history are preserved.
+- `agent_artifacts`: org-scoped immutable private unsigned offer drafts, unique
+  `(organization_id, reference)`, `kind`, `entity_id`, `content_json`, status,
+  `created_at`, `created_by`. They are **not** executed lease amendments or fake PDFs.
+- Assessment findings/citations/proposals remain durable tool output. Optional
+  immutable plan-level `expectedSourceHash` binds proposals before approval staging;
+  existing approved `tool_calls.source_hash` remains an execution check.
+- No new financial source table or synthetic cash/posting is introduced.
+
+
+## Phase 8 additive runtime structures
+
+- `users.token_version` (integer default 0) gates fresh access claims; authenticated
+  logout increments it and revokes this account's refresh tokens.
+- `portal_reviews`: organization, owner, property, lease/ticket source, immutable
+  summary/cost/source hash/requester, final decision/note/reviewer timestamps.
+  Update/delete triggers retain intent and final history. Decisions are nonbinding.
+- `auth_rate_limits`: hashed key, request count, expiry; persistent fixed-window
+  quotas with expired-key cleanup and capacity guard.
+- Partial indexes cover active linked owner/tenant profiles and personal invoice,
+  lease/ticket collections; owner statement/review indexes support bounded pages.
+- Prisma models document these structures; Node SQLite DDL is the active runtime.
+  Administrator account linkage uses existing owner/tenant `user_id` columns and
+  does not replace original domain or immutable financial tables.

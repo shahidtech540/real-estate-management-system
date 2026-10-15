@@ -12,28 +12,53 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "db:seed": "tsx src/server/db/seed-cli.ts"
+    "db:seed": "tsx src/server/db/seed-cli.ts",
+    "billing:cycle": "tsx src/server/modules/billing/cycle-cli.ts",
+    "maintenance:cycle": "tsx src/server/modules/maintenance/cycle-cli.ts",
+    "maintenance:worker": "tsx src/server/modules/maintenance/cycle-cli.ts --watch",
+    "accounting:sync": "tsx src/server/modules/accounting/cycle-cli.ts --sync",
+    "reports:cycle": "tsx src/server/modules/accounting/cycle-cli.ts",
+    "reports:worker": "tsx src/server/modules/accounting/cycle-cli.ts --watch",
+    "agents:cycle": "tsx src/server/modules/orchestration/cycle-cli.ts",
+    "agents:worker": "tsx src/server/modules/orchestration/cycle-cli.ts --watch",
+    "validate:design": "node scripts/validate-design.cjs",
+    "test:agents": "vitest run tests/domain-agents.eval.test.ts tests/phase7.test.ts",
+    "db:provision": "tsx scripts/provision-production.ts",
+    "db:backup": "tsx scripts/db-backup.ts",
+    "test:portals": "vitest run tests/phase8.test.ts",
+    "perf:portals": "NODE_ENV=test tsx scripts/benchmark-portals.ts",
+    "audit:production": "npm audit --omit=dev --audit-level=moderate",
+    "validate:api": "node scripts/validate-openapi.cjs",
+    "test:e2e:production": "playwright test --config=playwright.production.config.ts"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "fflate": "^0.8.3",
     "lucide-react": "^0.468.0",
-    "next": "15.1.6",
+    "next": "15.5.28",
+    "pdf-lib": "^1.17.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.6.0",
     "zod": "^3.24.1",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.6.0"
+    "tsx": "^4.19.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
+    "@prisma/prisma-schema-wasm": "^6.19.0-26.2ba551f319ab1df4bc874a89965d8b3641056773",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "4.1.11",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-    "tsx": "^4.19.2",
+    "postcss": "^8.5.30",
+    "tailwindcss": "3.4.19",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "4.1.11",
+    "yaml": "^2.9.1"
+  },
+  "overrides": {
+    "postcss": "^8.5.30",
+    "postcss-selector-parser": "^7.1.6"
   }
 }

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PakLand Agentic REMS | Real Estate Management System",
+  title: "Fahad Real Estate | Rahim Yar Khan",
   description:
-    "Production-grade Agentic Real Estate Management System for Housing Schemes, Commercial Centers, Landlords & Agencies in Pakistan.",
+    "Fahad Real Estate property management for Fahad Garden Housing Scheme, Abdullah City, Taj Commercial Center, VIP Block and University Commercial Centers in Rahim Yar Khan, Pakistan.",
 };
 
 export default function RootLayout({

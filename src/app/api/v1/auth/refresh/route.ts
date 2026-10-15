@@ -1,24 +1,24 @@
+import {mutationOrigin,readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { refreshSession } from "@/server/modules/auth/auth.service";
 import { attachAuthCookies, handleApiError } from "@/server/auth/http";
 
 export async function POST(req: NextRequest) {
   try {
+    mutationOrigin(req);
     let refreshToken = "";
-    try {
-      const body = await req.json();
+    if (req.body) {
+      const body = await readJson(req);
       if (body && typeof body.refreshToken === "string") {
         refreshToken = body.refreshToken;
       }
-    } catch {
-      // Allow empty body if cookie is present
     }
 
     if (!refreshToken) {
       const cookieHeader = req.headers.get("cookie") || "";
       const match = cookieHeader.match(/(?:^|;\s*)rems_refresh_token=([^;]+)/);
       if (match && match[1]) {
-        refreshToken = decodeURIComponent(match[1]);
+        try { refreshToken = decodeURIComponent(match[1]); } catch { refreshToken = ""; }
       }
     }
 

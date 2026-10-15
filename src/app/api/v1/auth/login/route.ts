@@ -1,3 +1,5 @@
+import {productionDeployment} from "@/server/security/config";
+import {mutationOrigin,rateLimit,readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { listDemoAccounts, loginWithPassword } from "@/server/modules/auth/auth.service";
@@ -5,7 +7,7 @@ import { attachAuthCookies, handleApiError } from "@/server/auth/http";
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1),
+  password: z.string().min(1).max(256),
   organizationSlug: z.string().optional(),
   twoFactorCode: z.string().optional(),
 });
@@ -13,7 +15,7 @@ const loginSchema = z.object({
 export async function GET() {
   try {
     const accounts = listDemoAccounts();
-    return NextResponse.json({ accounts });
+    return NextResponse.json({accounts,demoEnabled:!productionDeployment()});
   } catch (err) {
     return handleApiError(err);
   }
@@ -21,7 +23,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    mutationOrigin(req);
+    rateLimit("login:global",300);
+    const body = await readJson(req);
+    rateLimit("login:"+String(body?.email||"unknown").trim().toLowerCase().replace(/@pakland\.pk$/,"@fahadrealestate.test"));
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

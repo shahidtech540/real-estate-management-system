@@ -1,3 +1,5 @@
+import {canReadDocument} from "@/server/modules/shared/access";
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -36,7 +38,7 @@ export async function GET(req: NextRequest) {
       expiryStatus,
     });
 
-    return NextResponse.json({ documents });
+    return NextResponse.json({documents:documents.filter(d=>canReadDocument(ctx,d.entityType,d.entityId))});
   } catch (err) {
     return handleApiError(err);
   }
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "documents:write");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = uploadDocSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

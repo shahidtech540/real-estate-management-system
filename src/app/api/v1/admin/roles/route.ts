@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, requirePermission } from "@/server/auth/guards";
@@ -25,7 +26,7 @@ export async function PATCH(req: NextRequest) {
     const ctx = requireAuth(req);
     requirePermission(ctx, "admin:manage");
 
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = toggleSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

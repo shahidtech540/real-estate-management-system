@@ -314,12 +314,14 @@ CREATE TABLE IF NOT EXISTS tenants (
   kyc_status TEXT NOT NULL DEFAULT 'verified',
   emergency_contact_name TEXT,
   emergency_contact_phone TEXT,
+  references_json TEXT NOT NULL DEFAULT '[]',
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   created_by TEXT,
   deleted_at TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_tenants_org ON tenants(organization_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tenant_cnic ON tenants(organization_id, cnic) WHERE deleted_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS leases (
   id TEXT PRIMARY KEY,
@@ -440,6 +442,26 @@ CREATE TABLE IF NOT EXISTS ledger_entries (
   deleted_at TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_ledger_org_prop_date ON ledger_entries(organization_id, property_id, entry_date);
+
+CREATE TABLE IF NOT EXISTS owner_statements (
+  id TEXT PRIMARY KEY,
+  organization_id TEXT NOT NULL REFERENCES organizations(id),
+  owner_id TEXT NOT NULL REFERENCES owners(id),
+  property_id TEXT REFERENCES properties(id),
+  period_month TEXT NOT NULL,
+  gross_rent_minor INTEGER NOT NULL DEFAULT 0,
+  expenses_minor INTEGER NOT NULL DEFAULT 0,
+  management_fee_pct REAL NOT NULL DEFAULT 5.0,
+  management_fee_minor INTEGER NOT NULL DEFAULT 0,
+  net_payout_minor INTEGER NOT NULL DEFAULT 0,
+  currency TEXT NOT NULL DEFAULT 'PKR',
+  status TEXT NOT NULL DEFAULT 'issued',
+  line_items_json TEXT NOT NULL DEFAULT '[]',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  created_by TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_owner_statements_org_owner ON owner_statements(organization_id, owner_id, period_month);
 
 CREATE TABLE IF NOT EXISTS vendors (
   id TEXT PRIMARY KEY,
@@ -627,4 +649,41 @@ CREATE TABLE IF NOT EXISTS approval_requests (
   created_by TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_approval_requests_org_status ON approval_requests(organization_id, status);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_owner_statement_period ON owner_statements(organization_id, owner_id, period_month);
+CREATE TABLE IF NOT EXISTS lease_events (
+ id TEXT PRIMARY KEY, organization_id TEXT NOT NULL REFERENCES organizations(id),
+ lease_id TEXT NOT NULL REFERENCES leases(id), type TEXT NOT NULL, payload_json TEXT NOT NULL,
+ created_at TEXT NOT NULL, created_by TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS credit_notes (
+ id TEXT PRIMARY KEY, organization_id TEXT NOT NULL REFERENCES organizations(id),
+ invoice_id TEXT NOT NULL REFERENCES invoices(id), amount_minor INTEGER NOT NULL,
+ reason TEXT NOT NULL, created_at TEXT NOT NULL, created_by TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS lease_checklists (
+ id TEXT PRIMARY KEY, organization_id TEXT NOT NULL REFERENCES organizations(id),
+ lease_id TEXT NOT NULL REFERENCES leases(id), kind TEXT NOT NULL,
+ items_json TEXT NOT NULL, photos_json TEXT NOT NULL DEFAULT '[]',
+ created_at TEXT NOT NULL, updated_at TEXT NOT NULL, created_by TEXT NOT NULL,
+ UNIQUE(organization_id, lease_id, kind)
+);
+CREATE TABLE IF NOT EXISTS statement_payouts (
+ id TEXT PRIMARY KEY, organization_id TEXT NOT NULL REFERENCES organizations(id),
+ statement_id TEXT NOT NULL UNIQUE REFERENCES owner_statements(id),
+ amount_minor INTEGER NOT NULL, reference_number TEXT NOT NULL,
+ paid_at TEXT NOT NULL, created_by TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_payment_reference ON payments(organization_id, reference_number) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_rent_period ON invoices(organization_id, lease_id, period_month) WHERE type = 'rent' AND deleted_at IS NULL;
+CREATE TABLE IF NOT EXISTS recurring_charges (
+ id TEXT PRIMARY KEY, organization_id TEXT NOT NULL REFERENCES organizations(id),
+ lease_id TEXT NOT NULL REFERENCES leases(id), type TEXT NOT NULL, amount_minor INTEGER NOT NULL,
+ start_month TEXT NOT NULL, end_month TEXT NOT NULL, created_at TEXT NOT NULL, created_by TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS recurring_charge_invoices (
+ charge_id TEXT NOT NULL REFERENCES recurring_charges(id), period_month TEXT NOT NULL,
+ invoice_id TEXT NOT NULL REFERENCES invoices(id), PRIMARY KEY(charge_id, period_month)
+);
 `;

@@ -1,5 +1,6 @@
 services:
   postgres:
+    profiles: [design]
     image: pgvector/pgvector:pg16
     container_name: rems-postgres
     restart: unless-stopped
@@ -18,6 +19,7 @@ services:
       retries: 10
 
   redis:
+    profiles: [design]
     image: redis:7-alpine
     container_name: rems-redis
     restart: unless-stopped
@@ -32,6 +34,7 @@ services:
       retries: 10
 
   minio:
+    profiles: [design]
     image: minio/minio:latest
     container_name: rems-minio
     restart: unless-stopped
@@ -46,6 +49,7 @@ services:
       - minio_data:/data
 
   app:
+    image: rems-app:local
     build:
       context: .
       dockerfile: Dockerfile
@@ -55,21 +59,100 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: production
+      REMS_DEPLOYMENT: ${REMS_DEPLOYMENT:-demo}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-rems-dev-jwt-access-secret-change-in-production-2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-rems-dev-jwt-refresh-secret-change-in-production-2026}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-}
+      FRAME_ANCESTORS: ${FRAME_ANCESTORS:-}
+      PUBLIC_ORGANIZATION_ID: ${PUBLIC_ORGANIZATION_ID:-}
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+      NOTIFICATION_PROVIDER_MODE: ${NOTIFICATION_PROVIDER_MODE:-mock}
       PORT: 3000
       DATABASE_URL: postgresql://rems_user:rems_password@postgres:5432/rems_db?schema=public
       REDIS_URL: redis://redis:6379
       S3_ENDPOINT: http://minio:9000
       S3_ACCESS_KEY: minioadmin
       S3_SECRET_KEY: minioadminpassword
-      JWT_ACCESS_SECRET: rems-prod-jwt-access-secret-2026
-      JWT_REFRESH_SECRET: rems-prod-jwt-refresh-secret-2026
+    volumes:
+      - sqlite_data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/v1/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+
+  maintenance-worker:
+    image: rems-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["npm", "run", "maintenance:worker"]
+    environment:
+      NODE_ENV: production
+      REMS_DEPLOYMENT: ${REMS_DEPLOYMENT:-demo}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-rems-dev-jwt-access-secret-change-in-production-2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-rems-dev-jwt-refresh-secret-change-in-production-2026}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-}
+      FRAME_ANCESTORS: ${FRAME_ANCESTORS:-}
+      PUBLIC_ORGANIZATION_ID: ${PUBLIC_ORGANIZATION_ID:-}
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+      NOTIFICATION_PROVIDER_MODE: ${NOTIFICATION_PROVIDER_MODE:-mock}
+    volumes:
+      - sqlite_data:/app/data
     depends_on:
-      postgres:
+      app:
         condition: service_healthy
-      redis:
+
+  reports-worker:
+    image: rems-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["npm", "run", "reports:worker"]
+    environment:
+      NODE_ENV: production
+      REMS_DEPLOYMENT: ${REMS_DEPLOYMENT:-demo}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-rems-dev-jwt-access-secret-change-in-production-2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-rems-dev-jwt-refresh-secret-change-in-production-2026}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-}
+      FRAME_ANCESTORS: ${FRAME_ANCESTORS:-}
+      PUBLIC_ORGANIZATION_ID: ${PUBLIC_ORGANIZATION_ID:-}
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+    volumes:
+      - sqlite_data:/app/data
+    depends_on:
+      app:
+        condition: service_healthy
+
+  agents-worker:
+    image: rems-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["npm", "run", "agents:worker"]
+    environment:
+      NODE_ENV: production
+      REMS_DEPLOYMENT: ${REMS_DEPLOYMENT:-demo}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-rems-dev-jwt-access-secret-change-in-production-2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-rems-dev-jwt-refresh-secret-change-in-production-2026}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-}
+      FRAME_ANCESTORS: ${FRAME_ANCESTORS:-}
+      PUBLIC_ORGANIZATION_ID: ${PUBLIC_ORGANIZATION_ID:-}
+      SQLITE_DB_PATH: /app/data/rems.sqlite
+      AGENT_PROVIDER_MODE: local
+    volumes:
+      - sqlite_data:/app/data
+    depends_on:
+      app:
         condition: service_healthy
 
 volumes:
+  sqlite_data:
   postgres_data:
   redis_data:
   minio_data:

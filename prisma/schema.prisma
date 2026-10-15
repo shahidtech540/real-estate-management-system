@@ -1,5 +1,5 @@
-// Prisma Schema for Production PostgreSQL + pgvector deployment
-// Covers all 32 entities in docs/ERD.md with multi-tenancy (organizationId),
+// PostgreSQL + pgvector deployment design (active runtime is SQLite).
+// Phased entities from docs/ERD.md with multi-tenancy (organizationId),
 // audit fields (createdAt, updatedAt, createdBy, deletedAt), and integer minor units.
 
 generator client {
@@ -46,6 +46,7 @@ model Organization {
   notifications   Notification[]
   auditLogs       AuditLog[]
   agents          Agent[]
+  agentArtifacts  AgentArtifact[]
 
   @@map("organizations")
 }
@@ -138,6 +139,7 @@ model User {
   fullName         String         @map("full_name")
   phone            String?
   locale           String         @default("en")
+  tokenVersion Int @default(0) @map("token_version")
   twoFactorEnabled Boolean        @default(false) @map("two_factor_enabled")
   twoFactorSecret  String?        @map("two_factor_secret")
   status           String         @default("active")
@@ -292,6 +294,8 @@ model Unit {
   property         Property  @relation(fields: [propertyId], references: [id])
   building         Building? @relation(fields: [buildingId], references: [id])
 
+  vacantSince DateTime? @map("vacant_since")
+
   @@index([organizationId, propertyId, status])
   @@map("units")
 }
@@ -415,9 +419,10 @@ model Tenant {
   cnic                  String
   phone                 String
   email                 String
-  kycStatus             String       @default("verified") @map("kyc_status")
+  kycStatus             String       @default("pending") @map("kyc_status")
   emergencyContactName  String?      @map("emergency_contact_name")
   emergencyContactPhone String?      @map("emergency_contact_phone")
+  referencesJson        String       @default("[]") @map("references_json")
   createdAt             DateTime     @default(now()) @map("created_at")
   updatedAt             DateTime     @updatedAt @map("updated_at")
   createdBy             String?      @map("created_by")
@@ -567,6 +572,10 @@ model LedgerEntry {
 
   organization   Organization @relation(fields: [organizationId], references: [id])
 
+  journalId String? @map("journal_id")
+  lineNumber Int? @map("line_number")
+  @@unique([organizationId, journalId, lineNumber])
+
   @@index([organizationId, propertyId, entryDate])
   @@map("ledger_entries")
 }
@@ -582,6 +591,7 @@ model Vendor {
   baseRateMinor  BigInt       @map("base_rate_minor")
   currency       String       @default("PKR")
   slaHours       Int          @default(24) @map("sla_hours")
+  available      Boolean      @default(true)
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
   createdBy      String?      @map("created_by")
@@ -607,6 +617,9 @@ model MaintenanceTicket {
   status         String       @default("open")
   slaDueAt       DateTime     @map("sla_due_at")
   photosJson     String       @default("[]") @map("photos_json")
+  confirmedAt    DateTime?    @map("confirmed_at")
+  resolutionNotes String?     @map("resolution_notes")
+  rating         Int?
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
   createdBy      String?      @map("created_by")
@@ -630,6 +643,7 @@ model WorkOrder {
   currency           String    @default("PKR")
   scheduledAt        DateTime  @map("scheduled_at")
   completedAt        DateTime? @map("completed_at")
+  completionNotes String?   @map("completion_notes")
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
   createdBy          String?   @map("created_by")
@@ -676,6 +690,13 @@ model Notification {
   status         String       @default("sent")
   isAiDrafted    Boolean      @default(false) @map("is_ai_drafted")
   sentAt         DateTime?    @map("sent_at")
+  eventKey       String?      @map("event_key")
+  attemptCount   Int          @default(0) @map("attempt_count")
+  nextAttemptAt  DateTime?    @map("next_attempt_at")
+  lastError      String?      @map("last_error")
+  readAt         DateTime?    @map("read_at")
+  providerId     String?      @map("provider_id")
+  lockedAt       DateTime?    @map("locked_at")
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
   createdBy      String?      @map("created_by")
@@ -683,6 +704,8 @@ model Notification {
 
   organization   Organization @relation(fields: [organizationId], references: [id])
 
+  @@unique([organizationId, eventKey])
+  @@index([organizationId, status, nextAttemptAt])
   @@index([organizationId, userId])
   @@map("notifications")
 }
@@ -726,6 +749,9 @@ model Agent {
 
   organization    Organization @relation(fields: [organizationId], references: [id])
 
+  runtimeInitialized Boolean @default(false) @map("runtime_initialized")
+  domainInitialized Boolean @default(false) @map("domain_initialized")
+
   @@unique([organizationId, slug])
   @@map("agents")
 }
@@ -747,6 +773,15 @@ model AgentRun {
   updatedAt        DateTime @updatedAt @map("updated_at")
   createdBy        String?  @map("created_by")
 
+  planJson String @default("[]") @map("plan_json")
+  nextStep Int @default(0) @map("next_step")
+  requestKey String? @map("request_key")
+  provider String @default("local-scripted")
+  maxCostMinor BigInt @default(0) @map("max_cost_minor")
+  errorCode String? @map("error_code")
+  errorMessage String? @map("error_message")
+  @@unique([organizationId, createdBy, requestKey])
+
   @@index([organizationId, agentId])
   @@map("agent_runs")
 }
@@ -764,6 +799,13 @@ model ToolCall {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
   createdBy        String?  @map("created_by")
+
+  stepIndex Int? @map("step_index")
+  inputHash String? @map("input_hash")
+  toolVersion String? @map("tool_version")
+  sourceHash String? @map("source_hash")
+  executedAt DateTime? @map("executed_at")
+  @@unique([organizationId, agentRunId, stepIndex])
 
   @@index([organizationId, agentRunId])
   @@map("tool_calls")
@@ -786,6 +828,339 @@ model ApprovalRequest {
   updatedAt      DateTime  @updatedAt @map("updated_at")
   createdBy      String?   @map("created_by")
 
+
+  @@unique([organizationId, toolCallId])
+
   @@index([organizationId, status])
   @@map("approval_requests")
+}
+
+// Phase 3 additive records. Runtime services currently use SQLite; this is the
+// equivalent PostgreSQL deployment design, not an active Prisma repository.
+model OwnerStatement {
+  id                 String   @id @default(cuid())
+  organizationId     String   @map("organization_id")
+  ownerId            String   @map("owner_id")
+  propertyId         String?  @map("property_id")
+  periodMonth        String   @map("period_month")
+  grossRentMinor     BigInt   @default(0) @map("gross_rent_minor")
+  expensesMinor      BigInt   @default(0) @map("expenses_minor")
+  managementFeePct   Float    @default(5) @map("management_fee_pct")
+  managementFeeMinor BigInt   @default(0) @map("management_fee_minor")
+  netPayoutMinor     BigInt   @default(0) @map("net_payout_minor")
+  currency           String   @default("PKR")
+  status             String   @default("issued")
+  lineItemsJson      String   @default("[]") @map("line_items_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  createdBy          String?  @map("created_by")
+  @@unique([organizationId, ownerId, periodMonth])
+  @@map("owner_statements")
+}
+model LeaseEvent {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  leaseId        String   @map("lease_id")
+  type           String
+  payloadJson    String   @map("payload_json")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@index([organizationId, leaseId])
+  @@map("lease_events")
+}
+model CreditNote {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  invoiceId      String   @map("invoice_id")
+  amountMinor    BigInt   @map("amount_minor")
+  reason         String
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@index([organizationId, invoiceId])
+  @@map("credit_notes")
+}
+model LeaseChecklist {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  leaseId        String   @map("lease_id")
+  kind           String
+  itemsJson      String   @map("items_json")
+  photosJson     String   @default("[]") @map("photos_json")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, leaseId, kind])
+  @@map("lease_checklists")
+}
+model StatementPayout {
+  id              String   @id @default(cuid())
+  organizationId  String   @map("organization_id")
+  statementId     String   @unique @map("statement_id")
+  amountMinor     BigInt   @map("amount_minor")
+  referenceNumber String   @map("reference_number")
+  paidAt          DateTime @default(now()) @map("paid_at")
+  createdBy       String   @map("created_by")
+  @@map("statement_payouts")
+}
+model RecurringCharge {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  leaseId        String   @map("lease_id")
+  type           String
+  amountMinor    BigInt   @map("amount_minor")
+  startMonth     String   @map("start_month")
+  endMonth       String   @map("end_month")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@index([organizationId, leaseId])
+  @@map("recurring_charges")
+}
+model RecurringChargeInvoice {
+  chargeId    String @map("charge_id")
+  periodMonth String @map("period_month")
+  invoiceId   String @map("invoice_id")
+  @@id([chargeId, periodMonth])
+  @@map("recurring_charge_invoices")
+}
+
+// Phase 4 domain additions. Runtime uses the additive SQLite migration in db/phase4.ts.
+model MaintenanceEvent {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  ticketId       String   @map("ticket_id")
+  type           String
+  note           String
+  sequence       Int
+  eventKey       String?  @map("event_key")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, ticketId, sequence])
+  @@unique([organizationId, eventKey])
+  @@map("maintenance_events")
+}
+model VendorReview {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  vendorId       String   @map("vendor_id")
+  ticketId       String   @unique @map("ticket_id")
+  rating         Int
+  note           String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  @@map("vendor_reviews")
+}
+model PreventiveSchedule {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  unitId         String   @map("unit_id")
+  title          String
+  category       String
+  intervalDays   Int      @map("interval_days")
+  nextDueAt      DateTime @map("next_due_at")
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  deletedAt      DateTime? @map("deleted_at")
+  @@index([organizationId, active, nextDueAt])
+  @@map("preventive_schedules")
+}
+model PreventiveRun {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  scheduleId     String   @map("schedule_id")
+  dueAt          DateTime @map("due_at")
+  ticketId       String   @map("ticket_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, scheduleId, dueAt])
+  @@map("preventive_runs")
+}
+model NotificationTemplate {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  event          String
+  locale         String
+  subject        String
+  body           String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdBy      String   @map("created_by")
+  @@unique([organizationId, event, locale])
+  @@map("notification_templates")
+}
+
+// Phase 5/6 PostgreSQL design. SQLite migrations are authoritative for runtime
+// foreign keys, partial indexes, CHECKs and immutability triggers; port those explicitly.
+model JournalBatch {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  propertyId String? @map("property_id")
+  entryDate DateTime @map("entry_date")
+  description String
+  sourceType String @map("source_type")
+  sourceId String @map("source_id")
+  reference String
+  reversedBatchId String? @map("reversed_batch_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, reference])
+  @@unique([reversedBatchId])
+  @@index([organizationId, entryDate, propertyId])
+  @@map("journal_batches")
+}
+model AccountingSourceState {
+  organizationId String @map("organization_id")
+  sourceType String @map("source_type")
+  sourceId String @map("source_id")
+  postedMinor BigInt @map("posted_minor")
+  propertyId String? @map("property_id")
+  revision Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@id([organizationId, sourceType, sourceId])
+  @@map("accounting_source_state")
+}
+model LedgerOwnerAllocation {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  ledgerEntryId String @map("ledger_entry_id")
+  ownerId String? @map("owner_id")
+  amountMinor BigInt @map("amount_minor")
+  ownershipBasisPoints Int @map("ownership_basis_points")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  @@index([organizationId, ownerId, ledgerEntryId])
+  @@map("ledger_owner_allocations")
+}
+model AccountingExpense {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  propertyId String @map("property_id")
+  accountId String @map("account_id")
+  amountMinor BigInt @map("amount_minor")
+  expenseDate DateTime @map("expense_date")
+  description String
+  reference String
+  status String
+  journalId String @map("journal_id")
+  receiptName String? @map("receipt_name")
+  receiptMime String? @map("receipt_mime")
+  receiptData String? @map("receipt_data")
+  voidReason String? @map("void_reason")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, reference])
+  @@map("accounting_expenses")
+}
+model AccountingBudget {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  propertyId String @map("property_id")
+  accountId String @map("account_id")
+  periodMonth String @map("period_month")
+  amountMinor BigInt @map("amount_minor")
+  ownerSharesJson String @map("owner_shares_json")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, propertyId, accountId, periodMonth])
+  @@map("accounting_budgets")
+}
+model AccountingVendorPayment {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  workOrderId String @map("work_order_id")
+  reference String
+  paidDate DateTime @map("paid_date")
+  amountMinor BigInt @map("amount_minor")
+  journalId String @map("journal_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([workOrderId])
+  @@unique([organizationId, reference])
+  @@map("accounting_vendor_payments")
+}
+model ReportSchedule {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  userId String @map("user_id")
+  frequency String
+  nextDueAt DateTime @map("next_due_at")
+  active Boolean
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@map("report_schedules")
+}
+model ReportDelivery {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  scheduleId String @map("schedule_id")
+  dueAt DateTime @map("due_at")
+  reportJson String @map("report_json")
+  notificationId String @map("notification_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@unique([organizationId, scheduleId, dueAt])
+  @@map("report_deliveries")
+}
+model OrchestrationSettings {
+  organizationId String @id @map("organization_id")
+  enabled Boolean
+  dailyCostBudgetMinor BigInt @map("daily_cost_budget_minor")
+  dailyToolLimit Int @map("daily_tool_limit")
+  maxSteps Int @map("max_steps")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@map("orchestration_settings")
+}
+
+// Private immutable unsigned offers; never amendments to an executed lease.
+model AgentArtifact {
+  id String @id @default(cuid())
+  organizationId String @map("organization_id")
+  kind String
+  entityId String @map("entity_id")
+  reference String
+  contentJson String @map("content_json")
+  status String @default("draft")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  organization Organization @relation(fields: [organizationId], references: [id])
+  @@unique([organizationId, reference])
+  @@map("agent_artifacts")
+}
+
+model PortalReview {
+ id String @id @default(cuid())
+ organizationId String @map("organization_id")
+ ownerId String @map("owner_id")
+ propertyId String @map("property_id")
+ entityType String @map("entity_type")
+ entityId String @map("entity_id")
+ summary String
+ proposedCostMinor BigInt @map("proposed_cost_minor")
+ sourceHash String @map("source_hash")
+ status String @default("pending")
+ decisionNote String? @map("decision_note")
+ createdAt DateTime @default(now()) @map("created_at")
+ createdBy String @map("created_by")
+ reviewedAt DateTime? @map("reviewed_at")
+ reviewedBy String? @map("reviewed_by")
+ @@index([organizationId,ownerId,status,createdAt])
+ @@map("portal_reviews")
+}
+model AuthRateLimit {
+ key String @id
+ count Int
+ resetAt Int @map("reset_at")
+ @@map("auth_rate_limits")
 }

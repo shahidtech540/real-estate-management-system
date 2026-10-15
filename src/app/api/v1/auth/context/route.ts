@@ -1,3 +1,4 @@
+import {readJson} from "@/server/security/request";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth } from "@/server/auth/guards";
@@ -12,7 +13,7 @@ const contextSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const ctx = requireAuth(req);
-    const body = await req.json();
+    const body = await readJson(req);
     const parsed = contextSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

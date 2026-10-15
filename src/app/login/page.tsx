@@ -1,5 +1,7 @@
 "use client";
 
+import { authFetch, getAccessToken } from "@/lib/auth-client";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -64,26 +66,39 @@ const ROLE_BADGE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> =
 export default function LoginPage() {
   const router = useRouter();
   const [locale, setLocale] = useState<Locale>("en");
+  const [demoEnabled,setDemoEnabled]=useState(false);
+  const [demoReady,setDemoReady]=useState(false);
   const [accounts, setAccounts] = useState<DemoAccount[]>([]);
-  const [email, setEmail] = useState("admin@pakland.pk");
-  const [password, setPassword] = useState("Password123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/v1/auth/login")
+    authFetch("/api/v1/auth/login")
       .then((res) => res.json())
       .then((data) => {
+        setDemoEnabled(data.demoEnabled===true);setDemoReady(true);if(data.demoEnabled===true){setEmail(v=>v||"admin@fahadrealestate.test");setPassword(v=>v||"Password123!");}
         if (data.accounts) {
           setAccounts(data.accounts);
         }
       })
       .catch(() => {
-        // ignore
+        setError("Unable to load sign-in configuration. Reload to retry.");
       });
   }, []);
+
+  useEffect(() => {
+    // Reloading an embedded preview can reopen its original /login URL. Resume
+    // an existing tab session instead of asking an authenticated user to sign in.
+    if (getAccessToken()) {
+      authFetch("/api/v1/auth/me")
+        .then(res => { if (res.ok) router.replace("/dashboard"); })
+        .catch(() => { /* Keep the sign-in form available on network failure. */ });
+    }
+  }, [router]);
 
   async function handleLogin(
     e?: React.FormEvent,
@@ -95,7 +110,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const res = await fetch("/api/v1/auth/login", {
+      const res = await authFetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -118,12 +133,14 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.accessToken) {
-        localStorage.setItem("rems_access_token", data.accessToken);
-      }
-      router.push("/dashboard");
-    } catch {
-      setError("Network error while signing in.");
+      if (!data.accessToken) throw new Error("Sign-in did not create a session. Please try again.");
+      // Confirm authentication before leaving the form, rather than silently
+      // bouncing back here when an embedded browser rejects cookies.
+      const session = await authFetch("/api/v1/auth/me");
+      if (!session.ok) throw new Error("Unable to establish your session. Please try opening the preview in a new tab.");
+      router.replace("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error while signing in.");
       setLoading(false);
     }
   }
@@ -159,9 +176,16 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <a
+              href="/listings"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition"
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Public Listings Site (/listings)</span>
+            </a>
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Phase 0: Auth + RBAC + Multi-Tenancy
+              Rahim Yar Khan · One Office
             </span>
             <button
               type="button"
@@ -185,8 +209,7 @@ export default function LoginPage() {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-1">{t(locale, "signIn")}</h2>
           <p className="text-sm text-slate-600 mb-6">
-            Sign in with credentials or click any role card to test role-based access control and
-            multi-tenancy isolation.
+            {demoEnabled?"Sign in with credentials or a demo role card to test role-based access.":"Sign in with your own account credentials."}
           </p>
 
           {error && (
@@ -209,8 +232,9 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 data-testid="email-input"
+                disabled={!demoReady}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm"
-                placeholder="admin@pakland.pk"
+                placeholder="Your account email"
               />
             </div>
 
@@ -224,12 +248,13 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 data-testid="password-input"
+                disabled={!demoReady}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm"
               />
-              <p className="mt-1 text-xs text-slate-500">
+              {demoEnabled&&<p className="mt-1 text-xs text-slate-500">
                 Default demo password for all seeded accounts:{" "}
                 <code className="font-mono font-semibold text-slate-700">Password123!</code>
-              </p>
+              </p>}
             </div>
 
             {requiresTwoFactor && (
@@ -253,7 +278,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !demoReady}
               data-testid="login-submit"
               className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold text-sm shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition"
             >
@@ -266,7 +291,7 @@ export default function LoginPage() {
           {/* Portfolio Context Summary */}
           <div className="mt-6 pt-6 border-t border-slate-200">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-              Seeded Flagship Projects (PakLand Developers)
+              Our Projects · Rahim Yar Khan
             </h3>
             <div className="flex flex-wrap gap-1.5">
               {[
@@ -288,7 +313,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right Column: One-Click Role Switcher Cards */}
-        <div className="lg:col-span-7 space-y-4">
+        {demoEnabled&&<div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -297,7 +322,7 @@ export default function LoginPage() {
               </h2>
               <p className="text-sm text-slate-300">
                 Click any role below to immediately log in and inspect its RBAC permissions, branch
-                scope, and tenant isolation.
+                scope, and permissions.
               </p>
             </div>
           </div>
@@ -305,17 +330,15 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {accounts.map((acc) => {
               const badge = ROLE_BADGE_STYLES[acc.roleSlug] || ROLE_BADGE_STYLES.admin;
-              const isSecondaryOrg = acc.organizationId === "org_indus";
               return (
                 <button
                   key={acc.id}
                   type="button"
+                  disabled={loading || !demoReady}
                   onClick={() => handleQuickSelect(acc)}
                   data-testid={`quick-login-${acc.roleSlug}-${acc.organizationId}`}
                   className={`text-left p-4 rounded-xl border transition group ${
-                    isSecondaryOrg
-                      ? "bg-slate-900/90 border-amber-500/40 hover:border-amber-400"
-                      : "bg-slate-900/75 border-white/15 hover:border-emerald-400 hover:bg-slate-900"
+                    "bg-slate-900/75 border-white/15 hover:border-emerald-400 hover:bg-slate-900"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
@@ -337,7 +360,7 @@ export default function LoginPage() {
                   <p className="text-xs text-slate-300 line-clamp-2 mb-2">{acc.roleDescription}</p>
                   <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-white/10">
                     <span>
-                      Branch: <strong className="text-slate-200">{acc.branchName || "All"}</strong>
+                      Office: <strong className="text-slate-200">{acc.branchName || "All"}</strong>
                     </span>
                     <span className="text-emerald-400 font-semibold group-hover:translate-x-0.5 transition">
                       Click to Sign In →
@@ -347,7 +370,7 @@ export default function LoginPage() {
               );
             })}
           </div>
-        </div>
+        </div>}
       </main>
     </div>
   );

@@ -1,60 +1,166 @@
-# PakLand Agentic Real Estate Management System (REMS)
+# Fahad Real Estate — Rahim Yar Khan
 
-A production-grade, multi-tenant **Real Estate Management System (REMS)** with **Agentic AI** capabilities built for housing scheme developers, commercial centers, property managers, and real estate agencies.
+Property management for **Fahad Real Estate**, with a single office in
+**Rahim Yar Khan, Punjab, Pakistan**.
 
----
+## Projects
 
-## Quick Start
+All five projects are in Rahim Yar Khan:
 
-### Option A: Zero-Daemon Local Run (Node.js 22+)
+1. Fahad Garden Housing Scheme
+2. Abdullah City
+3. Taj Commercial Center
+4. VIP Block
+5. University Commercial Centers
+
+Exact street addresses, map coordinates, legal approvals and the company's real
+email/domain/phone have **not** been supplied. None are asserted by this setup.
+The units, owners, customers, prices and financial transactions remain **demo
+records**, not a verified inventory or legal/financial representation of the business.
+
+## Run locally (Node.js 22+)
+
 ```bash
-npm install
+npm ci
 npm run db:seed
 npm run dev
+# Second terminal, using the SAME database path/environment as the app:
+npm run maintenance:worker
+# Optional separate terminals, using the SAME database:
+npm run accounting:sync  # one-time existing-source import (safe to repeat)
+npm run reports:worker
+npm run agents:worker
 ```
-Open `http://localhost:3000`. The embedded SQLite database (`./data/rems.sqlite`) initializes all 32 tables and seeds the full demo dataset automatically.
 
-### Option B: Docker Compose (PostgreSQL + pgvector, Redis, MinIO, App)
+Open `http://localhost:3000`. SQLite at `./data/rems.sqlite` initializes and migrates
+automatically. To use a different file, export `SQLITE_DB_PATH` in both terminals.
+Production build: `npm run build`, then `npm start`.
+
+### Demo sign-in
+
+Password for all six demo roles: **`Password123!`**.
+
+| Role | Demo email |
+|---|---|
+| Administrator | `admin@fahadrealestate.test` |
+| Sales agent | `agent@fahadrealestate.test` |
+| Accountant | `accountant@fahadrealestate.test` |
+| Maintenance coordinator | `maintenance@fahadrealestate.test` |
+| Owner | `owner@fahadrealestate.test` |
+| Tenant | `tenant@fahadrealestate.test` |
+
+`.test` is a reserved demo domain, not an operational company email address.
+Original `@pakland.pk` sign-ins remain aliases for the six existing demo users.
+The unrelated secondary demo company is retired and no longer available to sign in.
+
+## Current capabilities
+
+Phases 0–6 are complete for local/mock-provider use:
+- Role-based access, organization isolation, optional TOTP and English/Urdu RTL.
+- Properties/units, ownership splits, document vault and CSV import.
+- Listings/public enquiries, CRM pipeline, viewings and commission tracking.
+- Tenants/leases, rent invoices, payment records, PDF receipts and owner statements.
+- Photo maintenance tickets, vendor work orders, costs, tenant confirmations,
+  SLA alerts, preventive schedules and a notification inbox/outbox.
+- Accrual accounting, immutable double-entry journals, expenses/receipts, budgets,
+  financial/operational reports, CSV/XLSX/PDF exports and private scheduled digests.
+  See [`docs/PHASE5.md`](docs/PHASE5.md).
+- Durable local structured-plan orchestration, independent approval queues, fresh
+  permission checks, immutable intent/source hashes, budgets and kill switches.
+  See [`docs/PHASE6.md`](docs/PHASE6.md). The six source-backed local assessments are now available in [Phase 7](docs/PHASE7.md).
+
+At narrow widths use the **Workspace** dropdown. Existing rent records and unit
+identities survive the business correction. The five invented sub-projects are
+archived and their operational inventory consolidated under the five named projects.
+Paid statements, ledger records and audit history are not rewritten. See
+[`docs/BUSINESS_PROFILE.md`](docs/BUSINESS_PROFILE.md) for migration details.
+
+**External payment and email/SMS/WhatsApp adapters are mock implementations.**
+`mock_sent` is simulated delivery. Live delivery fails closed until a validated
+provider adapter is implemented. No real charges, bank payouts or messages are
+performed by the mocks. Local accounting, bounded agent orchestration and personal portals are implemented.
+Live providers and production security certification are not implied.
+
+## Tests
+
 ```bash
-cp .env.example .env
-docker compose up --build
-```
-
----
-
-## Seeded Demo Accounts (All 6 Roles + Secondary Organization)
-
-Default Password for all accounts: **`Password123!`**
-
-| Role | Email | Organization | Branch | Key Capabilities |
-|---|---|---|---|---|
-| **Admin** | `admin@pakland.pk` | PakLand Developers | Islamabad HQ | Full access (all 36 permissions), RBAC matrix editor, user/branch admin, audit trail |
-| **Sales Agent** | `agent@pakland.pk` | PakLand Developers | Islamabad HQ | Listings, CRM leads, viewings, deals, Lead & Listing AI agents |
-| **Accountant** | `accountant@pakland.pk` | PakLand Developers | Islamabad HQ | Rent invoicing, payments, receipts, owner statements, chart of accounts |
-| **Maintenance** | `maintenance@pakland.pk` | PakLand Developers | Rawalpindi | Maintenance ticket triage, SLA tracking, vendor & work order dispatch |
-| **Owner** | `owner@pakland.pk` | PakLand Developers | Islamabad HQ | Owner portal, property performance, payout statements, approvals |
-| **Tenant** | `tenant@pakland.pk` | PakLand Developers | Rawalpindi | Tenant portal (Urdu RTL default), lease details, invoices, ticket submission |
-| **Org 2 Admin** | `admin@indusvalley.pk` | Indus Valley Estates | Karachi HQ | Demonstrates strict row-level multi-tenant isolation (`org_indus`) |
-
----
-
-## Verification & Testing Commands
-
-```bash
-# TypeScript strict check
 npm run typecheck
-
-# Run unit & integration test suite with >=70% coverage enforcement
 npm run test:coverage
-
-# Production build verification
 npm run build
+npx playwright install --with-deps chromium
+CI=true npm run test:e2e
 ```
 
----
+Security regression suites intentionally retain the original multi-organization
+fixture world under `NODE_ENV=test`. Business-profile tests explicitly migrate it
+and check the corrected setup. Normal demo/browser workflows use the corrected
+Fahad Real Estate profile; the production smoke provisions a separate empty fixture; no old branches/company are exposed by the normal app.
 
-## Key Documentation
-- [`DECISIONS.md`](./DECISIONS.md) — Architectural & domain defaults
-- [`PROGRESS.md`](./PROGRESS.md) — Phase-by-phase completion log
-- [`docs/PLAN.md`](./docs/PLAN.md) — Architecture diagram, stack justification, folder structure, and risk register
-- [`docs/ERD.md`](./docs/ERD.md) — Complete 32-table Entity-Relationship Diagram and data model specification
+## Deployment notes
+
+Demo Docker: `docker compose up --build`; app and all three workers share
+a persistent SQLite volume. Docker execution was unavailable in the development
+sandbox. PostgreSQL, Redis and S3 settings remain deployment designs, not enabled
+runtime switches. Use secure deployment-specific secrets; the demo is not a
+production-security certification.
+
+Set `PUBLIC_SITE_URL` to your actual deployed origin for absolute QR/feed links.
+Until then exports use relative listing paths rather than an invented domain.
+
+## Documentation / next checkpoint
+
+- [Business setup and safe migration](docs/BUSINESS_PROFILE.md)
+- [Progress](PROGRESS.md) and [decisions](DECISIONS.md)
+- [Architecture](docs/PLAN.md) and [data model](docs/ERD.md)
+- [Phase 3 walkthrough/API](docs/PHASE3.md)
+- [Phase 4 walkthrough/API](docs/PHASE4.md)
+
+**Phases 0–8 are complete for their documented local scope. PR #2 remains unmerged.**
+
+## Phase 7: six domain agents
+
+Open **Agent orchestration → Six domain agents** for lead matching, bilingual listing
+copy, rent reconciliation/reminders, maintenance safety triage, lease text/offer
+review and cited portfolio insights. Queue an assessment, advance it (or run the
+same-database agent worker), inspect citations and request independent approval
+for a persisted proposal. No silent record changes, publication or contract execution.
+
+This is working **local rules / lexical retrieval**, not a configured live LLM,
+verified appraisal, neural semantic search or OCR. Offers remain unsigned/nonbinding;
+reminders are in-app only. An administrator cannot approve their own write.
+
+```bash
+npm run test:agents  # 125 evaluations + 20 guarded-engine integration tests
+```
+
+See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 8 complete; awaiting authorization for any further work. PR #2 remains unmerged.**
+
+
+## Phase 8: owner and tenant portals
+
+Visit **`/portal/tenant`** or **`/portal/owner`** after signing in with the matching
+role (demo emails above, password `Password123!`). Staff opens **`/portal`** for
+source-bound owner consent; administrators can explicitly link/unlink personal
+accounts after verifying identity. No automatic business write follows consent.
+Guided English/Urdu navigation, bounded source records, tenant repairs, statement/
+unsigned-lease PDFs and private in-app messages are implemented.
+
+```bash
+npm run test:portals
+npm run perf:portals       # 10,000 synthetic in-memory invoices, no business DB touched
+npm run validate:api
+npm run audit:production
+npm run test:e2e:production # after build + Chromium install
+```
+
+Real deployment is **opt-in**: `REMS_DEPLOYMENT=production`, strong distinct signing
+secrets, persistent database and HTTPS. Use `npm run db:provision` only for an absent
+production path with environment-supplied real admin credentials. It creates zero
+inventory/financial fixtures. `npm run db:backup -- <new-path>` creates a verified
+online SQLite backup. Do not treat `NODE_ENV=production` alone as the security switch.
+
+See [portal/user/security guide](docs/PHASE8.md), [deployment/recovery runbook](docs/DEPLOYMENT.md)
+and [API](docs/API.md) / [OpenAPI](docs/openapi.json). The preview is a **fresh demo**,
+not recovered historical data. Runtime audit is clean at this checkpoint; the full
+build graph still has five documented high Tailwind/braces advisory reports.
+**Stopping at Phase 8; no PR merge or next phase without authorization.**
