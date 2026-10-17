@@ -329,3 +329,70 @@ opt into empty production provisioning; backups/upgrade rehearsals preserve hist
 **Stop after Phase 8. No later implementation or PR #2 merge without further
 user authorization. Live integrations and independent launch review remain outside
 this completed local checkpoint.**
+
+## Interactive Plot Map — Phase A completed (2026-10-17)
+
+User explicitly authorized this new feature after the Phase 8 checkpoint. Latest
+`main` pulled fast-forward-only on `arena/3203e4be-real-estate-management-system`;
+read `interactive-plot-map-feature-prompt.md` and summarized the plan before editing.
+
+### Delivered (Phase A only)
+
+- Additive/idempotent migration and matching Prisma design for maps/settings/private
+  assets, canonical plots/per-version geometry and future booking/sale/ownership/
+  resale records. Existing `properties` are projects; no unrelated units, leases or
+  financial source rows rewritten. Composite scopes, integer money checks, partial
+  active-record uniqueness and database status-change audit triggers added.
+- Admin-only raw SVG upload <=10 MiB with streamed bounds/type/UTF-8 validation.
+  DOMPurify/jsdom sanitation plus SAX preflight node/depth budgets; scripts, handlers,
+  foreign content, styles/resources/escaped CSS removed. Fresh role + admin/domain
+  write permission and same-project organization checks protect every draft endpoint.
+- Private original/sanitized SQLite BLOB assets participate in the same transaction
+  and online backup; HTTP only serves sanitized sandboxed attachments, never originals.
+  Unique internal element IDs replace possibly duplicated designer IDs.
+- All four requested detection approaches: explicit attributes, patterned IDs,
+  numbered groups without double-counting, transformed text anchors to smallest
+  containing closed shapes; road/park/boundary/legend/hidden/definition exclusions.
+  RE2-compatible per-project configuration is bounded and applies to future uploads.
+- Polygon/bbox/centroid/SVG-unit area for rect/polygon/closed-polyline and normalized
+  curve/arc/compound paths, nested matrix/rotation/scale/skew transforms; detection
+  warnings and strict complexity budgets, paged results. No invented physical scale,
+  official area, price, facing or corners.
+- Every upload is a new draft with added/removed/changed/unchanged diff against
+  published or latest draft. Existing canonical plots/bookings remain unchanged.
+  Preservation confirmation/publishing is not silently implemented in Phase A.
+- Three synthetic sample SVGs, each eight plots; explicit demo-only sample import
+  CLI seeds inspectable draft candidates without changing business inventory.
+  Dedicated API/Windows testing guide and designer preparation guide, README,
+  decisions/ERD/OpenAPI inventory updated (53 routes / 96 operations).
+
+### Verification
+
+- **44 new tests**, **378/378 total tests across 14 files** pass. Coverage:
+  **92.51% statements, 93.36% lines, 83.40% branches, 98.23% functions**.
+- Each sample detects **8/8** plots; adversarial cases include executable/external/
+  CSS-escaped SVG content, XML/XXE/depth/size, transformed/curved/holed geometry,
+  missing/duplicate numbers, permission downgrades/cross-org access, financial
+  migration equality, version/canonical-booking preservation, integer money,
+  cross-org references, active booking constraints and status audit entries.
+- A 1,000-plot fixture detects exactly 1,000 candidates (local test ~0.42 seconds);
+  not a final UI/concurrent load-performance acceptance claim.
+- Typecheck, full test coverage, production Next build, OpenAPI and static Prisma/
+  Compose validation pass. Runtime npm audit: **0 known vulnerabilities**. Existing
+  five high Tailwind/build-graph reports remain; no full audit-zero claim.
+- Real built-server smoke on port 3000: admin login, all three raw uploads (201),
+  8 candidate reads each (200), sanitized SVG downloads (200), versions 1–3.
+  Fresh preview DB: `data/plot-map-phase-a-demo.sqlite`, explicitly synthetic;
+  no historic data/backups were available to recover or overwrite.
+- New jsdom requires Node ^22.22.2 / ^24.15 / >=26; tested Node 22.22.3. Runtime
+  dependencies are externalized appropriately for Next's server build.
+
+### How to test / stop boundary
+
+`npm ci`, `npm run test:plot-maps`, then `npm run plot-maps:sample -- prop_1
+samples/plots-explicit.svg` (repeat with text-only/messy). Use `npm run dev` and the
+PowerShell upload/read/download walkthrough in `docs/PLOT_MAP_PHASE_A.md` to test
+HTTP. All map content is still draft/admin-only; there is **no Plot Map UI yet**.
+
+**STOP after Phase A for user testing. Phase B is calibration, measurements, review,
+CSV and publishing; do not begin it or merge the feature branch without authorization.**

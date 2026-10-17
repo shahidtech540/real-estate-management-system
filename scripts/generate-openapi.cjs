@@ -130,6 +130,65 @@ portal.post.responses["201"] = {
 portal.post.responses["409"] = {
   description: "Source changed or decision already final.",
 };
+const mapBase = paths["/api/v1/properties/{id}/plot-maps"];
+mapBase.post.description =
+  "Phase A: administrator + admin:manage + properties:write. Stream up to 10 MiB UTF-8 SVG; sanitize and detect draft geometry. Does not publish or change business plots/bookings.";
+mapBase.post.requestBody = {
+  required: true,
+  content: {
+    "image/svg+xml": { schema: { type: "string", format: "binary" } },
+  },
+};
+mapBase.post.responses["201"] = {
+  description:
+    "Draft map, version, detection report and added/removed/changed diff. Read paged candidates through the map detail operation.",
+};
+mapBase.post.responses["413"] = {
+  description: "SVG exceeds 10 MiB or geometry/node/depth complexity budgets.",
+};
+mapBase.post.responses["415"] = {
+  description: "Use raw image/svg+xml; multipart/JSON are not accepted.",
+};
+mapBase.patch.requestBody = {
+  required: true,
+  content: {
+    "application/json": {
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["plotNumberPattern"],
+        properties: {
+          plotNumberPattern: {
+            type: "string",
+            maxLength: 256,
+            description:
+              "RE2-compatible pattern; first capture group is the plot number. Applies to future versions only.",
+          },
+        },
+      },
+    },
+  },
+};
+const mapDetail = paths["/api/v1/properties/{id}/plot-maps/{mapId}"].get;
+mapDetail.parameters.push(
+  {
+    in: "query",
+    name: "page",
+    schema: { type: "integer", minimum: 1, maximum: 10000, default: 1 },
+  },
+  {
+    in: "query",
+    name: "limit",
+    schema: { type: "integer", minimum: 1, maximum: 100, default: 50 },
+  },
+);
+const mapSvg = paths["/api/v1/properties/{id}/plot-maps/{mapId}/svg"].get;
+mapSvg.description =
+  "Administrator-only sanitized SVG attachment, sandbox CSP/no-store. Original SVG assets have no HTTP serving endpoint.";
+mapSvg.responses["200"] = {
+  description: "Sanitized SVG attachment",
+  content: { "image/svg+xml": { schema: { type: "string" } } },
+};
 const spec = {
   openapi: "3.0.3",
   info: {
@@ -142,7 +201,13 @@ const spec = {
   paths,
   components: {
     securitySchemes: {
-      cookieAuth: {type:"apiKey",in:"cookie",name:"rems_access_token",description:"HttpOnly session transport; fresh identical validation and Origin defense for mutations."},
+      cookieAuth: {
+        type: "apiKey",
+        in: "cookie",
+        name: "rems_access_token",
+        description:
+          "HttpOnly session transport; fresh identical validation and Origin defense for mutations.",
+      },
       bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
       previewHeader: {
         type: "apiKey",

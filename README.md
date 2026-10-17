@@ -18,7 +18,7 @@ email/domain/phone have **not** been supplied. None are asserted by this setup.
 The units, owners, customers, prices and financial transactions remain **demo
 records**, not a verified inventory or legal/financial representation of the business.
 
-## Run locally (Node.js 22+)
+## Run locally (Node.js 22.22.3+ recommended in the 22.x series)
 
 ```bash
 npm ci
@@ -164,3 +164,22 @@ and [API](docs/API.md) / [OpenAPI](docs/openapi.json). The preview is a **fresh 
 not recovered historical data. Runtime audit is clean at this checkpoint; the full
 build graph still has five documented high Tailwind/braces advisory reports.
 **Stopping at Phase 8; no PR merge or next phase without authorization.**
+
+
+## Interactive Plot Map — Phase A
+
+Backend/schema/upload/detection is available; **no Plot Map dashboard UI yet**.
+Admin uploads create private, versioned draft candidates and a diff, never bookings
+or published inventory. Existing units, contracts and money remain unchanged.
+
+```bash
+npm ci
+npm run test:plot-maps
+npm run plot-maps:sample -- prop_1 samples/plots-explicit.svg
+```
+
+Try all three `samples/plots-*.svg` fixtures (eight plots each). See
+[Phase A testing/API guide](docs/PLOT_MAP_PHASE_A.md) and
+[SVG preparation guide](docs/SVG_PREPARATION.md). Node 22.22.3 is tested; the new SVG
+sanitizer DOM requires at least 22.22.2 in that series. Review/calibration/publishing
+is Phase B and awaits authorization after you test Phase A.

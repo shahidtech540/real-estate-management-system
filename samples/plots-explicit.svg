@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 180">
+  <title>Explicit plot attributes and grouped lots — synthetic sample</title>
+  <g id="roads"><rect x="0" y="75" width="260" height="25" fill="#ddd"/><text x="110" y="92">ROAD</text></g>
+  <rect data-plot="1" x="10" y="10" width="50" height="60" fill="#cae8ca"/>
+  <g id="plot-2"><rect x="70" y="10" width="50" height="60" fill="#cae8ca"/><text x="90" y="45">2</text></g>
+  <polygon id="A-3" points="130,10 180,10 180,70 130,70" fill="#cae8ca"/>
+  <rect id="P-4" x="190" y="10" width="50" height="60" fill="#cae8ca"/>
+  <rect data-plot-number="5" x="10" y="105" width="50" height="60" fill="#cae8ca"/>
+  <g id="Plot6"><path d="M70 105h50v60h-50z" fill="#cae8ca"/><text x="90" y="140">6</text></g>
+  <polygon id="7" points="130,105 180,105 180,165 130,165" fill="#cae8ca"/>
+  <rect id="plot_8" x="190" y="105" width="50" height="60" fill="#cae8ca"/>
+</svg>

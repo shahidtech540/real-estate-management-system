@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+ <title>Nested transforms and curved boundaries — synthetic sample</title>
+ <rect id="boundary" x="1" y="1" width="598" height="398" fill="none" stroke="#333"/>
+ <g id="roads" transform="translate(5 5)"><path d="M0 95H580V120H0Z" fill="#ccc"/><text x="200" y="110">12</text></g>
+ <g transform="translate(20 20) scale(1.2)">
+  <g id="plot-1" transform="rotate(5 25 30)"><rect width="50" height="60" fill="#cae8ca"/><text x="20" y="30">1</text></g>
+  <g transform="translate(65 0)"><path d="M0 0 C15 -6 35 -6 50 0 L50 60H0Z" fill="#cae8ca"/><text x="25" y="30">2</text></g>
+  <g transform="matrix(1 0.1 0 1 130 0)"><path data-plot="3" d="M0 0h50v60Q25 70 0 60Z" fill="#cae8ca"/></g>
+  <path id="P-4" d="M195 0H245V60A25 10 0 0 1 195 60Z" fill="#cae8ca"/>
+ </g>
+ <g transform="translate(20 180)">
+  <g id="plot_5" transform="scale(1.1 .9)"><rect width="50" height="60" fill="#cae8ca"/></g>
+  <g transform="translate(80 0) rotate(-10)"><polygon points="0 0 50 0 50 60 0 60" fill="#cae8ca"/><text x="20" y="30">6</text></g>
+  <g transform="translate(160 0) skewX(10)"><path d="M0 0H50V60H0Z" fill="#cae8ca"/><text><tspan x="20" y="30">7</tspan></text></g>
+  <path id="A-8" d="M250 0h70v70h-70Z M270 20h30v30h-30Z" fill-rule="evenodd" fill="#cae8ca"/>
+ </g>
+ <g class="park"><rect x="400" y="200" width="160" height="140" fill="#8a8"/><text x="470" y="260">99</text></g>
+</svg>

@@ -313,3 +313,44 @@ This header is never attached to external URLs and never placed in query strings
   validator checks actual route/method coverage and references.
 - No security/legal certification, live payment/outbound/model/OCR, automatic
   contract execution, bank verification or historical-data recovery is claimed.
+
+## Interactive Plot Map — Phase A (2026-10-17)
+
+- Latest main pulled fast-forward-only on the active feature branch; user authorizes
+  Phase A only, with a plan first and a testing stop after every phase. No Phase B
+  UI/calibration/publish work, booking actions or feature PR merge yet.
+- `properties` are projects. Do not create a parallel projects table or mutate/link
+  the existing `units`, leases or ledger. Additive/idempotent SQLite migration plus
+  Prisma design models; cross-org references and integer money checks in new tables.
+- Keep canonical `plots` unique per project/number, and per-version candidate/geometry
+  snapshots separately. Draft duplicate numbers are reviewable, not silently merged.
+  Re-upload inserts drafts and computes diff; canonical plots/bookings/sales remain
+  untouched until a later explicitly confirmed/published workflow.
+- Store original/sanitized SVG as private SQLite BLOB assets with opaque `sqlite:`
+  locators in the specified path columns. This matches the actual local architecture,
+  makes assets part of atomic transactions/online backups, and avoids public files
+  or orphaned writes. Never expose an original SVG through HTTP.
+- Phase A raw upload API is administrator-role + admin:manage + properties:write,
+  freshly checked. 10 MiB streamed UTF-8 image/svg+xml; existing JSON cap unchanged.
+  Read draft endpoints are equally private; public map privacy comes in later phases.
+- DOMPurify 3.4.17 + jsdom 30.1.3 maintained server sanitizer; streaming saxes preflight
+  limits depth/nodes before DOM allocation. Remove all CSS/style/URL/escaped-attribute,
+  external-resource, animation, script/event and foreignObject mechanisms. Regenerate
+  all interaction IDs; keep sanitized source identifiers only as data.
+- Transform/path processing uses svgpath; 32 samples per normalized curve/arc segment.
+  Closed polygon rings, evenodd/nonzero fills and centroid/bounds/area are SVG-unit
+  approximations, not calibrated/official survey measurements. Rounded rects currently
+  use their rectangular footprint; overlap/self-intersection resolution stays in B.
+- Per-project regex uses bounded RE2JS patterns, not user-supplied native backtracking.
+  Explicit attributes win; numbered groups own children; fallback chooses the smallest
+  containing unclaimed closed shape. Ignore known nonplot layers/large fallback shapes;
+  keep warnings rather than inventing unlabeled bookable plots.
+- Enforce explicit XML/shape/point/comparison limits; docs describe accepted SVG subset.
+  8/8 on each supplied fixture is not an arbitrary-file 95% accuracy certification.
+- Sample imports are opt-in/demo-only and seed draft candidates, not live inventory.
+  No automatic production fixtures. Fresh preview DB is labeled synthetic; prior
+  absent runtime history is not represented as recovered data.
+- New jsdom raises supported Node to ^22.22.2 / ^24.15 / >=26; tested Node 22.22.3.
+  Runtime Next externalizes jsdom/DOMPurify to preserve their package loading.
+- Later-transaction schema fields do not imply implemented money, CRM, notifications,
+  bookings, hold expiry, sale/resale or agent tools. Stop at the Phase A boundary.

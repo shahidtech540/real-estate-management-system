@@ -250,3 +250,15 @@ SHA-256 binds organization, run, ordinal, tool/version, exact input and source s
 - Prisma models document these structures; Node SQLite DDL is the active runtime.
   Administrator account linkage uses existing owner/tenant `user_id` columns and
   does not replace original domain or immutable financial tables.
+
+## Plot Map Phase A
+
+`properties` are reused as projects. New additive tables:
+`plot_map_settings`, `project_maps`, `project_map_assets`, `plots`,
+`map_plot_geometries`, `plot_bookings`, `plot_sales`, `plot_ownership_history`,
+`resale_listings`. Original/sanitized SVGs are private BLOB assets in the same DB;
+geometry is versioned independently of canonical plot identity and business history.
+Composite org/project constraints, scoped actor/customer reference checks, exact
+integer-minor-unit bounds and status audit triggers protect the new schema.
+The booking/sale/resale tables are foundations only in A; no transaction APIs yet.
+See `docs/PLOT_MAP_PHASE_A.md` for lifecycle/partial index and retention decisions.
