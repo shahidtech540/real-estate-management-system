@@ -467,3 +467,72 @@ in **`docs/PLOT_MAP_PHASE_B.md`**. Node 22.22.3+ in the 22.x series is recommend
 **STOP after Phase B.** No Phase C visitor interactions/status colors/zoom/pan/hover
 map, Phase D bookings/billing, later privacy/live updates or agent hooks implemented.
 Feature PR remains draft/unmerged; await explicit “continue” after user testing.
+
+## Interactive Plot Map — Phase C completed (2026-10-17)
+
+User authorized C with “countine” after B. Plan summarized before editing; work
+remains on `arena/3203e4be-real-estate-management-system`. No later phase started.
+
+### Delivered
+
+- **Plot Map → Published map** viewer alongside the retained B **Review & publish**
+  workspace. Project selection carries between modes; no-publication states guide
+  the admin to publish rather than display drafts. No existing sidebar rewrite.
+- New read-only published snapshot API with fresh existing admin permissions/org
+  guard, current canonical statuses/prices, safe field allowlist and sanitized SVG in
+  one consistent response. Draft/archived/original assets and private transaction
+  records are not returned. No database migration or financial/domain writes.
+- Six status colors + distinct patterns/abbreviations/legend; labels scale with zoom.
+  Mouse wheel, drag, double-click, touch pan/pinch, +/− and fit controls; pointer-
+  anchored bounded camera, search centering/highlight/focus, reduced motion support.
+- Combined status/block/size/price/facing/corner filters, visible status counts, useful
+  exact-number/hidden/no-match/invalid-range messages. Official sizes convert into
+  calibrated filter units; major price inputs compare integer minor-unit amounts.
+- Instant local hover tooltip follows mouse and stays inside viewport; mobile tap,
+  click and Enter/Space pin read-only information with close/Escape focus return.
+  Official/calculated sources, dimensions, facing/corner, price and status shown.
+- Static memoized SVG scene and delegated events; hover/filter/zoom preserve plot
+  nodes. Background SVG inert; generated internal IDs only, no raw uploaded markup.
+  Roving keyboard stop, spatial arrows, labeled plot controls, hidden-filter focus
+  handling, responsive English/RTL layout, helpers and guide/API docs.
+- Counts/statuses reflect loaded canonical snapshot and filters; **Refresh published
+  map** fetches updates. Cross-user polling/SSE/toasts remain Phase E, not silently
+  implemented as part of C. Broader role/public map access also remains Phase E.
+
+### Verification
+
+- **32 new C unit/integration tests; 472/472 total across 16 files** pass; all
+  **138 plot-map A/B/C tests** pass. Coverage **92.84% statements, 93.76% lines,
+  84.01% branches, 98.39% functions**.
+- Browser flows cover hover and official/price values, filters/counts/refresh, search,
+  wheel/pan/zoom, spatial keyboard/Enter/Escape, real two-finger CDP touch pinch,
+  mobile tooltip bounds/no page overflow, project carry-over and empty states.
+- 1,000-plot browser fixture verifies unchanged SVG node identity/zero subtree child
+  mutation during hover/filter/zoom, zero hover detail reads, median local tooltip
+  render <100ms. No claim of a universal device SLA or completed Phase F load pass.
+- All six styles tested with an explicitly synthetic render DTO fixture; no later
+  booking/sale/resale workflows fabricated. Read model tests separately verify
+  real canonical state and permission/privacy/source immutability constraints.
+- Typecheck/production build pass, OpenAPI **57 routes / 102 operations**, static
+  Prisma/Compose validation pass; runtime npm audit **0 known vulnerabilities**.
+  Existing five high dev/build graph reports remain, not falsely claimed fixed.
+- **42/42 full browser regression tests pass**, including **6 new C browser
+  tests**; **1/1 separate production-policy browser smoke passes**. All run against
+  isolated seeded demo/empty production fixtures, never real business data.
+  Test artifacts, browser libraries and demo DBs ignored.
+
+### How to test / STOP
+
+`npm ci`, `npm run test:plot-maps`, `npm run dev`; sign in as admin, choose
+**Plot Map → Published map**. If needed first upload/calibrate/publish a sample in
+**Review & publish**. Hover/tap, search, combine filters, zoom/pan/pinch, keyboard
+navigate and refresh. Full manual/API/limits/isolation guide:
+**`docs/PLOT_MAP_PHASE_C.md`**. Existing synthetic preview DB preserved in place.
+
+**STOP after C.** No D booking/billing/CRM actions, E ownership/public-role privacy/
+live updates/expiry or F agent tools added. Feature PR stays draft and unmerged;
+await explicit “continue” after user testing before beginning D.
+
+Phase C preview refreshed on port 3000 using the preserved synthetic DB. Preview-
+Origin login, no-store published API and actual browser viewer/hover smoke pass:
+existing published version **10**, **8 plots**, **0 browser runtime errors**.

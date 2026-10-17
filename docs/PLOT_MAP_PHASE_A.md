@@ -1,7 +1,7 @@
 # Interactive Plot Map — Phase A
 
-> Historical Phase A checkpoint. Phase B is now implemented; use
-> [the review/publish guide](PLOT_MAP_PHASE_B.md) for the current administrator UI.
+> Historical Phase A checkpoint. For the current administrator UI use
+> [review/publish (B)](PLOT_MAP_PHASE_B.md) and [published viewing (C)](PLOT_MAP_PHASE_C.md).
 
 **Implemented:** additive schema, secured SVG ingestion, versioned private assets,
 detection and draft geometry/diffs, API/CLI tests. **Not implemented in this phase:**

@@ -397,3 +397,38 @@ This header is never attached to external URLs and never placed in query strings
 - Testing uses isolated seeded demo databases. Preview remains the previously labeled
   synthetic file; this does not restore absent business history. Stop for user testing
   after B, keep the existing feature PR draft/unmerged, await C authorization.
+
+## Interactive Plot Map — Phase C (2026-10-17)
+
+- User's “countine” authorizes C only. Add published-map viewing within the existing
+  Plot Map section, preserving the selected project between review/published modes.
+  Do not implement D booking/click actions, E live/public-role workflows or F tools.
+- Keep A/B's fresh admin/manage/property-write organization boundary for all C reads.
+  Broader public/portal/agent read policies and price toggle need E's explicit privacy
+  work. No new permission grants or accidental anonymous map exposure.
+- Dedicated published-only read endpoint returns sanitized SVG and allowlisted plot
+  metadata in one transaction snapshot, preventing mixed SVG/metadata versions during
+  publication. Current canonical statuses/prices, never draft review values, drive C.
+  No buyer/owner/client/agent/history/notes joins, original SVG or asset locators.
+- No migration needed. Source maps, canonical plots, business/financial rows unchanged
+  by viewer reads; existing authentication quotas use the standard technical tables.
+- Counts update with filters and explicit refresh. Automatic server polling/SSE and
+  cross-user notifications remain E, even though the C read model is status-ready.
+- Static memoized SVG scene, delegated pointer/focus/key events, imperative bounded
+  transforms/visibility/focus attributes and requestAnimationFrame tooltip positioning.
+  No per-plot React listeners, subtree reconstruction or hover detail requests.
+- Reuse generated SVG IDs/canonical geometry, make background inert, suppress matched
+  source shapes beneath the interactive overlay, preserve compound holes. Never put
+  raw uploaded bytes or raw field strings into the SVG/HTML rendering sink.
+- Colorblind-aware six-status patterns and text; reserved/booked share amber but have
+  different patterns/marks. Plot labels scale; detail status marks appear at 200%.
+- Official size/dimensions take precedence, calculated fallback explicit. Filter size
+  converts to current map display units; unknown prices/corners do not match numeric/
+  definite filters. Price input uses major units, DTO/storage integer minor units.
+  Mixed currency comparisons are nominal per-currency, not invented FX conversion.
+- Mouse hover and touch/click/Enter read-only pin panel only; no fake booking drawer,
+  owner details or inquiry buttons. Roving tab stop, spatial arrows, Escape focus return,
+  reduced motion, wheel/drag/pinch controls and fit/search complete C interaction scope.
+- Tests use isolated demo DBs and synthetic render-only six-state DTO fixtures for
+  future statuses. No manufactured production bookings/sales or tracked large datasets.
+  Stop at C, retain draft/unmerged feature PR, await user authorization for D.

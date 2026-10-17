@@ -1,5 +1,8 @@
 # Interactive Plot Map — Phase B: review and publish
 
+> Phase B checkpoint guide. Phase C is now implemented; see
+> [the published-map viewer guide](PLOT_MAP_PHASE_C.md) for current viewing controls.
+
 Phase B adds an **administrator-only Plot Map workspace** to the dashboard. It is
 an editing/review tool, not the Phase C interactive visitor map. Booking, sales,
 live status updates and agent hooks remain later phases.

@@ -133,7 +133,7 @@ reminders are in-app only. An administrator cannot approve their own write.
 npm run test:agents  # 125 evaluations + 20 guarded-engine integration tests
 ```
 
-See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 8 complete; awaiting authorization for any further work. PR #2 remains unmerged.**
+See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 8 complete; PR #2 was merged. Subsequent authorized plot-map work is tracked below.**
 
 
 ## Phase 8: owner and tenant portals
@@ -163,13 +163,16 @@ See [portal/user/security guide](docs/PHASE8.md), [deployment/recovery runbook](
 and [API](docs/API.md) / [OpenAPI](docs/openapi.json). The preview is a **fresh demo**,
 not recovered historical data. Runtime audit is clean at this checkpoint; the full
 build graph still has five documented high Tailwind/braces advisory reports.
-**Stopping at Phase 8; no PR merge or next phase without authorization.**
+**Phase 8 checkpoint complete. Further phases and PR merges require explicit authorization; see current plot-map progress below.**
 
 
-## Interactive Plot Map — Phases A & B
+## Interactive Plot Map — Phases A, B & C
 
-Phase A ingestion and **Phase B administrator review/publish UI** are available.
-Select **Plot Map** in the dashboard as an administrator.
+Phase A ingestion, **Phase B administrator review/publish** and
+**Phase C interactive published-map viewer** are available.
+Select **Plot Map** in the dashboard as an administrator, then **Review & publish**
+or **Published map**. The viewer supports status patterns, zoom/pan/pinch, search,
+filters/counts and hover/tap information.
 Admin uploads create private, versioned draft candidates and a diff. Calibration,
 number/geometry repair, official overrides and CSV exchange stay draft until explicit
 validated publication. Existing units, contracts, booking history and money remain unchanged.
@@ -181,9 +184,11 @@ npm run plot-maps:sample -- prop_1 samples/plots-explicit.svg
 ```
 
 Try all three `samples/plots-*.svg` fixtures (eight plots each). See
+[Phase C viewer/testing guide](docs/PLOT_MAP_PHASE_C.md),
 [Phase B review/publish walkthrough](docs/PLOT_MAP_PHASE_B.md),
 [Phase A upload/API guide](docs/PLOT_MAP_PHASE_A.md) and
 [SVG preparation guide](docs/SVG_PREPARATION.md). Node 22.22.3 is tested; the new SVG
 sanitizer DOM requires at least 22.22.2 in that series. Review/calibration/publishing
-is implemented in Phase B. Visitor interactions/zoom/pan/tooltips are Phase C and
-await authorization after you test Phase B.
+is implemented in B; admin published viewing is implemented in C. Booking actions
+are Phase D, while public-role access/privacy and automatic live updates are Phase E.
+Both await their separate authorizations.

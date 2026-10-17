@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { PublishedPlotMapWorkspace } from "./PublishedPlotMap";
 import { authFetch } from "@/lib/auth-client";
 import { api, button, Card, field, Label, secondary } from "./Phase4Shared";
 type Point = [number, number];
@@ -81,8 +82,55 @@ const path = (rings: Point[][]) =>
   rings.map((r) => "M" + r.map((p) => p.join(" ")).join("L") + "Z").join(" ");
 const round = (n: number) => Number(n.toFixed(3)).toLocaleString();
 export function PlotMapWorkspace() {
+  const [mode, setMode] = useState<"review" | "published">("review");
+  const [selectedProject, setSelectedProject] = useState("");
+  return (
+    <div className="space-y-5">
+      <div
+        role="group"
+        aria-label="Plot Map mode"
+        className="flex flex-wrap gap-2"
+      >
+        <button
+          type="button"
+          className={mode === "review" ? button : secondary}
+          aria-pressed={mode === "review"}
+          onClick={() => setMode("review")}
+        >
+          Review & publish
+        </button>
+        <button
+          type="button"
+          className={mode === "published" ? button : secondary}
+          aria-pressed={mode === "published"}
+          onClick={() => setMode("published")}
+        >
+          Published map
+        </button>
+      </div>
+      {mode === "review" ? (
+        <PlotMapReviewWorkspace
+          initialProject={selectedProject}
+          onProjectChange={setSelectedProject}
+        />
+      ) : (
+        <PublishedPlotMapWorkspace
+          initialProject={selectedProject}
+          onProjectChange={setSelectedProject}
+        />
+      )}
+    </div>
+  );
+}
+function PlotMapReviewWorkspace({
+  initialProject,
+  onProjectChange,
+}: {
+  initialProject: string;
+  onProjectChange: (id: string) => void;
+}) {
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([]),
-    [project, setProject] = useState(""),
+    [project, setProject] = useState(initialProject),
     [versions, setVersions] = useState<
       { id: string; version: number; status: string }[]
     >([]),
@@ -124,12 +172,19 @@ export function PlotMapWorkspace() {
     setMapId(preferred || r.maps[0]?.id || "");
   }
   useEffect(() => {
+    onProjectChange(project);
+  }, [project, onProjectChange]);
+  useEffect(() => {
     let live = true;
     api<{ properties: typeof projects }>("properties")
       .then((r) => {
         if (live) {
           setProjects(r.properties);
-          setProject(r.properties[0]?.id || "");
+          setProject((current) =>
+            r.properties.some((p) => p.id === current)
+              ? current
+              : r.properties[0]?.id || "",
+          );
         }
       })
       .catch((e) => {

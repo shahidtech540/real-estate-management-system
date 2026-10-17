@@ -264,6 +264,65 @@ publishPath.requestBody.content["application/json"].schema = {
 publishPath.responses["409"] = {
   description: "Stale revision/published baseline or read-only map.",
 };
+const viewer = paths["/api/v1/properties/{id}/plot-maps/viewer"].get;
+viewer.description =
+  "Phase C admin-only published-map snapshot: sanitized SVG and allowlisted canonical plot geometry/status/official-or-calculated measurements/price. Never accepts a draft map ID or returns booking/buyer/owner details. Same existing fresh admin/manage/property-write scope until Phase E. Read-only business snapshot; quota 60/user/org/15min.";
+viewer.responses["200"] = {
+  description:
+    "Coherent current published SVG/plot snapshot, private/no-store; loadedAt identifies refresh time.",
+  content: {
+    "application/json": {
+      schema: {
+        type: "object",
+        required: [
+          "id",
+          "version",
+          "projectId",
+          "projectName",
+          "viewBox",
+          "svg",
+          "areaUnit",
+          "plots",
+          "loadedAt",
+        ],
+        properties: {
+          id: { type: "string" },
+          version: { type: "integer" },
+          projectId: { type: "string" },
+          projectName: { type: "string" },
+          publishedAt: { type: "string" },
+          loadedAt: { type: "string", format: "date-time" },
+          areaUnit: { type: "string", enum: ["sqft", "sqm", "marla", "kanal"] },
+          viewBox: {
+            type: "array",
+            items: { type: "number" },
+            minItems: 4,
+            maxItems: 4,
+          },
+          svg: {
+            type: "string",
+            description:
+              "Server-sanitized SVG only; never the source original.",
+          },
+          plots: {
+            type: "array",
+            description:
+              "Allowlisted DTO documented in docs/PLOT_MAP_PHASE_C.md; stable plot/element IDs, rings, bounds, centroid, status, size/dimensions/source, official facing/corner, total price/currency. No PII or transaction histories.",
+            items: { type: "object" },
+          },
+        },
+      },
+    },
+  },
+};
+viewer.responses["404"] = {
+  description:
+    "Project absent/out of organization or no published map. Drafts and archived versions are never served.",
+};
+viewer.responses["409"] = {
+  description:
+    "Legacy published map is uncalibrated; publish a calibrated version.",
+};
 const spec = {
   openapi: "3.0.3",
   info: {

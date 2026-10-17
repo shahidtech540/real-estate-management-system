@@ -30,7 +30,7 @@
     "audit:production": "npm audit --omit=dev --audit-level=moderate",
     "validate:api": "node scripts/validate-openapi.cjs",
     "test:e2e:production": "playwright test --config=playwright.production.config.ts",
-    "test:plot-maps": "vitest run tests/plot-maps.test.ts tests/plot-map-review.test.ts",
+    "test:plot-maps": "vitest run tests/plot-maps.test.ts tests/plot-map-review.test.ts tests/plot-map-viewer.test.ts",
     "plot-maps:sample": "tsx scripts/plot-map-sample.ts"
   },
   "dependencies": {
