@@ -368,7 +368,7 @@ read `interactive-plot-map-feature-prompt.md` and summarized the plan before edi
 
 ### Verification
 
-- **44 new tests**, **378/378 total tests across 14 files** pass. Coverage:
+- **45 new tests**, **379/379 total tests across 14 files** pass. Coverage:
   **92.51% statements, 93.36% lines, 83.40% branches, 98.23% functions**.
 - Each sample detects **8/8** plots; adversarial cases include executable/external/
   CSS-escaped SVG content, XML/XXE/depth/size, transformed/curved/holed geometry,
@@ -380,6 +380,8 @@ read `interactive-plot-map-feature-prompt.md` and summarized the plan before edi
 - Typecheck, full test coverage, production Next build, OpenAPI and static Prisma/
   Compose validation pass. Runtime npm audit: **0 known vulnerabilities**. Existing
   five high Tailwind/build-graph reports remain; no full audit-zero claim.
+- Real built-server smoke verified middleware preserves the SVG-only sandbox CSP
+  (regression test added; normal application CSP unchanged).
 - Real built-server smoke on port 3000: admin login, all three raw uploads (201),
   8 candidate reads each (200), sanitized SVG downloads (200), versions 1–3.
   Fresh preview DB: `data/plot-map-phase-a-demo.sqlite`, explicitly synthetic;

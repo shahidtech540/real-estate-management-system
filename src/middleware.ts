@@ -2,10 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 export function middleware(req: NextRequest) {
   const response = NextResponse.next(),
     production = process.env.REMS_DEPLOYMENT === "production",
-    frames = process.env.FRAME_ANCESTORS || (production ? "'self'" : "*");
+    frames = process.env.FRAME_ANCESTORS || (production ? "'self'" : "*"),
+    plotSvg = /^\/api\/v1\/properties\/[^/]+\/plot-maps\/[^/]+\/svg\/?$/.test(
+      req.nextUrl.pathname,
+    );
   response.headers.set(
     "Content-Security-Policy",
-    `default-src 'self'; script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors ${frames}; form-action 'self'`,
+    plotSvg
+      ? "sandbox; default-src 'none'; style-src 'none'"
+      : `default-src 'self'; script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors ${frames}; form-action 'self'`,
   );
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");

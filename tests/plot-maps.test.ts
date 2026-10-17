@@ -1,3 +1,4 @@
+import { middleware } from "../src/middleware";
 import { readFileSync } from "node:fs";
 import { beforeEach, describe, it, expect, vi, afterEach } from "vitest";
 import { NextRequest } from "next/server";
@@ -125,6 +126,21 @@ it("removes CSS-escaped URL functions and XML stylesheet instructions", () => {
   );
   expect(r.sanitized).not.toContain("evil.example");
   expect(r.doc.querySelector("rect")?.hasAttribute("fill")).toBe(false);
+});
+it("middleware preserves sandbox CSP for sanitized SVG without restricting app pages", () => {
+  const svgResponse = middleware(
+    new NextRequest(
+      "http://localhost/api/v1/properties/prop_1/plot-maps/map_1/svg",
+    ),
+  );
+  expect(svgResponse.headers.get("content-security-policy")).toBe(
+    "sandbox; default-src 'none'; style-src 'none'",
+  );
+  const page = middleware(new NextRequest("http://localhost/dashboard"));
+  expect(page.headers.get("content-security-policy")).toContain(
+    "script-src 'self'",
+  );
+  expect(page.headers.get("content-security-policy")).not.toContain("sandbox");
 });
 describe("all four detection strategies and sampled geometry", () => {
   it.each(["explicit", "text-only", "messy"])(
