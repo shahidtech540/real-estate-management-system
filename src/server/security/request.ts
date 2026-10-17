@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { getDb } from "@/server/db";
 import { HttpError } from "@/server/auth/guards";
-export async function readJson(req: Request) {
+export async function readJson(req: Request, maxBytes = 1048576) {
   const reader = req.body?.getReader();
   if (!reader) throw new HttpError(400, "BODY_REQUIRED", "JSON body required.");
   let size = 0;
@@ -10,12 +10,12 @@ export async function readJson(req: Request) {
     const { done, value } = await reader.read();
     if (done) break;
     size += value.length;
-    if (size > 1048576) {
+    if (size > maxBytes) {
       await reader.cancel();
       throw new HttpError(
         413,
         "BODY_TOO_LARGE",
-        "JSON bodies are limited to 1 MiB.",
+        `JSON bodies are limited to ${maxBytes / 1048576} MiB.`,
       );
     }
     chunks.push(value);

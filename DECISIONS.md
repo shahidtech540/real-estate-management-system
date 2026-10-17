@@ -432,3 +432,48 @@ This header is never attached to external URLs and never placed in query strings
 - Tests use isolated demo DBs and synthetic render-only six-state DTO fixtures for
   future statuses. No manufactured production bookings/sales or tracked large datasets.
   Stop at C, retain draft/unmerged feature PR, await user authorization for D.
+
+## Interactive Plot Map — Phase D (2026-10-17)
+
+- User's latest “continue” authorizes D only. Native modal click/tap/Enter booking
+  form, private plot page/activity, reserved/booked confirm/extend/cancel. Sold/resale
+  ownership actions, public-role privacy, automatic updates/expiry are E, tools F.
+- Keep admin/manage/property-write boundary through D. Reads additionally require
+  leads/invoices/documents read; writes require corresponding writes. No new role
+  grants. Agent assignee can receive an in-app notice without receiving new API access.
+- Existing rent invoice FKs require lease/tenant/unit, and CRM deals require units.
+  Never fabricate those: add source-linked `plot_token_invoices` within billing and
+  link actual existing CRM leads/clients. Separate register in Rent & Payments.
+- Token is an amount requested, not received. Create real unpaid invoice/PDF (zero
+  token `not_due`), never fake payment/receipt, sale revenue, ledger, refund or bypass
+  independent approvals. Installments are agreed terms, not auto-paid future invoices.
+- Share strict input/temporal/payment validators between browser and API. Minor-unit
+  integer amounts; full or monthly schedule with token included in down payment and
+  exact remainder distribution/month-end clamping. Positive published price required;
+  exact map/price/currency guards prevent stale or discounted submissions.
+- Sensible bounded defaults: booking date today in Asia/Karachi, pending holds future
+  ≤90 days, confirmed no expiry, installment count 1–120, existing lookup 2–100 chars/
+  ≤30 literal matches, assignees ≤200 active same-org agent/admin. No inferred KYC.
+- PDF buffers prepared asynchronously before SQLite BEGIN IMMEDIATE; transaction
+  revalidates fresh access/price/publication/client/agent/expiry and writes every
+  domain/billing/CRM/document/audit/inbox side effect atomically. CAS available status
+  and unique active booking index protect same-/cross-process concurrent writers.
+- UUID key + validated payload SHA-256 scoped to org/actor gives exact retries with
+  original stored documents. Changed input under used key conflicts; no duplicate rows.
+- Confirm/extend/cancel require revision/reason and reject closed/legacy/inconsistent/
+  sale/ownership encumbrances. Cancellation retains client/lead/files/history, voids
+  only this unpaid token invoice and explicitly releases only this active booking.
+  Elapsed holds cannot confirm; explicit extension/cancel only until E's worker.
+- Additive SQLite migration and Prisma design fields; old booking rows untouched and
+  read-only until reconciled, rather than assigning fictional paid/unpaid history.
+  Existing rent/lease/payment/ledger/owner statement/units unaffected (tested).
+- Real private file BLOBs + scoped document catalogue, ≤2 PDF/PNG/JPEG files of ≤2MiB,
+  signature/encoding checks, attachment-only sandbox/no-store/nosniff downloads. POST
+  streaming cap 6MiB; all existing JSON routes keep 1MiB. No malware/authenticity claim.
+- English/ASCII PDF font fallback reuses existing renderer; Unicode retained exactly
+  in UI/JSON. Immutable issuance PDFs must be checked against current booking state.
+- Native dialog/inert background, explicit Tab/Shift-Tab wrap, Escape/close focus return,
+  lazy private details, stale-load guards and filtered-plot canvas focus. Local mutation/
+  conflict response patches canonical status/counts without resetting camera; no polling.
+- Tests on isolated DBs only; preserved preview gets verified online backup and additive
+  startup upgrade. Stop at D for user testing; same feature PR stays draft/unmerged.

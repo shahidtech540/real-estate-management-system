@@ -83,9 +83,6 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
-.tooltip[data-pinned="true"] {
-  pointer-events: auto;
-}
 .tooltip h3 {
   font-size: 16px;
   font-weight: 700;

@@ -166,16 +166,20 @@ build graph still has five documented high Tailwind/braces advisory reports.
 **Phase 8 checkpoint complete. Further phases and PR merges require explicit authorization; see current plot-map progress below.**
 
 
-## Interactive Plot Map — Phases A, B & C
+## Interactive Plot Map — Phases A–D
 
-Phase A ingestion, **Phase B administrator review/publish** and
-**Phase C interactive published-map viewer** are available.
+Phase A ingestion, **Phase B administrator review/publish**,
+**Phase C interactive viewer** and **Phase D private booking workflow** are available.
 Select **Plot Map** in the dashboard as an administrator, then **Review & publish**
 or **Published map**. The viewer supports status patterns, zoom/pan/pinch, search,
-filters/counts and hover/tap information.
+filters/counts and hover information. Click/tap/Enter opens a transactional admin
+booking form or private booking details, with real PDFs, unpaid token invoice, CRM
+lead, audit and in-app notices.
 Admin uploads create private, versioned draft candidates and a diff. Calibration,
 number/geometry repair, official overrides and CSV exchange stay draft until explicit
-validated publication. Existing units, contracts, booking history and money remain unchanged.
+validated publication. Existing rental units, contracts and financial history remain
+unchanged. Plot bookings create separate buyer token obligations, never fake rental
+leases/receipts, received cash, sale revenue or ledger postings.
 
 ```bash
 npm ci
@@ -184,11 +188,13 @@ npm run plot-maps:sample -- prop_1 samples/plots-explicit.svg
 ```
 
 Try all three `samples/plots-*.svg` fixtures (eight plots each). See
+[Phase D booking/testing guide](docs/PLOT_MAP_PHASE_D.md),
 [Phase C viewer/testing guide](docs/PLOT_MAP_PHASE_C.md),
 [Phase B review/publish walkthrough](docs/PLOT_MAP_PHASE_B.md),
 [Phase A upload/API guide](docs/PLOT_MAP_PHASE_A.md) and
 [SVG preparation guide](docs/SVG_PREPARATION.md). Node 22.22.3 is tested; the new SVG
 sanitizer DOM requires at least 22.22.2 in that series. Review/calibration/publishing
-is implemented in B; admin published viewing is implemented in C. Booking actions
-are Phase D, while public-role access/privacy and automatic live updates are Phase E.
-Both await their separate authorizations.
+is implemented in B, admin published viewing in C, and human-admin booking in D.
+Sold/resale ownership actions, public-role privacy/access, automatic live updates
+and hold-expiry worker are Phase E and await authorization. Agent tools remain F.
+**Stop after D for user testing; feature PR #3 remains draft and unmerged.**

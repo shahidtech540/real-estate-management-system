@@ -536,3 +536,74 @@ await explicit “continue” after user testing before beginning D.
 Phase C preview refreshed on port 3000 using the preserved synthetic DB. Preview-
 Origin login, no-store published API and actual browser viewer/hover smoke pass:
 existing published version **10**, **8 plots**, **0 browser runtime errors**.
+
+## Interactive Plot Map — Phase D completed (2026-10-17)
+
+User authorized D with “continue”. Announced D-only scope and inspected existing
+schema/permissions/billing/CRM/documents before changes. No E/F started.
+
+### Delivered
+
+- Click/tap/Enter opens native accessible booking/private-detail dialog; published
+  plot/project/price locked, existing-client search or new name/phone/ID/email/address,
+  assignee, reserve/book, token request, office date/hold expiry, full/monthly payment
+  plan with exact schedule preview, notes and actual private ID/evidence uploads.
+- Shared strict browser/server structural and temporal validation. Positive current
+  canonical price and exact publication/price/currency guards. Stale map must refresh.
+- Transactional booking uses BEGIN IMMEDIATE, conditional available update and unique
+  active index; same-/cross-process two-writer races yield exactly one winner. UUID
+  payload-bound retries return original booking/PDFs without duplicating business rows.
+- Atomic real client/CRM lead link, billing-module token invoice, stored confirmation/
+  invoice PDF BLOBs + document metadata/uploads, real-actor audit and delivered in-app
+  notifications. Downstream failure rolls everything back. No placeholder services.
+- Existing rental invoice/deal mandatory FKs are not faked: separate plot buyer token
+  obligations/register, real CRM lead, zero fake leases/units/tenants/commissions.
+  No money received, receipt, revenue, ledger posting or refund is fabricated.
+- Authorized reserved/booked detail with revision-guarded confirm/extend/cancel and
+  required reason. Protected/legacy/stale/sold/owned records cannot be overwritten.
+  Cancellation retains source history/documents/CRM and cancels this unpaid invoice.
+- Private `/plots/{id}` page with booking history/actor activity, source-bound protected
+  downloads and **Rent & Payments → Plot token invoices**. Admin-only current scope;
+  no new public/portal/agent grant. C map still sends no booking identity or documents.
+- Modal focus trap/return, desktop/phone operation, instant local status/count updates
+  and conflict refresh; filtered-out bookings keep confirmation open, then focus canvas.
+  Existing hover/search/zoom/pan/pinch and 1,000-plot stable SVG regression retained.
+- Additive migration, Prisma/API/user-guide/decisions updates. Preserves real records;
+  no tracked DBs/large binary fixtures or financial demo writes in preserved preview.
+
+### Verified locally
+
+- **514/514 unit/integration tests, 17 files**; **42 new D cases**, **180 plot-map
+  A/B/C/D tests**. Coverage **92.90% statements / 93.78% lines / 84.55% branches /
+  98.46% functions**.
+- **47/47 full browser regressions**, including **5 new D workflows**. Real desktop
+  full lifecycle/upload/PDF/CRM/billing, competing browser submissions, phone/focus,
+  blocked/unpriced/register, stale publication and filtered-close focus scenarios.
+- Independent Node subprocesses additionally verify contention through one real
+  file-backed SQLite DB, beyond a same-event-loop Promise race. Financial preservation,
+  rollback, retry, legacy schema, org/role/file scope, Origin/quota/body limits tested.
+- Typecheck/production build, OpenAPI **62 routes / 108 operations**, static Prisma/
+  Compose validation and **1/1 separate production-policy browser smoke** pass.
+  Runtime audit **0 known vulnerabilities**; existing five high dev/build graph
+  reports are not represented as fixed. No Docker execution or physical-device SLA claim.
+
+### Run/test / STOP
+
+`npm ci`, `npm run test:plot-maps`, `npm run dev`; admin → **Plot Map → Published map**
+→ click a positive-priced available plot → reserve/book → inspect PDF/invoice/lead,
+confirm/extend/cancel and inspect activity. Phone uses tap. Full instructions and
+financial/privacy limits: **`docs/PLOT_MAP_PHASE_D.md`**.
+
+**STOP after D.** E public/agent per-role access/privacy, sold/resale ownership flows,
+automatic cross-user live updates and scheduled hold expiry remain unimplemented;
+F agent tools/performance acceptance remains separate. Same PR draft/unmerged;
+await explicit “continue” after D user testing.
+
+Phase D preview delivery: verified online backup saved to ignored
+`data/backups/before-plot-d-20261017.sqlite` before upgrade. Port 3000 restarted
+against the same preserved demo DB. Preview-Origin sign-in, publication v10/eight
+plots, hover → priced Plot 101 booking form → Escape/focus return pass, with **zero
+runtime browser errors and zero booking/business mutations in the preserved DB**.
+Read-only before/after comparison confirms original projects, units, leases,
+invoices, payments, receipts, ledger, owner statements, canonical plots, maps,
+geometries and existing client fields unchanged; SQLite FK check clean.

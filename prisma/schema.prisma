@@ -358,6 +358,7 @@ model Client {
   cnic           String?
   phone          String
   email          String?
+  address        String?
   clientType     String    @default("buyer") @map("client_type")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
@@ -1292,6 +1293,14 @@ model PlotBooking {
   createdAt DateTime @default(now()) @map("created_at")
   createdBy String @map("created_by")
   updatedAt DateTime @updatedAt @map("updated_at")
+  requestKey String? @map("request_key")
+  inputHash String? @map("input_hash")
+  bookingType String? @map("booking_type")
+  revision Int @default(0)
+  priceMinor BigInt? @map("price_minor")
+  mapVersionId String? @map("map_version_id")
+  @@unique([organizationId,id])
+  @@unique([organizationId,createdBy,requestKey])
   @@map("plot_bookings")
 }
 
@@ -1354,4 +1363,36 @@ model PlotAreaSetting {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdBy String @map("created_by")
   @@map("plot_area_settings")
+}
+
+
+// Phase D: plot buyer obligations never impersonate lease/tenant/unit rent invoices.
+model PlotTokenInvoice {
+ id String @id
+ organizationId String @map("organization_id")
+ bookingId String @map("booking_id")
+ invoiceNumber String @map("invoice_number")
+ amountMinor BigInt @map("amount_minor")
+ currency String
+ dueDate DateTime @map("due_date")
+ status String
+ createdAt DateTime @default(now()) @map("created_at")
+ updatedAt DateTime @updatedAt @map("updated_at")
+ createdBy String @map("created_by")
+ @@unique([organizationId,bookingId])
+ @@unique([organizationId,invoiceNumber])
+ @@map("plot_token_invoices")
+}
+model PlotBookingFile {
+ organizationId String @map("organization_id")
+ bookingId String @map("booking_id")
+ documentId String @map("document_id")
+ kind String
+ content Bytes
+ createdAt DateTime @default(now()) @map("created_at")
+ updatedAt DateTime @updatedAt @map("updated_at")
+ createdBy String @map("created_by")
+ @@id([organizationId,documentId])
+ @@index([organizationId,bookingId])
+ @@map("plot_booking_files")
 }

@@ -3,9 +3,11 @@ export function middleware(req: NextRequest) {
   const response = NextResponse.next(),
     production = process.env.REMS_DEPLOYMENT === "production",
     frames = process.env.FRAME_ANCESTORS || (production ? "'self'" : "*"),
-    plotSvg = /^\/api\/v1\/properties\/[^/]+\/plot-maps\/[^/]+\/svg\/?$/.test(
-      req.nextUrl.pathname,
-    );
+    plotSvg =
+      /^\/api\/v1\/properties\/[^/]+\/plot-maps\/[^/]+\/svg\/?$/.test(
+        req.nextUrl.pathname,
+      ) ||
+      /^\/api\/v1\/plots\/[^/]+\/files\/[^/]+\/?$/.test(req.nextUrl.pathname);
   response.headers.set(
     "Content-Security-Policy",
     plotSvg

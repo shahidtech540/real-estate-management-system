@@ -1,5 +1,8 @@
 # Interactive Plot Map — Phase C: published-map viewer
 
+> Phase C checkpoint guide. Phase D is now implemented: [booking guide](PLOT_MAP_PHASE_D.md).
+> Hover remains catalogue-only; click/tap/Enter now opens the D booking/details modal.
+
 **Phase C is complete:** published sanitized SVG rendering, status colors/patterns,
 zoom/pan, plot search, filters, counts and hover/tap information. It is currently
 **administrator-only**, retaining the existing A/B API permission boundary. Public/

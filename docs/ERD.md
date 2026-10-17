@@ -271,3 +271,28 @@ area unit. `plot_area_settings` stores per-org display-unit/marla defaults, snap
 into each calibrated map. Publish links geometry to stable plot identity; maps archive
 independently of booking/sale/ownership history. See `PLOT_MAP_PHASE_B.md` for compare-
 and-swap/preservation rules; no future transaction actions are implied.
+
+
+## Interactive Plot Map — Phase D additive model
+
+`clients.address` optional. `plot_bookings` adds UUID request key/payload hash, original
+request booking type, revision, agreed minor-unit total and publication ID; legacy
+NULL fields remain legacy, not inferred financial state. Request uniqueness is
+(org,creator,key); active booking uniqueness remains the existing partial index.
+
+```mermaid
+erDiagram
+  PLOTS ||--o{ PLOT_BOOKINGS : stable_identity
+  CLIENTS ||--o{ PLOT_BOOKINGS : buyer
+  LEADS ||--o{ PLOT_BOOKINGS : crm_link
+  PLOT_BOOKINGS ||--o| PLOT_TOKEN_INVOICES : unpaid_token_request
+  PLOT_BOOKINGS ||--o{ PLOT_BOOKING_FILES : private_actual_bytes
+  DOCUMENTS ||--o| PLOT_BOOKING_FILES : scoped_catalogue
+```
+
+`plot_token_invoices` belongs to the existing billing module but deliberately not the
+rental lease/tenant/unit invoice table. `plot_booking_files` stores real BLOBs with
+org-scoped booking/document/creator FKs. Both tables have audit metadata; integer money
+checks, unique invoice/booking links, status audit trigger and protected file downloads.
+No rental/ledger/sale/ownership schema is repurposed or fictional source record added.
+See [D guide](PLOT_MAP_PHASE_D.md) for limits and transaction/privacy semantics.

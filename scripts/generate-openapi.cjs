@@ -323,6 +323,153 @@ viewer.responses["409"] = {
   description:
     "Legacy published map is uncalibrated; publish a calibrated version.",
 };
+// Phase D: human admin booking writes; never fake rental leases/units or auto-receive cash.
+const bookings = paths["/api/v1/plots/{id}/bookings"];
+bookings.post.description =
+  "Phase D admin-only atomic booking. Requires existing admin/manage/property-write plus leads/invoices/documents read+write. Strict structural/temporal validation shared with browser; published active available plot, exact expected map/price/currency, same-org client/agent. UUID requestKey scoped to org+actor provides exact-input replay; BEGIN IMMEDIATE + conditional status update + unique active booking prevent races. CRM client/lead, unpaid token invoice, actual private PDFs/uploads, actor audit and in-app notifications commit/roll back together. No payment, receipt, sale or ledger posting. See docs/PLOT_MAP_PHASE_D.md.";
+bookings.post.responses["201"] = {
+  description:
+    "New booking and all side effects committed. Contains bookingId, replayed:false and private plot details.",
+};
+bookings.post.responses["200"] = {
+  description:
+    "Exact same-actor/request-key replay; replayed:true with original bookingId, current plot details and issued files. No duplicate side effects.",
+};
+bookings.post.responses["409"] = {
+  description:
+    "Plot just booked/nonavailable, stale publication/price/currency, encumbrance, changed client, or key reused with different terms. No partial business writes; refresh details/map.",
+};
+bookings.post.responses["413"] = {
+  description:
+    "Streamed JSON body exceeds 6 MiB. Maximum 2 base64 attachments, each decoded <=2 MiB; PDF/PNG/JPEG signature required.",
+};
+bookings.post.requestBody.content["application/json"].schema = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "requestKey",
+    "expectedMapId",
+    "expectedPriceMinor",
+    "currency",
+    "agentId",
+    "bookingType",
+    "tokenAmountMinor",
+    "bookingDate",
+    "expiryDate",
+    "paymentPlan",
+  ],
+  properties: {
+    requestKey: { type: "string", format: "uuid" },
+    expectedMapId: { type: "string" },
+    expectedPriceMinor: { type: "integer", minimum: 1, maximum: 1000000000000 },
+    currency: { type: "string", pattern: "^[A-Z]{3}$" },
+    clientId: {
+      type: "string",
+      description: "Exactly one of clientId/newClient.",
+    },
+    newClient: {
+      type: "object",
+      additionalProperties: false,
+      required: ["fullName", "phone"],
+      properties: {
+        fullName: { type: "string", minLength: 2, maxLength: 150 },
+        phone: { type: "string", maxLength: 30 },
+        cnic: { type: "string", maxLength: 40 },
+        email: { type: "string", maxLength: 254 },
+        address: { type: "string", maxLength: 500 },
+      },
+    },
+    agentId: { type: "string" },
+    bookingType: { type: "string", enum: ["reserve", "book"] },
+    tokenAmountMinor: { type: "integer", minimum: 0, maximum: 1000000000000 },
+    bookingDate: {
+      type: "string",
+      format: "date",
+      description: "Today in Asia/Karachi; no backdating/future booking.",
+    },
+    expiryDate: {
+      type: "string",
+      format: "date-time",
+      nullable: true,
+      description: "Future within 90 days for reserve; null for book.",
+    },
+    paymentPlan: {
+      type: "object",
+      additionalProperties: false,
+      required: ["kind", "downPaymentMinor", "installments", "firstDueDate"],
+      properties: {
+        kind: { type: "string", enum: ["full", "installment"] },
+        downPaymentMinor: {
+          type: "integer",
+          minimum: 0,
+          maximum: 1000000000000,
+        },
+        installments: { type: "integer", minimum: 0, maximum: 120 },
+        firstDueDate: {
+          type: "string",
+          description:
+            "Empty for full; valid date after booking for installment.",
+        },
+      },
+    },
+    notes: { type: "string", maxLength: 4000 },
+    files: {
+      type: "array",
+      maxItems: 2,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name", "category", "mimeType", "base64"],
+        properties: {
+          name: { type: "string", maxLength: 150 },
+          category: { type: "string", enum: ["id_copy", "payment_receipt"] },
+          mimeType: {
+            type: "string",
+            enum: ["application/pdf", "image/png", "image/jpeg"],
+          },
+          base64: { type: "string", maxLength: 2796204 },
+        },
+      },
+    },
+  },
+};
+bookings.patch.description =
+  "Same fresh Phase D permissions. Revision-CAS confirm/cancel/extend with required reason. Only the active source-linked D booking can mutate; legacy records read-only. Pending holds can confirm before expiry or extend forward within 90 days; explicit cancel releases plot and cancels unpaid token invoice without deleting client/CRM/history/files or asserting refunds. No automatic expiry or sale conversion.";
+bookings.patch.requestBody.content["application/json"].schema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["bookingId", "revision", "action", "reason"],
+  properties: {
+    bookingId: { type: "string" },
+    revision: { type: "integer", minimum: 0 },
+    action: { type: "string", enum: ["confirm", "cancel", "extend"] },
+    reason: { type: "string", minLength: 3, maxLength: 500 },
+    expiryDate: {
+      type: "string",
+      format: "date-time",
+      description: "Only for extend.",
+    },
+  },
+};
+bookings.patch.responses["409"] = {
+  description:
+    "Stale/closed/legacy booking, invalid plot state, elapsed hold on confirm, or ownership/sale/resale encumbrance.",
+};
+paths["/api/v1/plots/{id}"].get.description =
+  "Phase D private admin-only plot record: canonical catalogue, latest 50 booking records with authorized client identity, invoice/file metadata, latest 100 safe plot/booking activity events. No SVG bytes, source originals, sale/ownership records or file contents. No public/agent access until Phase E; private/no-store.";
+const options = paths["/api/v1/plots/{id}/booking-options"].get;
+options.description =
+  "Same fresh admin/read scope. At least 2 search characters; max 100. Literal bounded name/phone match returns <=30 client IDs/names/phones, never ID/address; <=200 active same-org admin/agent assignees and current default ID.";
+options.parameters.push({
+  name: "q",
+  in: "query",
+  schema: { type: "string", maxLength: 100 },
+});
+paths["/api/v1/plots/{id}/files/{fileId}"].get.description =
+  "Same fresh admin/read scope. Actual private booking PDF/PNG/JPEG bytes after org+plot+booking+document binding. Attachment-only, sandbox CSP, nosniff, private/no-store and audited. No storage credentials/public original locators. 120/user/org/15min.";
+paths["/api/v1/billing/plot-invoices"].get.description =
+  "Admin/manage/property-write + invoices:read. Latest 200 same-org plot token invoice references and non-PII plot/project labels. Separate from rent invoices and ledger revenue; amounts requested, never received. Pending/not_due/cancelled. 120/user/org/15min.";
+
 const spec = {
   openapi: "3.0.3",
   info: {

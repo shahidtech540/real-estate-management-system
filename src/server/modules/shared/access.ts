@@ -45,6 +45,22 @@ export function canReadDocument(
   type: string,
   id: string,
 ): boolean {
+  if (type === "plot_booking")
+    return (
+      ctx.roleSlug === "admin" &&
+      [
+        "admin:manage",
+        "properties:write",
+        "leads:read",
+        "invoices:read",
+        "documents:read",
+      ].every((p) => ctx.permissions.includes(p)) &&
+      !!getDb()
+        .prepare(
+          "SELECT b.id FROM plot_bookings b JOIN plots p ON p.id=b.plot_id AND p.organization_id=b.organization_id JOIN properties r ON r.id=p.project_id AND r.organization_id=p.organization_id WHERE b.organization_id=? AND b.id=? AND p.deleted_at IS NULL AND r.deleted_at IS NULL",
+        )
+        .get(ctx.organizationId, id)
+    );
   const tables: Record<string, string> = {
       property: "properties",
       unit: "units",

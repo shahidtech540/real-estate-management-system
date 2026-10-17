@@ -1,0 +1,14 @@
+.dialog {
+  width: min(760px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #cbd5e1;
+  overflow: auto;
+  color: #0f172a;
+  background: #fff;
+}
+.dialog::backdrop {
+  background: #0f172a80;
+}

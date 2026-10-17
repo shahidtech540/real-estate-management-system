@@ -1,7 +1,7 @@
 # API usage — portals and plot maps
 
-[`openapi.json`](openapi.json) is a route-complete OpenAPI 3.0.3 inventory of 57
-implemented routes / 102 operations, with typed Phase 8 portal inputs/responses.
+[`openapi.json`](openapi.json) is a route-complete OpenAPI 3.0.3 inventory of 62
+implemented routes / 108 operations, with typed Phase 8 portal inputs/responses.
 Legacy operation payloads/action variants are documented in Phases 3–7 guides;
 the inventory deliberately does not invent strict complete schemas for old DTOs.
 `npm run validate:api` checks every documented route/method against implementation,
@@ -92,3 +92,12 @@ All remain administrator-only; no public/booking API is implied.
 Administrator-only `GET /api/v1/properties/{projectId}/plot-maps/viewer` returns a
 coherent published sanitized SVG and safe canonical plot snapshot. No draft/original
 assets or booking/owner data. See [Phase C guide](PLOT_MAP_PHASE_C.md).
+
+
+## Plot Map Phase D
+
+Private admin plot details/options, transactional booking POST and revision-CAS
+confirm/cancel/extend PATCH, scoped attachment download and separate billing token
+register are documented in [Phase D](PLOT_MAP_PHASE_D.md). Five new routes/six
+operations; no fake rental records or asserted payments. Booking POST alone allows
+streamed 6 MiB JSON for two ≤2MiB private files; other routes retain 1MiB.

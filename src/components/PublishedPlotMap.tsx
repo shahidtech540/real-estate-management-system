@@ -9,6 +9,7 @@ import React, {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { PlotBookingDialog } from "./PlotBookingPanel";
 import { api, button, Card, field, Label, secondary } from "./Phase4Shared";
 import {
   cameraForPlot,
@@ -192,8 +193,9 @@ export function PublishedPlotMapWorkspace({
       <div>
         <h1 className="text-2xl font-bold">Published Plot Map</h1>
         <p className="text-sm text-slate-600">
-          Read-only Phase C viewer. Hover or tap for plot information; booking,
-          ownership actions and automatic cross-user updates are later phases.
+          Hover for plot information; click or tap for booking and private
+          details. Ownership actions and automatic cross-user updates remain
+          Phase E.
         </p>
       </div>
       <Label name="Published map project">
@@ -268,9 +270,15 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
     setPinned(false);
     if (restore && id) {
       const node = nodes.current.get(id);
-      if (node && document.activeElement !== node) {
+      if (
+        node &&
+        node.getAttribute("aria-hidden") !== "true" &&
+        document.activeElement !== node
+      ) {
         skipFocus.current = true;
         node.focus({ preventScroll: true });
+      } else if (!node || node.getAttribute("aria-hidden") === "true") {
+        viewport.current?.focus({ preventScroll: true });
       }
     }
   }
@@ -401,7 +409,7 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
       cancelAnimationFrame(frame.current);
       cancelAnimationFrame(tooltipFrame.current);
     };
-  }, [map]);
+  }, [map?.id]);
   useEffect(() => {
     const ids = new Set(visible.map((p) => p.id));
     for (const [id, n] of nodes.current) {
@@ -415,15 +423,23 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
         : visible[0]?.id;
     focusId.current = current || null;
     if (current) nodes.current.get(current)?.setAttribute("tabindex", "0");
-    if (activeRef.current && !ids.has(activeRef.current)) close();
+    if (activeRef.current && !ids.has(activeRef.current) && !pinnedRef.current)
+      close();
   }, [visible, map]);
   useEffect(() => {
     for (const [id, n] of nodes.current) {
       n.dataset.active = String(id === activeId);
       if (id === activeId) {
-        n.setAttribute("aria-describedby", tooltipId);
+        if (pinned) {
+          n.removeAttribute("aria-describedby");
+          n.setAttribute("aria-controls", tooltipId);
+        } else {
+          n.removeAttribute("aria-controls");
+          n.setAttribute("aria-describedby", tooltipId);
+        }
         n.setAttribute("aria-expanded", String(pinned));
       } else {
+        n.removeAttribute("aria-controls");
         n.removeAttribute("aria-describedby");
         n.removeAttribute("aria-expanded");
       }
@@ -619,7 +635,11 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
       }
     }
     function escape(e: KeyboardEvent) {
-      if (e.key === "Escape" && activeRef.current) {
+      if (
+        e.key === "Escape" &&
+        activeRef.current &&
+        !document.querySelector("dialog[data-plot-booking][open]")
+      ) {
         e.preventDefault();
         close(true);
       }
@@ -660,7 +680,7 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
       document.removeEventListener("keydown", escape);
       resize.disconnect();
     };
-  }, [map]);
+  }, [map?.id]);
   function search(e: React.FormEvent) {
     e.preventDefault();
     if (!map) return;
@@ -872,12 +892,13 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
           </div>
           <p id={scope + "-help"} className="text-xs text-slate-600">
             Wheel/double-click to zoom; drag to pan; pinch on touch screens. Tab
-            to a plot, arrow keys to move between plots, Enter/Space to pin
-            information, Escape to close, +/− to zoom, Home to fit. Labels scale
-            with zoom; status abbreviations appear at 200%.
+            to a plot, arrow keys to move between plots, Enter/Space to open
+            booking/details, Escape to close, +/− to zoom, Home to fit. Labels
+            scale with zoom; status abbreviations appear at 200%.
           </p>
           <div
             ref={viewport}
+            tabIndex={-1}
             className={styles.viewport}
             role="region"
             aria-label="Interactive published map"
@@ -896,29 +917,60 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
             <p>No plots match these filters. Clear or adjust the filters.</p>
           )}
           {activePlot &&
+            pinned &&
+            typeof document !== "undefined" &&
+            createPortal(
+              <PlotBookingDialog
+                key={activePlot.id}
+                plotId={activePlot.id}
+                dialogId={tooltipId}
+                viewMapId={map.id}
+                number={activePlot.number}
+                onClose={() => close(true)}
+                onChanged={(p) => {
+                  setMap((m) =>
+                    m &&
+                    m.projectId === p.projectId &&
+                    m.id === p.mapId &&
+                    m.plots.some(
+                      (plot) =>
+                        plot.id === p.id &&
+                        (plot.status !== p.status ||
+                          plot.priceMinor !== p.priceMinor ||
+                          plot.currency !== p.currency),
+                    )
+                      ? {
+                          ...m,
+                          plots: m.plots.map((plot) =>
+                            plot.id === p.id
+                              ? {
+                                  ...plot,
+                                  status: p.status as ViewerPlot["status"],
+                                  priceMinor: p.priceMinor,
+                                  currency: p.currency,
+                                }
+                              : plot,
+                          ),
+                        }
+                      : m,
+                  );
+                }}
+              />,
+              document.body,
+            )}
+          {activePlot &&
+            !pinned &&
             typeof document !== "undefined" &&
             createPortal(
               <div
                 ref={tooltip}
                 id={tooltipId}
                 className={styles.tooltip}
-                data-pinned={String(pinned)}
-                role={pinned ? "dialog" : "tooltip"}
+                role="tooltip"
                 aria-label={`Plot ${activePlot.number} information`}
-                aria-modal={pinned ? false : undefined}
               >
                 <div className="flex items-center justify-between gap-2">
                   <h3>Plot {activePlot.number}</h3>
-                  {pinned && (
-                    <button
-                      className="rounded border px-2 py-1"
-                      type="button"
-                      aria-label="Close plot information"
-                      onClick={() => close(true)}
-                    >
-                      ×
-                    </button>
-                  )}
                 </div>
                 <span className="font-semibold">
                   {statusPresentation[activePlot.status].label}
@@ -954,8 +1006,8 @@ export function PublishedPlotMap({ projectId }: { projectId: string }) {
                   <dd>{money(activePlot)}</dd>
                 </dl>
                 <p className="mt-2 text-xs text-slate-500">
-                  Read-only plot information. Booking and ownership actions are
-                  not part of Phase C.
+                  Hover information only. Click, tap or Enter to book or read
+                  private booking details.
                 </p>
               </div>,
               document.body,
