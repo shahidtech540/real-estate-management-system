@@ -313,3 +313,167 @@ This header is never attached to external URLs and never placed in query strings
   validator checks actual route/method coverage and references.
 - No security/legal certification, live payment/outbound/model/OCR, automatic
   contract execution, bank verification or historical-data recovery is claimed.
+
+## Interactive Plot Map — Phase A (2026-10-17)
+
+- Latest main pulled fast-forward-only on the active feature branch; user authorizes
+  Phase A only, with a plan first and a testing stop after every phase. No Phase B
+  UI/calibration/publish work, booking actions or feature PR merge yet.
+- `properties` are projects. Do not create a parallel projects table or mutate/link
+  the existing `units`, leases or ledger. Additive/idempotent SQLite migration plus
+  Prisma design models; cross-org references and integer money checks in new tables.
+- Keep canonical `plots` unique per project/number, and per-version candidate/geometry
+  snapshots separately. Draft duplicate numbers are reviewable, not silently merged.
+  Re-upload inserts drafts and computes diff; canonical plots/bookings/sales remain
+  untouched until a later explicitly confirmed/published workflow.
+- Store original/sanitized SVG as private SQLite BLOB assets with opaque `sqlite:`
+  locators in the specified path columns. This matches the actual local architecture,
+  makes assets part of atomic transactions/online backups, and avoids public files
+  or orphaned writes. Never expose an original SVG through HTTP.
+- Phase A raw upload API is administrator-role + admin:manage + properties:write,
+  freshly checked. 10 MiB streamed UTF-8 image/svg+xml; existing JSON cap unchanged.
+  Read draft endpoints are equally private; public map privacy comes in later phases.
+- DOMPurify 3.4.17 + jsdom 30.1.3 maintained server sanitizer; streaming saxes preflight
+  limits depth/nodes before DOM allocation. Remove all CSS/style/URL/escaped-attribute,
+  external-resource, animation, script/event and foreignObject mechanisms. Regenerate
+  all interaction IDs; keep sanitized source identifiers only as data.
+- Transform/path processing uses svgpath; 32 samples per normalized curve/arc segment.
+  Closed polygon rings, evenodd/nonzero fills and centroid/bounds/area are SVG-unit
+  approximations, not calibrated/official survey measurements. Rounded rects currently
+  use their rectangular footprint; overlap/self-intersection resolution stays in B.
+- Per-project regex uses bounded RE2JS patterns, not user-supplied native backtracking.
+  Explicit attributes win; numbered groups own children; fallback chooses the smallest
+  containing unclaimed closed shape. Ignore known nonplot layers/large fallback shapes;
+  keep warnings rather than inventing unlabeled bookable plots.
+- Enforce explicit XML/shape/point/comparison limits; docs describe accepted SVG subset.
+  8/8 on each supplied fixture is not an arbitrary-file 95% accuracy certification.
+- Sample imports are opt-in/demo-only and seed draft candidates, not live inventory.
+  No automatic production fixtures. Fresh preview DB is labeled synthetic; prior
+  absent runtime history is not represented as recovered data.
+- New jsdom raises supported Node to ^22.22.2 / ^24.15 / >=26; tested Node 22.22.3.
+  Runtime Next externalizes jsdom/DOMPurify to preserve their package loading.
+- Later-transaction schema fields do not imply implemented money, CRM, notifications,
+  bookings, hold expiry, sale/resale or agent tools. Stop at the Phase A boundary.
+
+## Interactive Plot Map — Phase B (2026-10-17)
+
+- User's “continue” authorizes B only. Add `PlotMapWorkspace` to existing dashboard,
+  administrator navigation and server-fresh admin/manage/property-write guard. No
+  new visitor/public endpoints, Phase C map tools, booking/billing or agent work.
+- Additive Phase A upgrade: map revision/published time, candidate exclusion/review
+  JSON/fill rule, explicit official area unit, per-org area defaults. No data reset.
+  Legacy Phase A holes infer fill rule from stored filled area when rule was absent.
+- Calibration is ratio or two distinct SVG points + known feet/meters distance.
+  Default marla is 272.25 sq ft, configurable, kanal=20 marla. Org display defaults
+  are reused for future maps, while calibration remains a map-specific snapshot.
+  Official/price units bind when entered; display recalibration does not relabel them.
+- Longest-edge-oriented extents and edge lengths are calculated approximations;
+  optional nearby parallel roads infer adjacent-side corner, facing only if north-up
+  is declared. Ambiguous/complex road cases remain unknown; official values separate.
+- `polygon-clipping` normalizes compound/group fills (including child hole rules),
+  then handles overlap diagnostics, union merges and
+  vertical/horizontal SVG-axis splits with holes. Edited outlines get actual safe
+  generated SVG path IDs; source originals remain immutable private BLOBs. Split
+  official area/dimensions/total/corner/facing/status are cleared, not duplicated.
+- CSV UTF-8 is the Excel exchange (Save As CSV); not claiming native XLSX. Strict
+  named headers, exact unique plot-number matching, blank=no change, whole-batch
+  rollback, integer minor money and formula-safe export. Clear overrides via UI/API.
+- All writes require revision compare-and-swap under BEGIN IMMEDIATE; publish also
+  compares the currently published baseline. No last-writer-wins silent overwrites.
+  Published/archived review is read-only, prior publication archived atomically.
+- Keep existing data defaults true; preserve stable canonical IDs, financial/booking/
+  sale/ownership/resale references. Explicit draft metadata overrides apply on publish.
+  Replacing metadata is allowed only for unencumbered plots, never replacing identity.
+  Protected removals/renumbering/merge/split are blocked; unencumbered removals require
+  diff acknowledgment and soft archive. Booking/sale statuses cannot be fabricated
+  through review/CSV. Source leases/units/invoices/ledger remain untouched.
+- Duplicate/missing numbers, calibration, protected removals and overlap-comparison
+  budget are blocking. Geometry/source warnings require explicit audited acceptance
+  reason; bounded diagnostics include truncation summaries. Acceptance never bypasses
+  blocking business or tenant-integrity checks.
+- New review/CSV/publish operation quotas are 60/user/org/15min. Phase A raw SVG limit
+  and 20-upload quota remain unchanged. Assets stay private and SVG sandbox CSP stays
+  intact; only trusted, server-sanitized bytes reach the review markup rendering sink.
+- Testing uses isolated seeded demo databases. Preview remains the previously labeled
+  synthetic file; this does not restore absent business history. Stop for user testing
+  after B, keep the existing feature PR draft/unmerged, await C authorization.
+
+## Interactive Plot Map — Phase C (2026-10-17)
+
+- User's “countine” authorizes C only. Add published-map viewing within the existing
+  Plot Map section, preserving the selected project between review/published modes.
+  Do not implement D booking/click actions, E live/public-role workflows or F tools.
+- Keep A/B's fresh admin/manage/property-write organization boundary for all C reads.
+  Broader public/portal/agent read policies and price toggle need E's explicit privacy
+  work. No new permission grants or accidental anonymous map exposure.
+- Dedicated published-only read endpoint returns sanitized SVG and allowlisted plot
+  metadata in one transaction snapshot, preventing mixed SVG/metadata versions during
+  publication. Current canonical statuses/prices, never draft review values, drive C.
+  No buyer/owner/client/agent/history/notes joins, original SVG or asset locators.
+- No migration needed. Source maps, canonical plots, business/financial rows unchanged
+  by viewer reads; existing authentication quotas use the standard technical tables.
+- Counts update with filters and explicit refresh. Automatic server polling/SSE and
+  cross-user notifications remain E, even though the C read model is status-ready.
+- Static memoized SVG scene, delegated pointer/focus/key events, imperative bounded
+  transforms/visibility/focus attributes and requestAnimationFrame tooltip positioning.
+  No per-plot React listeners, subtree reconstruction or hover detail requests.
+- Reuse generated SVG IDs/canonical geometry, make background inert, suppress matched
+  source shapes beneath the interactive overlay, preserve compound holes. Never put
+  raw uploaded bytes or raw field strings into the SVG/HTML rendering sink.
+- Colorblind-aware six-status patterns and text; reserved/booked share amber but have
+  different patterns/marks. Plot labels scale; detail status marks appear at 200%.
+- Official size/dimensions take precedence, calculated fallback explicit. Filter size
+  converts to current map display units; unknown prices/corners do not match numeric/
+  definite filters. Price input uses major units, DTO/storage integer minor units.
+  Mixed currency comparisons are nominal per-currency, not invented FX conversion.
+- Mouse hover and touch/click/Enter read-only pin panel only; no fake booking drawer,
+  owner details or inquiry buttons. Roving tab stop, spatial arrows, Escape focus return,
+  reduced motion, wheel/drag/pinch controls and fit/search complete C interaction scope.
+- Tests use isolated demo DBs and synthetic render-only six-state DTO fixtures for
+  future statuses. No manufactured production bookings/sales or tracked large datasets.
+  Stop at C, retain draft/unmerged feature PR, await user authorization for D.
+
+## Interactive Plot Map — Phase D (2026-10-17)
+
+- User's latest “continue” authorizes D only. Native modal click/tap/Enter booking
+  form, private plot page/activity, reserved/booked confirm/extend/cancel. Sold/resale
+  ownership actions, public-role privacy, automatic updates/expiry are E, tools F.
+- Keep admin/manage/property-write boundary through D. Reads additionally require
+  leads/invoices/documents read; writes require corresponding writes. No new role
+  grants. Agent assignee can receive an in-app notice without receiving new API access.
+- Existing rent invoice FKs require lease/tenant/unit, and CRM deals require units.
+  Never fabricate those: add source-linked `plot_token_invoices` within billing and
+  link actual existing CRM leads/clients. Separate register in Rent & Payments.
+- Token is an amount requested, not received. Create real unpaid invoice/PDF (zero
+  token `not_due`), never fake payment/receipt, sale revenue, ledger, refund or bypass
+  independent approvals. Installments are agreed terms, not auto-paid future invoices.
+- Share strict input/temporal/payment validators between browser and API. Minor-unit
+  integer amounts; full or monthly schedule with token included in down payment and
+  exact remainder distribution/month-end clamping. Positive published price required;
+  exact map/price/currency guards prevent stale or discounted submissions.
+- Sensible bounded defaults: booking date today in Asia/Karachi, pending holds future
+  ≤90 days, confirmed no expiry, installment count 1–120, existing lookup 2–100 chars/
+  ≤30 literal matches, assignees ≤200 active same-org agent/admin. No inferred KYC.
+- PDF buffers prepared asynchronously before SQLite BEGIN IMMEDIATE; transaction
+  revalidates fresh access/price/publication/client/agent/expiry and writes every
+  domain/billing/CRM/document/audit/inbox side effect atomically. CAS available status
+  and unique active booking index protect same-/cross-process concurrent writers.
+- UUID key + validated payload SHA-256 scoped to org/actor gives exact retries with
+  original stored documents. Changed input under used key conflicts; no duplicate rows.
+- Confirm/extend/cancel require revision/reason and reject closed/legacy/inconsistent/
+  sale/ownership encumbrances. Cancellation retains client/lead/files/history, voids
+  only this unpaid token invoice and explicitly releases only this active booking.
+  Elapsed holds cannot confirm; explicit extension/cancel only until E's worker.
+- Additive SQLite migration and Prisma design fields; old booking rows untouched and
+  read-only until reconciled, rather than assigning fictional paid/unpaid history.
+  Existing rent/lease/payment/ledger/owner statement/units unaffected (tested).
+- Real private file BLOBs + scoped document catalogue, ≤2 PDF/PNG/JPEG files of ≤2MiB,
+  signature/encoding checks, attachment-only sandbox/no-store/nosniff downloads. POST
+  streaming cap 6MiB; all existing JSON routes keep 1MiB. No malware/authenticity claim.
+- English/ASCII PDF font fallback reuses existing renderer; Unicode retained exactly
+  in UI/JSON. Immutable issuance PDFs must be checked against current booking state.
+- Native dialog/inert background, explicit Tab/Shift-Tab wrap, Escape/close focus return,
+  lazy private details, stale-load guards and filtered-plot canvas focus. Local mutation/
+  conflict response patches canonical status/counts without resetting camera; no polling.
+- Tests on isolated DBs only; preserved preview gets verified online backup and additive
+  startup upgrade. Stop at D for user testing; same feature PR stays draft/unmerged.

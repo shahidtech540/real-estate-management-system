@@ -18,7 +18,7 @@ email/domain/phone have **not** been supplied. None are asserted by this setup.
 The units, owners, customers, prices and financial transactions remain **demo
 records**, not a verified inventory or legal/financial representation of the business.
 
-## Run locally (Node.js 22+)
+## Run locally (Node.js 22.22.3+ recommended in the 22.x series)
 
 ```bash
 npm ci
@@ -133,7 +133,7 @@ reminders are in-app only. An administrator cannot approve their own write.
 npm run test:agents  # 125 evaluations + 20 guarded-engine integration tests
 ```
 
-See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 8 complete; awaiting authorization for any further work. PR #2 remains unmerged.**
+See [Phase 7 guide and limitations](docs/PHASE7.md). **Phase 8 complete; PR #2 was merged. Subsequent authorized plot-map work is tracked below.**
 
 
 ## Phase 8: owner and tenant portals
@@ -163,4 +163,38 @@ See [portal/user/security guide](docs/PHASE8.md), [deployment/recovery runbook](
 and [API](docs/API.md) / [OpenAPI](docs/openapi.json). The preview is a **fresh demo**,
 not recovered historical data. Runtime audit is clean at this checkpoint; the full
 build graph still has five documented high Tailwind/braces advisory reports.
-**Stopping at Phase 8; no PR merge or next phase without authorization.**
+**Phase 8 checkpoint complete. Further phases and PR merges require explicit authorization; see current plot-map progress below.**
+
+
+## Interactive Plot Map — Phases A–D
+
+Phase A ingestion, **Phase B administrator review/publish**,
+**Phase C interactive viewer** and **Phase D private booking workflow** are available.
+Select **Plot Map** in the dashboard as an administrator, then **Review & publish**
+or **Published map**. The viewer supports status patterns, zoom/pan/pinch, search,
+filters/counts and hover information. Click/tap/Enter opens a transactional admin
+booking form or private booking details, with real PDFs, unpaid token invoice, CRM
+lead, audit and in-app notices.
+Admin uploads create private, versioned draft candidates and a diff. Calibration,
+number/geometry repair, official overrides and CSV exchange stay draft until explicit
+validated publication. Existing rental units, contracts and financial history remain
+unchanged. Plot bookings create separate buyer token obligations, never fake rental
+leases/receipts, received cash, sale revenue or ledger postings.
+
+```bash
+npm ci
+npm run test:plot-maps
+npm run plot-maps:sample -- prop_1 samples/plots-explicit.svg
+```
+
+Try all three `samples/plots-*.svg` fixtures (eight plots each). See
+[Phase D booking/testing guide](docs/PLOT_MAP_PHASE_D.md),
+[Phase C viewer/testing guide](docs/PLOT_MAP_PHASE_C.md),
+[Phase B review/publish walkthrough](docs/PLOT_MAP_PHASE_B.md),
+[Phase A upload/API guide](docs/PLOT_MAP_PHASE_A.md) and
+[SVG preparation guide](docs/SVG_PREPARATION.md). Node 22.22.3 is tested; the new SVG
+sanitizer DOM requires at least 22.22.2 in that series. Review/calibration/publishing
+is implemented in B, admin published viewing in C, and human-admin booking in D.
+Sold/resale ownership actions, public-role privacy/access, automatic live updates
+and hold-expiry worker are Phase E and await authorization. Agent tools remain F.
+**Stop after D for user testing; feature PR #3 remains draft and unmerged.**

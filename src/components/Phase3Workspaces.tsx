@@ -1,5 +1,6 @@
 "use client";
 
+import {PlotTokenInvoices} from "./PlotTokenInvoices";
 import { AuthenticatedDownload } from "@/components/AuthenticatedDownload";
 
 import { authFetch } from "@/lib/auth-client";
@@ -864,6 +865,7 @@ export function BillingWorkspace({
           </button>
         )}
       </div>
+      {permissions.includes("admin:manage") && permissions.includes("properties:write") && permissions.includes("invoices:read") && <PlotTokenInvoices />}
       <Card title={tr("Invoice register", "انوائس رجسٹر")}>
         <select
           aria-label="Invoice status filter"

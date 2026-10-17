@@ -1,3 +1,5 @@
+import {migratePlotBookings} from "./plot-bookings";
+import {migratePlotMaps} from "./plot-maps";
 import {validateDeployment,productionDeployment} from "../security/config";
 import {migratePhase8} from "./phase8";
 import type { DatabaseSync as DatabaseSyncType } from "node:sqlite";
@@ -65,6 +67,8 @@ export function getDb(): DatabaseSyncType {
   migratePhase6(dbInstance);
   migratePhase7(dbInstance);
   migratePhase8(dbInstance);
+  migratePlotMaps(dbInstance);
+  migratePlotBookings(dbInstance);
   if(productionDeployment()&&dbInstance.prepare("SELECT id FROM users WHERE status='active' AND deleted_at IS NULL AND email LIKE '%@fahadrealestate.test'").get()){dbInstance.close();dbInstance=null;throw new Error("Suspend demo accounts before using production deployment mode.");}
 
   return dbInstance;

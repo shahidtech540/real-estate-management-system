@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 190">
+ <title>Text-anchor fallback — eight synthetic plots</title>
+ <g fill="#cae8ca" stroke="#333">
+  <rect x="10" y="10" width="45" height="65"/><rect x="65" y="10" width="45" height="65"/>
+  <rect x="120" y="10" width="45" height="65"/><rect x="175" y="10" width="45" height="65"/>
+  <polygon points="10 105 55 105 55 170 10 170"/><path d="M65 105h45v65h-45Z"/>
+  <polyline points="120 105 165 105 165 170 120 170 120 105"/><rect x="175" y="105" width="45" height="65"/>
+ </g>
+ <g fill="#111" font-size="12"><text x="30" y="45">1</text><text x="85" y="45">2</text><text x="140" y="45">A-3</text><text x="195" y="45">4</text><text x="30" y="140">5</text><text x="85" y="140">6</text><text x="140" y="140">7</text><text x="195" y="140">8</text></g>
+ <g class="roads"><rect x="0" y="80" width="240" height="20" fill="#ddd"/></g>
+</svg>

@@ -358,6 +358,7 @@ model Client {
   cnic           String?
   phone          String
   email          String?
+  address        String?
   clientType     String    @default("buyer") @map("client_type")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
@@ -1163,4 +1164,235 @@ model AuthRateLimit {
  count Int
  resetAt Int @map("reset_at")
  @@map("auth_rate_limits")
+}
+
+// Plot-map Phase A design. Runtime composite FKs, triggers and partial indexes
+// are enforced by src/server/db/plot-maps.ts; these scalar models are not a runtime switch.
+
+model PlotMapSetting {
+  organizationId String @map("organization_id")
+  projectId String @map("project_id")
+  plotNumberPattern String? @map("plot_number_pattern")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@id([organizationId,projectId])
+  @@map("plot_map_settings")
+}
+
+model ProjectMap {
+  revision Int @default(0)
+  publishedAt DateTime? @map("published_at")
+  id String @id
+  organizationId String @map("organization_id")
+  projectId String @map("project_id")
+  version Int
+  originalSvgPath String @map("original_svg_path")
+  sanitizedSvgPath String @map("sanitized_svg_path")
+  viewBox Json @map("view_box")
+  scaleConfig Json? @map("scale_config")
+  status String @default("draft")
+  detectionConfig Json @map("detection_config")
+  reportJson Json @map("report_json")
+  diffJson Json @map("diff_json")
+  sourceSha256 String @map("source_sha256")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@unique([organizationId,projectId,version])
+  @@unique([organizationId,projectId,id])
+  @@unique([organizationId,id])
+  @@map("project_maps")
+}
+
+model ProjectMapAsset {
+  organizationId String @map("organization_id")
+  mapId String @map("map_id")
+  kind String
+  content Bytes
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  @@id([organizationId,mapId,kind])
+  @@map("project_map_assets")
+}
+
+model Plot {
+  id String @id
+  organizationId String @map("organization_id")
+  projectId String @map("project_id")
+  mapId String @map("map_id")
+  plotNumber String @map("plot_number")
+  block String?
+  phase String?
+  street String?
+  areaUnit String? @map("area_unit")
+  areaOfficial Float? @map("area_official")
+  dimensionsOfficial String? @map("dimensions_official")
+  facing String?
+  isCorner Boolean? @map("is_corner")
+  category String?
+  pricePerUnitMinor BigInt? @map("price_per_unit_minor")
+  totalPriceMinor BigInt? @map("total_price_minor")
+  currency String @default("PKR")
+  status String @default("available")
+  statusChangedAt DateTime @map("status_changed_at")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@unique([projectId,plotNumber])
+  @@unique([organizationId,id])
+  @@unique([organizationId,projectId,id])
+  @@index([organizationId,projectId,status])
+  @@map("plots")
+}
+
+model MapPlotGeometry {
+  excluded Boolean @default(false)
+  reviewJson Json @map("review_json")
+  fillRule String? @map("fill_rule")
+  id String @id
+  organizationId String @map("organization_id")
+  projectId String @map("project_id")
+  mapId String @map("map_id")
+  plotId String? @map("plot_id")
+  plotNumber String @map("plot_number")
+  svgElementId String @map("svg_element_id")
+  detectionMethod String @map("detection_method")
+  confidence Float
+  polygonPoints Json @map("polygon_points")
+  centroid Json
+  boundingBox Json @map("bounding_box")
+  areaSvg Float @map("area_svg")
+  areaCalculated Float? @map("area_calculated")
+  dimensionsCalculated String? @map("dimensions_calculated")
+  geometryHash String @map("geometry_hash")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@unique([organizationId,mapId,svgElementId])
+  @@index([organizationId,mapId,plotNumber,id])
+  @@map("map_plot_geometries")
+}
+
+model PlotBooking {
+  id String @id
+  organizationId String @map("organization_id")
+  plotId String @map("plot_id")
+  clientId String? @map("client_id")
+  leadId String? @map("lead_id")
+  agentId String? @map("agent_id")
+  tokenAmountMinor BigInt @default(0) @map("token_amount_minor")
+  currency String @default("PKR")
+  paymentPlan Json @map("payment_plan")
+  bookingDate DateTime @map("booking_date")
+  closedAt DateTime? @map("closed_at")
+  expiryDate DateTime? @map("expiry_date")
+  status String
+  notes String?
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  requestKey String? @map("request_key")
+  inputHash String? @map("input_hash")
+  bookingType String? @map("booking_type")
+  revision Int @default(0)
+  priceMinor BigInt? @map("price_minor")
+  mapVersionId String? @map("map_version_id")
+  @@unique([organizationId,id])
+  @@unique([organizationId,createdBy,requestKey])
+  @@map("plot_bookings")
+}
+
+model PlotSale {
+  id String @id
+  organizationId String @map("organization_id")
+  plotId String @map("plot_id")
+  buyerId String @map("buyer_id")
+  salePriceMinor BigInt @map("sale_price_minor")
+  currency String @default("PKR")
+  saleDate DateTime @map("sale_date")
+  paymentStatus String @map("payment_status")
+  documents Json
+  currentOwner Boolean @map("current_owner")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("plot_sales")
+}
+
+model PlotOwnershipHistory {
+  id String @id
+  organizationId String @map("organization_id")
+  plotId String @map("plot_id")
+  ownerId String @map("owner_id")
+  fromDate DateTime @map("from_date")
+  toDate DateTime? @map("to_date")
+  transferType String @map("transfer_type")
+  currency String @default("PKR")
+  priceMinor BigInt? @map("price_minor")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("plot_ownership_history")
+}
+
+model ResaleListing {
+  id String @id
+  organizationId String @map("organization_id")
+  plotId String @map("plot_id")
+  sellerId String @map("seller_id")
+  currency String @default("PKR")
+  askingPriceMinor BigInt @map("asking_price_minor")
+  listedDate DateTime @map("listed_date")
+  status String
+  notes String?
+  agentId String? @map("agent_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("resale_listings")
+}
+
+// Per-organization defaults are snapshotted into each map calibration.
+model PlotAreaSetting {
+  createdAt DateTime @default(now()) @map("created_at")
+  organizationId String @id @map("organization_id")
+  areaUnit String @default("marla") @map("area_unit")
+  marlaSqft Float @default(272.25) @map("marla_sqft")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@map("plot_area_settings")
+}
+
+
+// Phase D: plot buyer obligations never impersonate lease/tenant/unit rent invoices.
+model PlotTokenInvoice {
+ id String @id
+ organizationId String @map("organization_id")
+ bookingId String @map("booking_id")
+ invoiceNumber String @map("invoice_number")
+ amountMinor BigInt @map("amount_minor")
+ currency String
+ dueDate DateTime @map("due_date")
+ status String
+ createdAt DateTime @default(now()) @map("created_at")
+ updatedAt DateTime @updatedAt @map("updated_at")
+ createdBy String @map("created_by")
+ @@unique([organizationId,bookingId])
+ @@unique([organizationId,invoiceNumber])
+ @@map("plot_token_invoices")
+}
+model PlotBookingFile {
+ organizationId String @map("organization_id")
+ bookingId String @map("booking_id")
+ documentId String @map("document_id")
+ kind String
+ content Bytes
+ createdAt DateTime @default(now()) @map("created_at")
+ updatedAt DateTime @updatedAt @map("updated_at")
+ createdBy String @map("created_by")
+ @@id([organizationId,documentId])
+ @@index([organizationId,bookingId])
+ @@map("plot_booking_files")
 }

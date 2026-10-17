@@ -329,3 +329,281 @@ opt into empty production provisioning; backups/upgrade rehearsals preserve hist
 **Stop after Phase 8. No later implementation or PR #2 merge without further
 user authorization. Live integrations and independent launch review remain outside
 this completed local checkpoint.**
+
+## Interactive Plot Map — Phase A completed (2026-10-17)
+
+User explicitly authorized this new feature after the Phase 8 checkpoint. Latest
+`main` pulled fast-forward-only on `arena/3203e4be-real-estate-management-system`;
+read `interactive-plot-map-feature-prompt.md` and summarized the plan before editing.
+
+### Delivered (Phase A only)
+
+- Additive/idempotent migration and matching Prisma design for maps/settings/private
+  assets, canonical plots/per-version geometry and future booking/sale/ownership/
+  resale records. Existing `properties` are projects; no unrelated units, leases or
+  financial source rows rewritten. Composite scopes, integer money checks, partial
+  active-record uniqueness and database status-change audit triggers added.
+- Admin-only raw SVG upload <=10 MiB with streamed bounds/type/UTF-8 validation.
+  DOMPurify/jsdom sanitation plus SAX preflight node/depth budgets; scripts, handlers,
+  foreign content, styles/resources/escaped CSS removed. Fresh role + admin/domain
+  write permission and same-project organization checks protect every draft endpoint.
+- Private original/sanitized SQLite BLOB assets participate in the same transaction
+  and online backup; HTTP only serves sanitized sandboxed attachments, never originals.
+  Unique internal element IDs replace possibly duplicated designer IDs.
+- All four requested detection approaches: explicit attributes, patterned IDs,
+  numbered groups without double-counting, transformed text anchors to smallest
+  containing closed shapes; road/park/boundary/legend/hidden/definition exclusions.
+  RE2-compatible per-project configuration is bounded and applies to future uploads.
+- Polygon/bbox/centroid/SVG-unit area for rect/polygon/closed-polyline and normalized
+  curve/arc/compound paths, nested matrix/rotation/scale/skew transforms; detection
+  warnings and strict complexity budgets, paged results. No invented physical scale,
+  official area, price, facing or corners.
+- Every upload is a new draft with added/removed/changed/unchanged diff against
+  published or latest draft. Existing canonical plots/bookings remain unchanged.
+  Preservation confirmation/publishing is not silently implemented in Phase A.
+- Three synthetic sample SVGs, each eight plots; explicit demo-only sample import
+  CLI seeds inspectable draft candidates without changing business inventory.
+  Dedicated API/Windows testing guide and designer preparation guide, README,
+  decisions/ERD/OpenAPI inventory updated (53 routes / 96 operations).
+
+### Verification
+
+- **45 new tests**, **379/379 total tests across 14 files** pass. Coverage:
+  **92.51% statements, 93.36% lines, 83.40% branches, 98.23% functions**.
+- Each sample detects **8/8** plots; adversarial cases include executable/external/
+  CSS-escaped SVG content, XML/XXE/depth/size, transformed/curved/holed geometry,
+  missing/duplicate numbers, permission downgrades/cross-org access, financial
+  migration equality, version/canonical-booking preservation, integer money,
+  cross-org references, active booking constraints and status audit entries.
+- A 1,000-plot fixture detects exactly 1,000 candidates (local test ~0.42 seconds);
+  not a final UI/concurrent load-performance acceptance claim.
+- Typecheck, full test coverage, production Next build, OpenAPI and static Prisma/
+  Compose validation pass. Runtime npm audit: **0 known vulnerabilities**. Existing
+  five high Tailwind/build-graph reports remain; no full audit-zero claim.
+- Real built-server smoke verified middleware preserves the SVG-only sandbox CSP
+  (regression test added; normal application CSP unchanged).
+- Real built-server smoke on port 3000: admin login, all three raw uploads (201),
+  8 candidate reads each (200), sanitized SVG downloads (200), versions 1–3.
+  Fresh preview DB: `data/plot-map-phase-a-demo.sqlite`, explicitly synthetic;
+  no historic data/backups were available to recover or overwrite.
+- New jsdom requires Node ^22.22.2 / ^24.15 / >=26; tested Node 22.22.3. Runtime
+  dependencies are externalized appropriately for Next's server build.
+
+### How to test / stop boundary
+
+`npm ci`, `npm run test:plot-maps`, then `npm run plot-maps:sample -- prop_1
+samples/plots-explicit.svg` (repeat with text-only/messy). Use `npm run dev` and the
+PowerShell upload/read/download walkthrough in `docs/PLOT_MAP_PHASE_A.md` to test
+HTTP. All map content is still draft/admin-only; there is **no Plot Map UI yet**.
+
+**STOP after Phase A for user testing. Phase B is calibration, measurements, review,
+CSV and publishing; do not begin it or merge the feature branch without authorization.**
+
+## Interactive Plot Map — Phase B completed (2026-10-17)
+
+User authorized B with “continue” after the Phase A checkpoint. Plan summarized
+before edits; worked only on `arena/3203e4be-real-estate-management-system`.
+
+### Delivered
+
+- New **Plot Map** administrator workspace in existing desktop/mobile dashboard
+  navigation: project/version selection, raw SVG upload, advanced pattern setting,
+  sanitized SVG + highlighted candidate overlays and editable review table.
+- Ratio/two-point feet/meters calibration; configurable org marla/kanal/display-area
+  defaults with per-map snapshots, real area and longest-edge-oriented approximate
+  dimensions, optional bounded road-facing/adjacent-corner hints. Official override
+  values stay separate and explicit area/price units survive later recalibration.
+- Assign/fix numbers, restore/exclude nonplots (including road-layer overrides),
+  bulk official block/phase/street/area/dimensions/facing/corner/category/price/status.
+  Merge by polygon union and split along chosen X/Y coordinate, preserving holes
+  and creating real internal SVG outline IDs. Unsafe hidden definitions are denied.
+- Strict UTF-8 CSV/Excel Save-As-CSV import/export, plot-number matching, quoted
+  multiline parsing, formula-safe export, integer money, whole-batch rollback.
+- Live review validation/diff: duplicates/missing numbers, calibration, source
+  diagnostics, area outliers, true overlaps (not touching edges), protected removal
+  and bounded-comparison checks. Warning acceptance requires an audited reason.
+- Revision-checked edits and atomic publish with published-baseline compare-and-swap;
+  prior map archived. Canonical plot identity/bookings/sales/ownership/resale and
+  unmentioned official data preserved; explicit draft overrides apply. Protected
+  removals/renumbering/status replacement are blocked; unused removed plots are
+  soft-archived only after explicit acknowledgment. Published versions read-only.
+- Additive migration upgrades Phase A DBs, including legacy hole interpretation;
+  Prisma design/ERD/API/OpenAPI and README/user/designer guides updated. No unrelated
+  source unit/lease/invoice/ledger changes or destructive migration.
+
+### Verification
+
+- **61 new B tests**, **440/440 unit/integration tests across 15 files** pass;
+  all **106 plot-map A+B tests** pass. Full coverage: **92.73% statements,
+  93.67% lines, 83.93% branches, 98.35% functions**.
+- All three SVG samples calibrate/publish 8 plots each. A 1,000-plot fixture can
+  upload/review/calibrate/publish exactly 1,000 (~1.37s locally for that test), not
+  a claim of completed Phase F interactive/concurrent performance acceptance.
+- Tests cover stale edits/baselines, permissions/cross-org, protected bookings/sales/
+  ownership/resale surviving reupload, official-vs-calculated values/units, legacy
+  Phase A holes, merge/split/overlap, CSV atomic failure/formulas, status and money
+  restrictions, immutable publications, archives/identity reuse and audit trails.
+- Production build, typecheck, OpenAPI **56 routes / 101 operations**, static Prisma/
+  Compose validation pass. Runtime dependency audit **0 vulnerabilities**; existing
+  five high build/dev graph advisories are not represented as fixed.
+- **36/36 full browser regression tests pass** on an isolated new demo DB, including
+  3 new Phase B flows: upload/fix/calibration/official/CSV/publish + mobile layout;
+  role denial; two-point picks + split/merge + switching projects without stale UI.
+  Exact calibration math tested separately from browser pointer-pixel approximation.
+- Separate production-mode browser smoke also passes (1/1): no demo credentials
+  or financial fixtures; secure session and production response policies preserved.
+- Node 22.22.3, Next production server, local Chromium 133 via temporary npm browser
+  harness. No browser binaries, test DBs, reports, screenshots or caches committed.
+  Existing preview DB is preserved and upgraded, never deleted or replaced.
+
+### How to test / STOP
+
+`npm ci`, `npm run test:plot-maps`, `npm run dev`; sign in as demo admin, select
+**Plot Map**, upload any `samples/plots-*.svg`, calibrate, correct/review, optionally
+import CSV, inspect diff/accept warnings and publish. The full walkthrough, units,
+Excel instructions, preservation rules, API examples and browser-test isolation are
+in **`docs/PLOT_MAP_PHASE_B.md`**. Node 22.22.3+ in the 22.x series is recommended.
+
+**STOP after Phase B.** No Phase C visitor interactions/status colors/zoom/pan/hover
+map, Phase D bookings/billing, later privacy/live updates or agent hooks implemented.
+Feature PR remains draft/unmerged; await explicit “continue” after user testing.
+
+## Interactive Plot Map — Phase C completed (2026-10-17)
+
+User authorized C with “countine” after B. Plan summarized before editing; work
+remains on `arena/3203e4be-real-estate-management-system`. No later phase started.
+
+### Delivered
+
+- **Plot Map → Published map** viewer alongside the retained B **Review & publish**
+  workspace. Project selection carries between modes; no-publication states guide
+  the admin to publish rather than display drafts. No existing sidebar rewrite.
+- New read-only published snapshot API with fresh existing admin permissions/org
+  guard, current canonical statuses/prices, safe field allowlist and sanitized SVG in
+  one consistent response. Draft/archived/original assets and private transaction
+  records are not returned. No database migration or financial/domain writes.
+- Six status colors + distinct patterns/abbreviations/legend; labels scale with zoom.
+  Mouse wheel, drag, double-click, touch pan/pinch, +/− and fit controls; pointer-
+  anchored bounded camera, search centering/highlight/focus, reduced motion support.
+- Combined status/block/size/price/facing/corner filters, visible status counts, useful
+  exact-number/hidden/no-match/invalid-range messages. Official sizes convert into
+  calibrated filter units; major price inputs compare integer minor-unit amounts.
+- Instant local hover tooltip follows mouse and stays inside viewport; mobile tap,
+  click and Enter/Space pin read-only information with close/Escape focus return.
+  Official/calculated sources, dimensions, facing/corner, price and status shown.
+- Static memoized SVG scene and delegated events; hover/filter/zoom preserve plot
+  nodes. Background SVG inert; generated internal IDs only, no raw uploaded markup.
+  Roving keyboard stop, spatial arrows, labeled plot controls, hidden-filter focus
+  handling, responsive English/RTL layout, helpers and guide/API docs.
+- Counts/statuses reflect loaded canonical snapshot and filters; **Refresh published
+  map** fetches updates. Cross-user polling/SSE/toasts remain Phase E, not silently
+  implemented as part of C. Broader role/public map access also remains Phase E.
+
+### Verification
+
+- **32 new C unit/integration tests; 472/472 total across 16 files** pass; all
+  **138 plot-map A/B/C tests** pass. Coverage **92.84% statements, 93.76% lines,
+  84.01% branches, 98.39% functions**.
+- Browser flows cover hover and official/price values, filters/counts/refresh, search,
+  wheel/pan/zoom, spatial keyboard/Enter/Escape, real two-finger CDP touch pinch,
+  mobile tooltip bounds/no page overflow, project carry-over and empty states.
+- 1,000-plot browser fixture verifies unchanged SVG node identity/zero subtree child
+  mutation during hover/filter/zoom, zero hover detail reads, median local tooltip
+  render <100ms. No claim of a universal device SLA or completed Phase F load pass.
+- All six styles tested with an explicitly synthetic render DTO fixture; no later
+  booking/sale/resale workflows fabricated. Read model tests separately verify
+  real canonical state and permission/privacy/source immutability constraints.
+- Typecheck/production build pass, OpenAPI **57 routes / 102 operations**, static
+  Prisma/Compose validation pass; runtime npm audit **0 known vulnerabilities**.
+  Existing five high dev/build graph reports remain, not falsely claimed fixed.
+- **42/42 full browser regression tests pass**, including **6 new C browser
+  tests**; **1/1 separate production-policy browser smoke passes**. All run against
+  isolated seeded demo/empty production fixtures, never real business data.
+  Test artifacts, browser libraries and demo DBs ignored.
+
+### How to test / STOP
+
+`npm ci`, `npm run test:plot-maps`, `npm run dev`; sign in as admin, choose
+**Plot Map → Published map**. If needed first upload/calibrate/publish a sample in
+**Review & publish**. Hover/tap, search, combine filters, zoom/pan/pinch, keyboard
+navigate and refresh. Full manual/API/limits/isolation guide:
+**`docs/PLOT_MAP_PHASE_C.md`**. Existing synthetic preview DB preserved in place.
+
+**STOP after C.** No D booking/billing/CRM actions, E ownership/public-role privacy/
+live updates/expiry or F agent tools added. Feature PR stays draft and unmerged;
+await explicit “continue” after user testing before beginning D.
+
+Phase C preview refreshed on port 3000 using the preserved synthetic DB. Preview-
+Origin login, no-store published API and actual browser viewer/hover smoke pass:
+existing published version **10**, **8 plots**, **0 browser runtime errors**.
+
+## Interactive Plot Map — Phase D completed (2026-10-17)
+
+User authorized D with “continue”. Announced D-only scope and inspected existing
+schema/permissions/billing/CRM/documents before changes. No E/F started.
+
+### Delivered
+
+- Click/tap/Enter opens native accessible booking/private-detail dialog; published
+  plot/project/price locked, existing-client search or new name/phone/ID/email/address,
+  assignee, reserve/book, token request, office date/hold expiry, full/monthly payment
+  plan with exact schedule preview, notes and actual private ID/evidence uploads.
+- Shared strict browser/server structural and temporal validation. Positive current
+  canonical price and exact publication/price/currency guards. Stale map must refresh.
+- Transactional booking uses BEGIN IMMEDIATE, conditional available update and unique
+  active index; same-/cross-process two-writer races yield exactly one winner. UUID
+  payload-bound retries return original booking/PDFs without duplicating business rows.
+- Atomic real client/CRM lead link, billing-module token invoice, stored confirmation/
+  invoice PDF BLOBs + document metadata/uploads, real-actor audit and delivered in-app
+  notifications. Downstream failure rolls everything back. No placeholder services.
+- Existing rental invoice/deal mandatory FKs are not faked: separate plot buyer token
+  obligations/register, real CRM lead, zero fake leases/units/tenants/commissions.
+  No money received, receipt, revenue, ledger posting or refund is fabricated.
+- Authorized reserved/booked detail with revision-guarded confirm/extend/cancel and
+  required reason. Protected/legacy/stale/sold/owned records cannot be overwritten.
+  Cancellation retains source history/documents/CRM and cancels this unpaid invoice.
+- Private `/plots/{id}` page with booking history/actor activity, source-bound protected
+  downloads and **Rent & Payments → Plot token invoices**. Admin-only current scope;
+  no new public/portal/agent grant. C map still sends no booking identity or documents.
+- Modal focus trap/return, desktop/phone operation, instant local status/count updates
+  and conflict refresh; filtered-out bookings keep confirmation open, then focus canvas.
+  Existing hover/search/zoom/pan/pinch and 1,000-plot stable SVG regression retained.
+- Additive migration, Prisma/API/user-guide/decisions updates. Preserves real records;
+  no tracked DBs/large binary fixtures or financial demo writes in preserved preview.
+
+### Verified locally
+
+- **514/514 unit/integration tests, 17 files**; **42 new D cases**, **180 plot-map
+  A/B/C/D tests**. Coverage **92.90% statements / 93.78% lines / 84.55% branches /
+  98.46% functions**.
+- **47/47 full browser regressions**, including **5 new D workflows**. Real desktop
+  full lifecycle/upload/PDF/CRM/billing, competing browser submissions, phone/focus,
+  blocked/unpriced/register, stale publication and filtered-close focus scenarios.
+- Independent Node subprocesses additionally verify contention through one real
+  file-backed SQLite DB, beyond a same-event-loop Promise race. Financial preservation,
+  rollback, retry, legacy schema, org/role/file scope, Origin/quota/body limits tested.
+- Typecheck/production build, OpenAPI **62 routes / 108 operations**, static Prisma/
+  Compose validation and **1/1 separate production-policy browser smoke** pass.
+  Runtime audit **0 known vulnerabilities**; existing five high dev/build graph
+  reports are not represented as fixed. No Docker execution or physical-device SLA claim.
+
+### Run/test / STOP
+
+`npm ci`, `npm run test:plot-maps`, `npm run dev`; admin → **Plot Map → Published map**
+→ click a positive-priced available plot → reserve/book → inspect PDF/invoice/lead,
+confirm/extend/cancel and inspect activity. Phone uses tap. Full instructions and
+financial/privacy limits: **`docs/PLOT_MAP_PHASE_D.md`**.
+
+**STOP after D.** E public/agent per-role access/privacy, sold/resale ownership flows,
+automatic cross-user live updates and scheduled hold expiry remain unimplemented;
+F agent tools/performance acceptance remains separate. Same PR draft/unmerged;
+await explicit “continue” after D user testing.
+
+Phase D preview delivery: verified online backup saved to ignored
+`data/backups/before-plot-d-20261017.sqlite` before upgrade. Port 3000 restarted
+against the same preserved demo DB. Preview-Origin sign-in, publication v10/eight
+plots, hover → priced Plot 101 booking form → Escape/focus return pass, with **zero
+runtime browser errors and zero booking/business mutations in the preserved DB**.
+Read-only before/after comparison confirms original projects, units, leases,
+invoices, payments, receipts, ledger, owner statements, canonical plots, maps,
+geometries and existing client fields unchanged; SQLite FK check clean.

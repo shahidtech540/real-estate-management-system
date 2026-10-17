@@ -250,3 +250,49 @@ SHA-256 binds organization, run, ordinal, tool/version, exact input and source s
 - Prisma models document these structures; Node SQLite DDL is the active runtime.
   Administrator account linkage uses existing owner/tenant `user_id` columns and
   does not replace original domain or immutable financial tables.
+
+## Plot Map Phase A
+
+`properties` are reused as projects. New additive tables:
+`plot_map_settings`, `project_maps`, `project_map_assets`, `plots`,
+`map_plot_geometries`, `plot_bookings`, `plot_sales`, `plot_ownership_history`,
+`resale_listings`. Original/sanitized SVGs are private BLOB assets in the same DB;
+geometry is versioned independently of canonical plot identity and business history.
+Composite org/project constraints, scoped actor/customer reference checks, exact
+integer-minor-unit bounds and status audit triggers protect the new schema.
+The booking/sale/resale tables are foundations only in A; no transaction APIs yet.
+See `docs/PLOT_MAP_PHASE_A.md` for lifecycle/partial index and retention decisions.
+
+### Plot Map Phase B upgrade
+
+`project_maps` adds revision/published timestamp; `map_plot_geometries` adds review
+metadata, exclusion and nullable legacy fill rule; `plots` records explicit official
+area unit. `plot_area_settings` stores per-org display-unit/marla defaults, snapshotted
+into each calibrated map. Publish links geometry to stable plot identity; maps archive
+independently of booking/sale/ownership history. See `PLOT_MAP_PHASE_B.md` for compare-
+and-swap/preservation rules; no future transaction actions are implied.
+
+
+## Interactive Plot Map — Phase D additive model
+
+`clients.address` optional. `plot_bookings` adds UUID request key/payload hash, original
+request booking type, revision, agreed minor-unit total and publication ID; legacy
+NULL fields remain legacy, not inferred financial state. Request uniqueness is
+(org,creator,key); active booking uniqueness remains the existing partial index.
+
+```mermaid
+erDiagram
+  PLOTS ||--o{ PLOT_BOOKINGS : stable_identity
+  CLIENTS ||--o{ PLOT_BOOKINGS : buyer
+  LEADS ||--o{ PLOT_BOOKINGS : crm_link
+  PLOT_BOOKINGS ||--o| PLOT_TOKEN_INVOICES : unpaid_token_request
+  PLOT_BOOKINGS ||--o{ PLOT_BOOKING_FILES : private_actual_bytes
+  DOCUMENTS ||--o| PLOT_BOOKING_FILES : scoped_catalogue
+```
+
+`plot_token_invoices` belongs to the existing billing module but deliberately not the
+rental lease/tenant/unit invoice table. `plot_booking_files` stores real BLOBs with
+org-scoped booking/document/creator FKs. Both tables have audit metadata; integer money
+checks, unique invoice/booking links, status audit trigger and protected file downloads.
+No rental/ledger/sale/ownership schema is repurposed or fictional source record added.
+See [D guide](PLOT_MAP_PHASE_D.md) for limits and transaction/privacy semantics.

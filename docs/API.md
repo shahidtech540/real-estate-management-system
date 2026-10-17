@@ -1,7 +1,7 @@
-# API usage — Phase 8
+# API usage — portals and plot maps
 
-[`openapi.json`](openapi.json) is a route-complete OpenAPI 3.0.3 inventory of 50
-implemented routes / 91 operations, with typed Phase 8 portal inputs/responses.
+[`openapi.json`](openapi.json) is a route-complete OpenAPI 3.0.3 inventory of 62
+implemented routes / 108 operations, with typed Phase 8 portal inputs/responses.
 Legacy operation payloads/action variants are documented in Phases 3–7 guides;
 the inventory deliberately does not invent strict complete schemas for old DTOs.
 `npm run validate:api` checks every documented route/method against implementation,
@@ -71,3 +71,33 @@ Body limit 1 MiB (agent routes 64 KB). 400 invalid, 401 no/revoked session, 403 
 scope/origin, 404 authorized source absent, 409 final/stale consent, 413 oversized,
 429 quota. `Retry-After:900` is a conservative fixed-window retry hint, not an exact
 remaining-time meter. See [Phase 8 controls/limits](PHASE8.md).
+
+
+## Plot Map Phase A
+
+Admin-only raw SVG upload, version/diff queries, per-project pattern settings and
+sandboxed sanitized download are documented in [the Phase A API/testing guide](PLOT_MAP_PHASE_A.md).
+The dedicated SVG upload limit is 10 MiB; generic JSON limits remain unchanged.
+
+
+## Plot Map Phase B
+
+Revision-checked draft review/calibration/geometry repair, CSV exchange and validated
+identity-preserving publication: [Phase B API and user guide](PLOT_MAP_PHASE_B.md).
+All remain administrator-only; no public/booking API is implied.
+
+
+## Plot Map Phase C
+
+Administrator-only `GET /api/v1/properties/{projectId}/plot-maps/viewer` returns a
+coherent published sanitized SVG and safe canonical plot snapshot. No draft/original
+assets or booking/owner data. See [Phase C guide](PLOT_MAP_PHASE_C.md).
+
+
+## Plot Map Phase D
+
+Private admin plot details/options, transactional booking POST and revision-CAS
+confirm/cancel/extend PATCH, scoped attachment download and separate billing token
+register are documented in [Phase D](PLOT_MAP_PHASE_D.md). Five new routes/six
+operations; no fake rental records or asserted payments. Booking POST alone allows
+streamed 6 MiB JSON for two ≤2MiB private files; other routes retain 1MiB.
