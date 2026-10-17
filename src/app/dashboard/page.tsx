@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { PlotMapWorkspace } from "@/components/PlotMapWorkspace";
 import { OrchestrationWorkspace } from "@/components/OrchestrationWorkspace";
 import { AccountingWorkspace } from "@/components/AccountingWorkspace";
 
@@ -283,6 +284,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [demoEnabled,setDemoEnabled]=useState(false);
   const [activeTab, setActiveTab] = useState<
+    | "plot-map"
     | "overview"
     | "listings"
     | "crm"
@@ -303,6 +305,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [branches, setBranches] = useState<BranchItem[]>([]);
   useEffect(() => {
+    if(user && activeTab === "plot-map" && (user.role.slug !== "admin" || !user.permissions.includes("admin:manage") || !user.permissions.includes("properties:write"))) setActiveTab("overview");
     if(user && activeTab === "orchestration" && !user.permissions.includes("agents:read")) setActiveTab("overview");
     if(user && activeTab === "accounting" && !user.permissions.includes("accounting:read")) setActiveTab("overview");
     if (user && activeTab === "maintenance" && !user.permissions.includes("maintenance:read")) {
@@ -905,6 +908,7 @@ export default function DashboardPage() {
   const isRtl = locale === "ur";
 
   const workspaceTabs = [
+    ...(user.role.slug === "admin" && user.permissions.includes("admin:manage") && user.permissions.includes("properties:write") ? [{id:"plot-map",label:"Plot Map",icon:MapPin}] : []),
     { id: "overview", label: t(locale, "overview"), icon: Building2 },
     { id: "listings", label: t(locale, "listingsTab"), icon: Sparkles },
     { id: "crm", label: t(locale, "crmTab"), icon: Users },
@@ -1600,6 +1604,7 @@ export default function DashboardPage() {
 
         {activeTab === "tenancy" && <TenancyWorkspace permissions={user.permissions} locale={locale} units={units} onRefresh={() => { fetchPortfolio(); fetchAudit(auditFilter); }} />}
         {activeTab === "billing" && <BillingWorkspace permissions={user.permissions} locale={locale} onRefresh={() => { fetchMe(); fetchAudit(auditFilter); }} />}
+        {activeTab === "plot-map" && user.role.slug === "admin" && user.permissions.includes("admin:manage") && user.permissions.includes("properties:write") && <PlotMapWorkspace key={user.id} />}
         {activeTab === "orchestration" && <OrchestrationWorkspace key={user.id} userId={user.id} locale={locale} permissions={user.permissions} />}
         {activeTab === "accounting" && <AccountingWorkspace key={user.id} locale={locale} permissions={user.permissions} />}
         {activeTab === "maintenance" && <MaintenanceWorkspace key={user.id} permissions={user.permissions} locale={locale} roleSlug={user.role.slug} />}

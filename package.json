@@ -30,7 +30,7 @@
     "audit:production": "npm audit --omit=dev --audit-level=moderate",
     "validate:api": "node scripts/validate-openapi.cjs",
     "test:e2e:production": "playwright test --config=playwright.production.config.ts",
-    "test:plot-maps": "vitest run tests/plot-maps.test.ts",
+    "test:plot-maps": "vitest run tests/plot-maps.test.ts tests/plot-map-review.test.ts",
     "plot-maps:sample": "tsx scripts/plot-map-sample.ts"
   },
   "dependencies": {
@@ -41,6 +41,7 @@
     "lucide-react": "^0.468.0",
     "next": "15.5.28",
     "pdf-lib": "^1.17.1",
+    "polygon-clipping": "^0.15.7",
     "re2js": "^2.8.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

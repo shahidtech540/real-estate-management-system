@@ -20,7 +20,7 @@ Recommended structure:
   Use `data-plot-number` for identifiers that differ from a designer's internal ID.
 - Do not put other independently numbered plots inside a numbered plot group.
 - Separate roads, parks, boundary, compass, legends and titles into named layers.
-  Those layers are ignored automatically; manual overrides arrive in Phase B.
+  Those layers are ignored automatically; manual overrides are available in the Phase B review.
 - Without identifiers, leave plot labels as text (not outlined letters) with x/y
   anchors inside the correct shape. Labels on shared edges or outside a plot are
   ambiguous; the detector deliberately reports unmatched labels.
@@ -42,4 +42,4 @@ Recommended structure:
 
 Try the three `samples/plots-*.svg` fixtures first; each contains eight synthetic
 lots. They demonstrate explicit attributes/groups, text-only matching, and nested
-transforms/curves/compound holes respectively. See `PLOT_MAP_PHASE_A.md` for testing.
+transforms/curves/compound holes respectively. See `PLOT_MAP_PHASE_B.md` for current review/calibration/publish testing.

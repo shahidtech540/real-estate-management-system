@@ -98,6 +98,43 @@ export function migratePlotMaps(db: DatabaseSync) {
     db.exec(
       `CREATE TRIGGER IF NOT EXISTS ${table}_${column}_audit AFTER UPDATE OF ${column} ON ${table} WHEN OLD.${column}!=NEW.${column} BEGIN INSERT INTO audit_logs(id,organization_id,actor_user_id,action,entity_type,entity_id,metadata_json,created_at,updated_at,created_by) VALUES('aud_map_'||lower(hex(randomblob(16))),NEW.organization_id,NULL,'${table}.${column}.changed','${table}',NEW.id,json_object('from',OLD.${column},'to',NEW.${column},'source','database trigger'),strftime('%Y-%m-%dT%H:%M:%fZ','now'),strftime('%Y-%m-%dT%H:%M:%fZ','now'),NEW.created_by); END;`,
     );
+  // Phase B: additive columns also upgrade databases created during Phase A.
+  for (const [table, definitions] of Object.entries({
+    plots: ["area_unit TEXT"],
+    project_maps: ["revision INTEGER NOT NULL DEFAULT 0", "published_at TEXT"],
+    map_plot_geometries: [
+      "excluded INTEGER NOT NULL DEFAULT 0 CHECK(excluded IN (0,1))",
+      "review_json TEXT NOT NULL DEFAULT '{}'",
+      "fill_rule TEXT",
+    ],
+  }))
+    for (const definition of definitions) {
+      const name = definition.split(" ")[0];
+      if (
+        !db
+          .prepare(`PRAGMA table_info(${table})`)
+          .all()
+          .some((c) => c.name === name)
+      )
+        db.exec(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
+    }
+  db.exec(`CREATE TABLE IF NOT EXISTS plot_area_settings (
+    organization_id TEXT PRIMARY KEY REFERENCES organizations(id),
+    area_unit TEXT NOT NULL DEFAULT 'marla' CHECK(area_unit IN ('sqft','sqm','marla','kanal')),
+    marla_sqft REAL NOT NULL DEFAULT 272.25 CHECK(marla_sqft>0 AND marla_sqft<=10000),
+    created_at TEXT NOT NULL, updated_at TEXT NOT NULL, created_by TEXT NOT NULL,
+    FOREIGN KEY(organization_id,created_by) REFERENCES users(organization_id,id)
+  );`);
+  if (
+    !db
+      .prepare("PRAGMA table_info(plot_area_settings)")
+      .all()
+      .some((c) => c.name === "created_at")
+  )
+    db.exec("ALTER TABLE plot_area_settings ADD COLUMN created_at TEXT");
+  db.exec(
+    "UPDATE plot_area_settings SET created_at=updated_at WHERE created_at IS NULL",
+  );
   const references: Record<string, Record<string, string>> = {
     plot_bookings: {
       client_id: "clients",

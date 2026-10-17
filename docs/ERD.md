@@ -262,3 +262,12 @@ Composite org/project constraints, scoped actor/customer reference checks, exact
 integer-minor-unit bounds and status audit triggers protect the new schema.
 The booking/sale/resale tables are foundations only in A; no transaction APIs yet.
 See `docs/PLOT_MAP_PHASE_A.md` for lifecycle/partial index and retention decisions.
+
+### Plot Map Phase B upgrade
+
+`project_maps` adds revision/published timestamp; `map_plot_geometries` adds review
+metadata, exclusion and nullable legacy fill rule; `plots` records explicit official
+area unit. `plot_area_settings` stores per-org display-unit/marla defaults, snapshotted
+into each calibrated map. Publish links geometry to stable plot identity; maps archive
+independently of booking/sale/ownership history. See `PLOT_MAP_PHASE_B.md` for compare-
+and-swap/preservation rules; no future transaction actions are implied.

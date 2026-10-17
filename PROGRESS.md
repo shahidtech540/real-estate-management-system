@@ -398,3 +398,72 @@ HTTP. All map content is still draft/admin-only; there is **no Plot Map UI yet**
 
 **STOP after Phase A for user testing. Phase B is calibration, measurements, review,
 CSV and publishing; do not begin it or merge the feature branch without authorization.**
+
+## Interactive Plot Map — Phase B completed (2026-10-17)
+
+User authorized B with “continue” after the Phase A checkpoint. Plan summarized
+before edits; worked only on `arena/3203e4be-real-estate-management-system`.
+
+### Delivered
+
+- New **Plot Map** administrator workspace in existing desktop/mobile dashboard
+  navigation: project/version selection, raw SVG upload, advanced pattern setting,
+  sanitized SVG + highlighted candidate overlays and editable review table.
+- Ratio/two-point feet/meters calibration; configurable org marla/kanal/display-area
+  defaults with per-map snapshots, real area and longest-edge-oriented approximate
+  dimensions, optional bounded road-facing/adjacent-corner hints. Official override
+  values stay separate and explicit area/price units survive later recalibration.
+- Assign/fix numbers, restore/exclude nonplots (including road-layer overrides),
+  bulk official block/phase/street/area/dimensions/facing/corner/category/price/status.
+  Merge by polygon union and split along chosen X/Y coordinate, preserving holes
+  and creating real internal SVG outline IDs. Unsafe hidden definitions are denied.
+- Strict UTF-8 CSV/Excel Save-As-CSV import/export, plot-number matching, quoted
+  multiline parsing, formula-safe export, integer money, whole-batch rollback.
+- Live review validation/diff: duplicates/missing numbers, calibration, source
+  diagnostics, area outliers, true overlaps (not touching edges), protected removal
+  and bounded-comparison checks. Warning acceptance requires an audited reason.
+- Revision-checked edits and atomic publish with published-baseline compare-and-swap;
+  prior map archived. Canonical plot identity/bookings/sales/ownership/resale and
+  unmentioned official data preserved; explicit draft overrides apply. Protected
+  removals/renumbering/status replacement are blocked; unused removed plots are
+  soft-archived only after explicit acknowledgment. Published versions read-only.
+- Additive migration upgrades Phase A DBs, including legacy hole interpretation;
+  Prisma design/ERD/API/OpenAPI and README/user/designer guides updated. No unrelated
+  source unit/lease/invoice/ledger changes or destructive migration.
+
+### Verification
+
+- **61 new B tests**, **440/440 unit/integration tests across 15 files** pass;
+  all **106 plot-map A+B tests** pass. Full coverage: **92.73% statements,
+  93.67% lines, 83.93% branches, 98.35% functions**.
+- All three SVG samples calibrate/publish 8 plots each. A 1,000-plot fixture can
+  upload/review/calibrate/publish exactly 1,000 (~1.37s locally for that test), not
+  a claim of completed Phase F interactive/concurrent performance acceptance.
+- Tests cover stale edits/baselines, permissions/cross-org, protected bookings/sales/
+  ownership/resale surviving reupload, official-vs-calculated values/units, legacy
+  Phase A holes, merge/split/overlap, CSV atomic failure/formulas, status and money
+  restrictions, immutable publications, archives/identity reuse and audit trails.
+- Production build, typecheck, OpenAPI **56 routes / 101 operations**, static Prisma/
+  Compose validation pass. Runtime dependency audit **0 vulnerabilities**; existing
+  five high build/dev graph advisories are not represented as fixed.
+- **36/36 full browser regression tests pass** on an isolated new demo DB, including
+  3 new Phase B flows: upload/fix/calibration/official/CSV/publish + mobile layout;
+  role denial; two-point picks + split/merge + switching projects without stale UI.
+  Exact calibration math tested separately from browser pointer-pixel approximation.
+- Separate production-mode browser smoke also passes (1/1): no demo credentials
+  or financial fixtures; secure session and production response policies preserved.
+- Node 22.22.3, Next production server, local Chromium 133 via temporary npm browser
+  harness. No browser binaries, test DBs, reports, screenshots or caches committed.
+  Existing preview DB is preserved and upgraded, never deleted or replaced.
+
+### How to test / STOP
+
+`npm ci`, `npm run test:plot-maps`, `npm run dev`; sign in as demo admin, select
+**Plot Map**, upload any `samples/plots-*.svg`, calibrate, correct/review, optionally
+import CSV, inspect diff/accept warnings and publish. The full walkthrough, units,
+Excel instructions, preservation rules, API examples and browser-test isolation are
+in **`docs/PLOT_MAP_PHASE_B.md`**. Node 22.22.3+ in the 22.x series is recommended.
+
+**STOP after Phase B.** No Phase C visitor interactions/status colors/zoom/pan/hover
+map, Phase D bookings/billing, later privacy/live updates or agent hooks implemented.
+Feature PR remains draft/unmerged; await explicit “continue” after user testing.

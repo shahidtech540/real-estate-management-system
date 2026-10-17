@@ -1,3 +1,5 @@
+import clipping from "polygon-clipping";
+import { polygons, fromPolygons } from "./measurements";
 import { createHash } from "node:crypto";
 import { RE2JS } from "re2js";
 import { HttpError } from "@/server/auth/guards";
@@ -101,7 +103,8 @@ export function detectPlots(source: string, pattern = DEFAULT_PLOT_PATTERN) {
   for (const el of doc.querySelectorAll("path,polygon,rect,polyline")) {
     if (ignored(el)) continue;
     try {
-      const g = shapeGeometry(el);
+      const raw = shapeGeometry(el);
+      const g = raw && raw.rings.length > 1 ? fromPolygons(polygons(raw)) : raw;
       if (g) {
         points += g.rings.reduce((n, r) => n + r.length, 0);
         if (points > 100000 || shapes.size >= 5000)
@@ -166,7 +169,15 @@ export function detectPlots(source: string, pattern = DEFAULT_PLOT_PATTERN) {
         : [el];
     const g =
       el.localName === "g"
-        ? measure(children.flatMap((s) => shapes.get(s)?.rings || []))
+        ? (() => {
+            const parts = children.flatMap((s) => {
+              const g = shapes.get(s);
+              return g ? [polygons(g)] : [];
+            });
+            return parts.length
+              ? fromPolygons(clipping.union(parts[0], ...parts.slice(1)))
+              : null;
+          })()
         : shapes.get(el);
     if (!g) {
       warnings.push({

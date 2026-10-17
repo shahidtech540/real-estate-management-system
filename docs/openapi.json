@@ -4495,6 +4495,448 @@
         }
       }
     },
+    "/api/v1/properties/{id}/plot-maps/{mapId}/csv": {
+      "get": {
+        "operationId": "get__api_v1_properties_id_plot_maps_mapId_csv",
+        "summary": "GET /api/v1/properties/{id}/plot-maps/{mapId}/csv",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "UTF-8 BOM CSV attachment; spreadsheet formula starts escaped, integer minor-unit prices.",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_v1_properties_id_plot_maps_mapId_csv",
+        "summary": "POST /api/v1/properties/{id}/plot-maps/{mapId}/csv",
+        "description": "Implemented handler. Legacy domain DTO details and action variants are in the linked phase guides. This inventory does not falsely claim strict schemas for every historical endpoint.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "409": {
+            "description": "Stale revision or read-only map."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "revision",
+                  "csv"
+                ],
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "csv": {
+                    "type": "string",
+                    "description": "UTF-8 CSV <=950 KB and <=5,000 rows; JSON envelope <=1 MiB. Match plot_number to exactly one active candidate. Atomic import."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/properties/{id}/plot-maps/{mapId}/publish": {
+      "post": {
+        "operationId": "post__api_v1_properties_id_plot_maps_mapId_publish",
+        "summary": "POST /api/v1/properties/{id}/plot-maps/{mapId}/publish",
+        "description": "Atomic validated publish with explicit keep-data, warning acceptance, removal acknowledgment, revision and published-baseline checks. Preserves canonical identity/history; previous map archived. No booking/sale creation or financial writes.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "409": {
+            "description": "Stale revision/published baseline or read-only map."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "revision",
+                  "baselineMapId",
+                  "keepExistingData",
+                  "acceptWarnings",
+                  "acknowledgeRemoved"
+                ],
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "baselineMapId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "keepExistingData": {
+                    "type": "boolean"
+                  },
+                  "acceptWarnings": {
+                    "type": "boolean"
+                  },
+                  "warningReason": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "description": "At least 3 trimmed characters when accepting warnings."
+                  },
+                  "acknowledgeRemoved": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/properties/{id}/plot-maps/{mapId}/review": {
+      "get": {
+        "operationId": "get__api_v1_properties_id_plot_maps_mapId_review",
+        "summary": "GET /api/v1/properties/{id}/plot-maps/{mapId}/review",
+        "description": "Admin-only full draft review: revision, scale/defaults, candidate geometry, official overrides, source shape inventory, validation and fresh published baseline diff.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_v1_properties_id_plot_maps_mapId_review",
+        "summary": "PATCH /api/v1/properties/{id}/plot-maps/{mapId}/review",
+        "description": "Revision-checked draft-only action: calibrate, assign, exclude, bulk, merge, split. No business records change until publish. Stale edits/read-only versions return 409.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "previewHeader": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful JSON response or protected export (per domain guide)."
+          },
+          "400": {
+            "description": "Malformed/invalid or unsupported request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication missing, expired or revoked."
+          },
+          "403": {
+            "description": "Permission, identity scope or origin denied."
+          },
+          "404": {
+            "description": "Authorized record not found."
+          },
+          "409": {
+            "description": "Stale revision or map is already published/archived."
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB (agent endpoints 64 KB)."
+          },
+          "429": {
+            "description": "Fixed-window request quota exhausted; Retry-After: 900."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action",
+                  "revision"
+                ],
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "calibrate",
+                      "assign",
+                      "exclude",
+                      "bulk",
+                      "merge",
+                      "split"
+                    ]
+                  }
+                },
+                "additionalProperties": true,
+                "description": "Action fields and strict validated DTO examples in docs/PLOT_MAP_PHASE_B.md."
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/properties/{id}/plot-maps/{mapId}": {
       "get": {
         "operationId": "get__api_v1_properties_id_plot_maps_mapId_",

@@ -189,6 +189,81 @@ mapSvg.responses["200"] = {
   description: "Sanitized SVG attachment",
   content: { "image/svg+xml": { schema: { type: "string" } } },
 };
+// Phase B administrator review contract (separate from Phase C visitor map).
+const reviewPath = paths["/api/v1/properties/{id}/plot-maps/{mapId}/review"];
+reviewPath.get.description =
+  "Admin-only full draft review: revision, scale/defaults, candidate geometry, official overrides, source shape inventory, validation and fresh published baseline diff.";
+reviewPath.patch.description =
+  "Revision-checked draft-only action: calibrate, assign, exclude, bulk, merge, split. No business records change until publish. Stale edits/read-only versions return 409.";
+reviewPath.patch.responses["409"] = {
+  description: "Stale revision or map is already published/archived.",
+};
+reviewPath.patch.requestBody.content["application/json"].schema = {
+  type: "object",
+  required: ["action", "revision"],
+  properties: {
+    revision: { type: "integer", minimum: 0 },
+    action: {
+      type: "string",
+      enum: ["calibrate", "assign", "exclude", "bulk", "merge", "split"],
+    },
+  },
+  additionalProperties: true,
+  description:
+    "Action fields and strict validated DTO examples in docs/PLOT_MAP_PHASE_B.md.",
+};
+const csvPath = paths["/api/v1/properties/{id}/plot-maps/{mapId}/csv"];
+csvPath.get.responses["200"] = {
+  description:
+    "UTF-8 BOM CSV attachment; spreadsheet formula starts escaped, integer minor-unit prices.",
+  content: { "text/csv": { schema: { type: "string" } } },
+};
+csvPath.post.requestBody.content["application/json"].schema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["revision", "csv"],
+  properties: {
+    revision: { type: "integer", minimum: 0 },
+    csv: {
+      type: "string",
+      description:
+        "UTF-8 CSV <=950 KB and <=5,000 rows; JSON envelope <=1 MiB. Match plot_number to exactly one active candidate. Atomic import.",
+    },
+  },
+};
+csvPath.post.responses["409"] = {
+  description: "Stale revision or read-only map.",
+};
+const publishPath =
+  paths["/api/v1/properties/{id}/plot-maps/{mapId}/publish"].post;
+publishPath.description =
+  "Atomic validated publish with explicit keep-data, warning acceptance, removal acknowledgment, revision and published-baseline checks. Preserves canonical identity/history; previous map archived. No booking/sale creation or financial writes.";
+publishPath.requestBody.content["application/json"].schema = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "revision",
+    "baselineMapId",
+    "keepExistingData",
+    "acceptWarnings",
+    "acknowledgeRemoved",
+  ],
+  properties: {
+    revision: { type: "integer", minimum: 0 },
+    baselineMapId: { type: "string", nullable: true },
+    keepExistingData: { type: "boolean" },
+    acceptWarnings: { type: "boolean" },
+    warningReason: {
+      type: "string",
+      maxLength: 1000,
+      description: "At least 3 trimmed characters when accepting warnings.",
+    },
+    acknowledgeRemoved: { type: "boolean" },
+  },
+};
+publishPath.responses["409"] = {
+  description: "Stale revision/published baseline or read-only map.",
+};
 const spec = {
   openapi: "3.0.3",
   info: {

@@ -1,7 +1,7 @@
 # API usage — Phase 8
 
-[`openapi.json`](openapi.json) is a route-complete OpenAPI 3.0.3 inventory of 53
-implemented routes / 96 operations, with typed Phase 8 portal inputs/responses.
+[`openapi.json`](openapi.json) is a route-complete OpenAPI 3.0.3 inventory of 56
+implemented routes / 101 operations, with typed Phase 8 portal inputs/responses.
 Legacy operation payloads/action variants are documented in Phases 3–7 guides;
 the inventory deliberately does not invent strict complete schemas for old DTOs.
 `npm run validate:api` checks every documented route/method against implementation,
@@ -78,3 +78,10 @@ remaining-time meter. See [Phase 8 controls/limits](PHASE8.md).
 Admin-only raw SVG upload, version/diff queries, per-project pattern settings and
 sandboxed sanitized download are documented in [the Phase A API/testing guide](PLOT_MAP_PHASE_A.md).
 The dedicated SVG upload limit is 10 MiB; generic JSON limits remain unchanged.
+
+
+## Plot Map Phase B
+
+Revision-checked draft review/calibration/geometry repair, CSV exchange and validated
+identity-preserving publication: [Phase B API and user guide](PLOT_MAP_PHASE_B.md).
+All remain administrator-only; no public/booking API is implied.

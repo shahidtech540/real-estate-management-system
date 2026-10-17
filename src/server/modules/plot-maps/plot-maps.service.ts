@@ -7,13 +7,13 @@ import { freshContext } from "../orchestration/orchestration.service";
 import { atomic, newId, nowIso, valid } from "../shared/domain";
 import { recordAuditLog } from "../audit/audit.service";
 import { compilePattern, DEFAULT_PLOT_PATTERN, detectPlots } from "./detect";
-function access(ctx: JwtPayload, projectId: string) {
+export function access(ctx: JwtPayload, projectId: string) {
   ctx = freshContext(ctx.organizationId, ctx.sub);
   if (ctx.roleSlug !== "admin")
     throw new HttpError(
       403,
       "PLOT_MAP_ADMIN",
-      "Phase A map ingestion is administrator-only.",
+      "Map administration is administrator-only.",
     );
   requirePermission(ctx, "admin:manage");
   requirePermission(ctx, "properties:write");
@@ -144,7 +144,7 @@ export function uploadMap(ctx: JwtPayload, projectId: string, source: string) {
       JSON.stringify({
         plotNumberPattern: pattern,
         curveSamples: 32,
-        geometryVersion: 1,
+        geometryVersion: 2,
       }),
       JSON.stringify(report),
       JSON.stringify(diff),
@@ -161,7 +161,7 @@ export function uploadMap(ctx: JwtPayload, projectId: string, source: string) {
         "INSERT INTO project_map_assets(organization_id,map_id,kind,content,created_at,created_by) VALUES(?,?,?,?,?,?)",
       ).run(ctx.organizationId, id, kind, Buffer.from(content), now, ctx.sub);
     const insert = db.prepare(
-      "INSERT INTO map_plot_geometries(id,organization_id,project_id,map_id,plot_number,svg_element_id,detection_method,confidence,polygon_points,centroid,bounding_box,area_svg,geometry_hash,created_at,updated_at,created_by) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO map_plot_geometries(id,organization_id,project_id,map_id,plot_number,svg_element_id,detection_method,confidence,polygon_points,centroid,bounding_box,area_svg,geometry_hash,created_at,updated_at,created_by,fill_rule) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
     );
     for (const p of result.plots)
       insert.run(
@@ -181,6 +181,7 @@ export function uploadMap(ctx: JwtPayload, projectId: string, source: string) {
         now,
         now,
         ctx.sub,
+        p.geometry.fillRule,
       );
     recordAuditLog({
       organizationId: ctx.organizationId,
@@ -260,15 +261,13 @@ export function getMap(
     page: q.page,
     limit: q.limit,
     hasMore: rows.length > q.limit,
-    plots: rows
-      .slice(0, q.limit)
-      .map((p) => ({
-        ...p,
-        area_svg: Number(p.area_svg),
-        polygon_points: JSON.parse(String(p.polygon_points)),
-        centroid: JSON.parse(String(p.centroid)),
-        bounding_box: JSON.parse(String(p.bounding_box)),
-      })),
+    plots: rows.slice(0, q.limit).map((p) => ({
+      ...p,
+      area_svg: Number(p.area_svg),
+      polygon_points: JSON.parse(String(p.polygon_points)),
+      centroid: JSON.parse(String(p.centroid)),
+      bounding_box: JSON.parse(String(p.bounding_box)),
+    })),
   };
 }
 export function sanitizedMap(

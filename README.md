@@ -166,11 +166,13 @@ build graph still has five documented high Tailwind/braces advisory reports.
 **Stopping at Phase 8; no PR merge or next phase without authorization.**
 
 
-## Interactive Plot Map — Phase A
+## Interactive Plot Map — Phases A & B
 
-Backend/schema/upload/detection is available; **no Plot Map dashboard UI yet**.
-Admin uploads create private, versioned draft candidates and a diff, never bookings
-or published inventory. Existing units, contracts and money remain unchanged.
+Phase A ingestion and **Phase B administrator review/publish UI** are available.
+Select **Plot Map** in the dashboard as an administrator.
+Admin uploads create private, versioned draft candidates and a diff. Calibration,
+number/geometry repair, official overrides and CSV exchange stay draft until explicit
+validated publication. Existing units, contracts, booking history and money remain unchanged.
 
 ```bash
 npm ci
@@ -179,7 +181,9 @@ npm run plot-maps:sample -- prop_1 samples/plots-explicit.svg
 ```
 
 Try all three `samples/plots-*.svg` fixtures (eight plots each). See
-[Phase A testing/API guide](docs/PLOT_MAP_PHASE_A.md) and
+[Phase B review/publish walkthrough](docs/PLOT_MAP_PHASE_B.md),
+[Phase A upload/API guide](docs/PLOT_MAP_PHASE_A.md) and
 [SVG preparation guide](docs/SVG_PREPARATION.md). Node 22.22.3 is tested; the new SVG
 sanitizer DOM requires at least 22.22.2 in that series. Review/calibration/publishing
-is Phase B and awaits authorization after you test Phase A.
+is implemented in Phase B. Visitor interactions/zoom/pan/tooltips are Phase C and
+await authorization after you test Phase B.

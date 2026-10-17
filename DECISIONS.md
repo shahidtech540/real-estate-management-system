@@ -354,3 +354,46 @@ This header is never attached to external URLs and never placed in query strings
   Runtime Next externalizes jsdom/DOMPurify to preserve their package loading.
 - Later-transaction schema fields do not imply implemented money, CRM, notifications,
   bookings, hold expiry, sale/resale or agent tools. Stop at the Phase A boundary.
+
+## Interactive Plot Map — Phase B (2026-10-17)
+
+- User's “continue” authorizes B only. Add `PlotMapWorkspace` to existing dashboard,
+  administrator navigation and server-fresh admin/manage/property-write guard. No
+  new visitor/public endpoints, Phase C map tools, booking/billing or agent work.
+- Additive Phase A upgrade: map revision/published time, candidate exclusion/review
+  JSON/fill rule, explicit official area unit, per-org area defaults. No data reset.
+  Legacy Phase A holes infer fill rule from stored filled area when rule was absent.
+- Calibration is ratio or two distinct SVG points + known feet/meters distance.
+  Default marla is 272.25 sq ft, configurable, kanal=20 marla. Org display defaults
+  are reused for future maps, while calibration remains a map-specific snapshot.
+  Official/price units bind when entered; display recalibration does not relabel them.
+- Longest-edge-oriented extents and edge lengths are calculated approximations;
+  optional nearby parallel roads infer adjacent-side corner, facing only if north-up
+  is declared. Ambiguous/complex road cases remain unknown; official values separate.
+- `polygon-clipping` normalizes compound/group fills (including child hole rules),
+  then handles overlap diagnostics, union merges and
+  vertical/horizontal SVG-axis splits with holes. Edited outlines get actual safe
+  generated SVG path IDs; source originals remain immutable private BLOBs. Split
+  official area/dimensions/total/corner/facing/status are cleared, not duplicated.
+- CSV UTF-8 is the Excel exchange (Save As CSV); not claiming native XLSX. Strict
+  named headers, exact unique plot-number matching, blank=no change, whole-batch
+  rollback, integer minor money and formula-safe export. Clear overrides via UI/API.
+- All writes require revision compare-and-swap under BEGIN IMMEDIATE; publish also
+  compares the currently published baseline. No last-writer-wins silent overwrites.
+  Published/archived review is read-only, prior publication archived atomically.
+- Keep existing data defaults true; preserve stable canonical IDs, financial/booking/
+  sale/ownership/resale references. Explicit draft metadata overrides apply on publish.
+  Replacing metadata is allowed only for unencumbered plots, never replacing identity.
+  Protected removals/renumbering/merge/split are blocked; unencumbered removals require
+  diff acknowledgment and soft archive. Booking/sale statuses cannot be fabricated
+  through review/CSV. Source leases/units/invoices/ledger remain untouched.
+- Duplicate/missing numbers, calibration, protected removals and overlap-comparison
+  budget are blocking. Geometry/source warnings require explicit audited acceptance
+  reason; bounded diagnostics include truncation summaries. Acceptance never bypasses
+  blocking business or tenant-integrity checks.
+- New review/CSV/publish operation quotas are 60/user/org/15min. Phase A raw SVG limit
+  and 20-upload quota remain unchanged. Assets stay private and SVG sandbox CSP stays
+  intact; only trusted, server-sanitized bytes reach the review markup rendering sink.
+- Testing uses isolated seeded demo databases. Preview remains the previously labeled
+  synthetic file; this does not restore absent business history. Stop for user testing
+  after B, keep the existing feature PR draft/unmerged, await C authorization.

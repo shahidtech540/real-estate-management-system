@@ -1180,6 +1180,8 @@ model PlotMapSetting {
 }
 
 model ProjectMap {
+  revision Int @default(0)
+  publishedAt DateTime? @map("published_at")
   id String @id
   organizationId String @map("organization_id")
   projectId String @map("project_id")
@@ -1222,6 +1224,7 @@ model Plot {
   block String?
   phase String?
   street String?
+  areaUnit String? @map("area_unit")
   areaOfficial Float? @map("area_official")
   dimensionsOfficial String? @map("dimensions_official")
   facing String?
@@ -1244,6 +1247,9 @@ model Plot {
 }
 
 model MapPlotGeometry {
+  excluded Boolean @default(false)
+  reviewJson Json @map("review_json")
+  fillRule String? @map("fill_rule")
   id String @id
   organizationId String @map("organization_id")
   projectId String @map("project_id")
@@ -1279,6 +1285,7 @@ model PlotBooking {
   currency String @default("PKR")
   paymentPlan Json @map("payment_plan")
   bookingDate DateTime @map("booking_date")
+  closedAt DateTime? @map("closed_at")
   expiryDate DateTime? @map("expiry_date")
   status String
   notes String?
@@ -1336,4 +1343,15 @@ model ResaleListing {
   createdBy String @map("created_by")
   updatedAt DateTime @updatedAt @map("updated_at")
   @@map("resale_listings")
+}
+
+// Per-organization defaults are snapshotted into each map calibration.
+model PlotAreaSetting {
+  createdAt DateTime @default(now()) @map("created_at")
+  organizationId String @id @map("organization_id")
+  areaUnit String @default("marla") @map("area_unit")
+  marlaSqft Float @default(272.25) @map("marla_sqft")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String @map("created_by")
+  @@map("plot_area_settings")
 }
